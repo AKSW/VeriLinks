@@ -1,5 +1,6 @@
-#Thu Sep 02 10:55:28 CEST 2010
+#Wed Oct 24 21:01:29 CEST 2012
 eclipse.preferences.version=1
 jarsExcludedFromWebInfLib=
+lastWarOutDir=/home/q1/workspace/VeriLinks/verilinks-core/target/verilinks-core-1.0-SNAPSHOT
 warSrcDir=src/main/webapp
-warSrcDirIsOutput=true
+warSrcDirIsOutput=false
