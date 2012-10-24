@@ -15,6 +15,26 @@
     <servlet-name>greetServlet</servlet-name>
     <url-pattern>/VeriLinks/greet</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>restServlet</servlet-name>
+    <servlet-class>org.aksw.verilinks.core.server.RestServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>restServlet</servlet-name>
+    <url-pattern>/Application/rest</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>uploadServlet</servlet-name>
+    <servlet-class>org.aksw.verilinks.core.server.TemplateUploadServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>uploadServlet</servlet-name>
+    <url-pattern>/Application/upload</url-pattern>
+  </servlet-mapping>
 
   <!-- Default page to serve -->
   <welcome-file-list>

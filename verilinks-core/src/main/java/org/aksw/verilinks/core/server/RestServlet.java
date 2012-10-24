@@ -84,6 +84,7 @@ public class RestServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		super.init();
+		echo("Init Server");
 		
 		//users
 		userList = new HashMap<String,User>();
@@ -1074,7 +1075,7 @@ public class RestServlet extends HttpServlet {
 	}
 	
 	private void echo(String s) {
-		System.out.println("REST Servlet: " + s);
+		System.out.println("[Server]: " + s);
 	}
 
 }
