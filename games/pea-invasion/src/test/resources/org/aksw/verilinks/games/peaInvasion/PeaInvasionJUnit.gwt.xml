@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='org.aksw.verilinks.games.peaInvasion.PeaInvasion' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/PeaInvasion/greet" class="org.aksw.verilinks.games.peaInvasion.server.GreetingServiceImpl" />
+
+</module>
