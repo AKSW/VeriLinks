@@ -57,6 +57,9 @@ public class RestServlet extends HttpServlet {
 	private String GET_LINKSETS = "getLinksets";
 	private String GET_TEMPLATE = "getTemplate";
 	
+	private String CHECK_STATUS = "checkStatus";
+	
+	
 	private String POST_COMMIT_VERIFICATIONS = "commitVerifications";
 	private String POST_SCORE = "postScore";
 	private String POST_LEVEL_STATS = "postLevelStats";
@@ -99,7 +102,7 @@ public class RestServlet extends HttpServlet {
 		if (!prefix.endsWith("/")) {
 			prefix += '/';
 		}
-		resourcePath = prefix + "Application/";
+		resourcePath = prefix + "VeriLinks/";
 		echo("####Server: Init Path : '" + resourcePath + "' Done ####\n");
 	}
 
@@ -117,8 +120,7 @@ public class RestServlet extends HttpServlet {
 			response = postScore(req.getParameter("userId"),req.getParameter("userName"),req.getParameter("score"),req.getParameter("game"));
 		if (service.equals(POST_LEVEL_STATS)) // Post score
 			response = postLevelStats(req);
-		
-		
+
 		resp.getWriter().write(response);
 	}
 
@@ -148,7 +150,9 @@ public class RestServlet extends HttpServlet {
 			response = getLinkset().toString();
 		else if (service.equals(GET_TEMPLATE))
 			response = getTemplate();
-
+		else if (service.equals(CHECK_STATUS))
+			response = "Server running!";
+		
 		// CORS
 //		resp.addHeader("Access-Control-Allow-Origin", "http://localhost:8080");
 		resp.addHeader("Access-Control-Allow-Origin", "*");

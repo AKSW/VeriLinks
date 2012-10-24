@@ -6,28 +6,40 @@ h1 {
   font-size: 2em;
   font-weight: bold;
   color: #777777;
-  margin: 40px 0px 70px;
+  padding: 40px 0px 40px;
   text-align: center;
 }
 
-.sendButton {
-  display: block;
-  font-size: 16pt;
+body{
+	margin: 0px 20%;
+	border-left: 1px solid grey;
+	border-right: 1px solid grey;
+
 }
 
-/** Most GWT widgets already have a style name defined */
-.gwt-DialogBox {
-  width: 400px;
+#menue{
+	margin-bottom: 40px;
+}
+/** Description */
+#descr{
+	text-align:center;
 }
 
-.dialogVPanel {
-  margin: 5px;
+ul.games{
+	border-bottom: 1px dotted grey;
+	border-top: 1px dotted grey;
+	padding: 15px; 
 }
 
-.serverResponseLabelError {
-  color: red;
+li{
+	font-weight: bold;
 }
 
+.aksw{
+	color: #777777;
+	font-weight: bold;
+	font-style: italic;
+}
 /** Set ids using widget.getElement().setId("idOfElement") */
 #closeButton {
   margin: 15px 6px 6px;
