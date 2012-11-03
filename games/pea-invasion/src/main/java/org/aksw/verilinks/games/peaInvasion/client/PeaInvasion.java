@@ -1,149 +1,2343 @@
 package org.aksw.verilinks.games.peaInvasion.client;
 
-import org.aksw.verilinks.games.peaInvasion.shared.FieldVerifier;
-import com.google.gwt.core.client.EntryPoint;
+import java.util.ArrayList;
+import java.util.List;
+
+
+import playn.core.PlayN;
+import playn.html.HtmlAssetManager;
+import playn.html.HtmlGame;
+import playn.html.HtmlPlatform;
+import org.aksw.verilinks.games.peaInvasion.client.core.GameComponent;
+import org.aksw.verilinks.games.peaInvasion.client.core.info.Statistics;
+import org.aksw.verilinks.games.peaInvasion.client.oauth.Auth;
+import org.aksw.verilinks.games.peaInvasion.client.oauth.AuthRequest;
+import org.aksw.verilinks.games.peaInvasion.client.oauth.Callback;
+import org.aksw.verilinks.games.peaInvasion.client.panels.HighscorePanel;
+import org.aksw.verilinks.games.peaInvasion.client.panels.LandingPanel;
+import org.aksw.verilinks.games.peaInvasion.client.panels.StartPanel;
+import org.aksw.verilinks.games.peaInvasion.client.panels.StatisticsPanel;
+import org.aksw.verilinks.games.peaInvasion.client.panels.TutorialPanel;
+import org.aksw.verilinks.games.peaInvasion.client.verify.VerifyComponent;
+import org.aksw.verilinks.games.peaInvasion.shared.Bonus;
+import org.aksw.verilinks.games.peaInvasion.shared.Configuration;
+import org.aksw.verilinks.games.peaInvasion.shared.Balancing;
+import org.aksw.verilinks.games.peaInvasion.shared.GameConstants;
+import org.aksw.verilinks.games.peaInvasion.shared.Linkset;
+import org.aksw.verilinks.games.peaInvasion.shared.LoginConstants;
+import org.aksw.verilinks.games.peaInvasion.shared.Message;
+import org.aksw.verilinks.games.peaInvasion.shared.Task;
+import org.aksw.verilinks.games.peaInvasion.shared.Template;
+import org.aksw.verilinks.games.peaInvasion.shared.User;
+import org.aksw.verilinks.games.peaInvasion.shared.Verification;
+import org.aksw.verilinks.games.peaInvasion.shared.VerificationStatistics;
+import org.aksw.verilinks.games.peaInvasion.shared.rdfStatement;
+import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoFacebookFriends;
+import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoFacebookUser;
+import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoGoogleUser;
+import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoInstance;
+import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoLinkset;
+import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoLinksetArray;
+import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoProperty;
+import org.aksw.verilinks.games.peaInvasion.shared.msg.Instance;
+import org.aksw.verilinks.games.peaInvasion.shared.msg.Property;
+import org.aksw.verilinks.games.peaInvasion.shared.templates.TemplateLinkset;
+
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.storage.client.Storage;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException;
+import com.google.gwt.user.client.rpc.InvocationException;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.jsonp.client.JsonpRequestBuilder;
+import com.google.gwt.maps.client.LoadApi;
+import com.google.gwt.maps.client.LoadApi.LoadLibrary;
+
 
 /**
- * Entry point classes define <code>onModuleLoad()</code>.
+ * Entry point class
  */
-public class PeaInvasion implements EntryPoint {
-  /**
-   * The message displayed to the user when the server cannot be reached or
-   * returns an error.
-   */
-  private static final String SERVER_ERROR = "An error occurred while "
-      + "attempting to contact the server. Please check your network "
-      + "connection and try again.";
+public class PeaInvasion extends HtmlGame {
+  
+  /** Semantic Web nerd, or newbie.*/
+  private Configuration config;
+  
+  private static final Auth AUTH = Auth.get();
+  private String accessToken;
+  
+  public static final int MONEY_FOR_NOT_SURE = 20;
+  public static final int MONEY_FOR_VERIFICATION = 40;
 
-  /**
-   * Create a remote service proxy to talk to the server-side Greeting service.
-   */
-  private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
+	private static final double ERROR_LIMIT = 0.125;
+//  private static final double ERROR_LIMIT = 0.0;
 
-  private final Messages messages = GWT.create(Messages.class);
+  /** Username for highscore */
+  private User user;
+  String userName;
+  /** User's choice from which interlinked ontologies the links come*/
+  private Linkset linkset; 
+  
+  //private Statistics statistics;
+  private VerificationStatistics verificationStats;
+  
+ 
+  // GUI
+  private VerifyComponent verifyComponent;
+  private Button verifyButton;
+  
+  /** Lock verification mechanism*/
+  private boolean verifyLock;
+  
+  private StartPanel tabPanel;
+  
+  //Test
+  private Button msgButton;
+  private Button linkMsg;
+  private Button testButton;
+  
+  /** Users verification */
+  private Verification verification;
+  
+  /** RDF link to verify*/
+  private rdfStatement link;
+  
+  private GameComponent game;
+  
+  /**Disable Event Listening for GameComponent*/
+  private boolean disableInput;
+  
+  /**Start of level*/
+  private boolean startOfLevel;
+  
+  /**Start of game*/
+  private boolean startOfGame;
+  
+  /** Should server send already-evaluated link, to check user's credibility*/
+  private boolean checkUserCredibility;
+  
+  private boolean thisLink = false;
+  private boolean nextLink = false;
+  
+  /** First Statement from server? Distinguish for GetLink Callback*/
+  private boolean isFirstStatement;
+  
+  /** Status of server*/
+  private boolean serverRunning;
+  
+  /** Saves last pushed key*/
+  private int numKeyCache;
+  
+  // Highscore
+  private PopupPanel popup;
+  private PopupPanel glass;
+  private PopupPanel menu;
+  private HighscorePanel highscorePanel;
+   
+  /*
+  * Money/Bonus calculation:
+  * notSure->10
+  * valid/notValid ->20
+  */
+  private boolean notSure;
+  
+  private String difficulty;
+  
+  /** Statistic for how long player plays game*/
+  private long startTime;
+  
+  /** ArrayList of interlinked ontologies */
+  private ArrayList<Linkset> linksetList;
+  
+
+//  private ArrayList<String> ontologyList;
+  
+  /** Template of subject ontology **/
+  private Template subjectTemplate;
+  
+  /** Template of object ontology **/
+  private Template objectTemplate;
+  
+  private TemplateLinkset template;
 
   /**
    * This is the entry point method.
    */
-  public void onModuleLoad() {
-    final Button sendButton = new Button( messages.sendButton() );
-    final TextBox nameField = new TextBox();
-    nameField.setText( messages.nameField() );
-    final Label errorLabel = new Label();
+  @Override
+  public void start() {
+//    DOM.setStyleAttribute(RootPanel.getBodyElement(), "margin", "0px auto");
+  	this.startOfGame=true;
+  	this.isFirstStatement=true;
+    this.disableInput = true;
+    this.startOfLevel = true;
+    this.verifyLock = false;
+    this.checkUserCredibility=false;
+    this.user= new User();
+    this.verificationStats=new VerificationStatistics();
 
-    // We can add style names to widgets
-    sendButton.addStyleName("sendButton");
+    this.config=new Configuration();
+    // Check if page called from kongregate -> set in configuration
+    String urlParam = com.google.gwt.user.client.Window.Location.getParameter("kongregate");
+    //Window.alert("urlParam: "+urlParam);
+    if(urlParam!=null && urlParam.equals("true")){
+//    	Window.alert("Welcome Kongregate User! :)");
+    	config.setKongregate(true);
+    	DOM.setStyleAttribute(RootPanel.getBodyElement(), "width", "1030px");
+//    	DOM.setStyleAttribute(RootPanel.getBodyElement(), "-moz-transform", "50%");
+    	DOM.setStyleAttribute(RootPanel.getBodyElement(), "margin", "0px auto");
+    }else if(urlParam == null){
+    	config.setSimple(true);
+    	DOM.setStyleAttribute(RootPanel.getBodyElement(), "width", "1030px");
+    	 DOM.setStyleAttribute(RootPanel.getBodyElement(), "margin", "0px auto");
+//    	 DOM.setStyleAttribute(RootPanel.getBodyElement(), "borderLeft", "1px solid grey");
+//    	 DOM.setStyleAttribute(RootPanel.getBodyElement(), "borderRight", "1px solid grey");
+    	 config.setKongregate(false);
+    }
+    this.serverRunning=false;
+    this.subjectTemplate = new Template();
+    this.objectTemplate = new Template();
+    loadMapApi();
+    initLanding();
+    
+    //Button textA = new Button("cmon");
+    
+    //initGUI();
+    //initCallback();
+    //initHandler();
+    //initGame();
+    //RootPanel.get().add(textA);
+    //final AdminPanel adminPanel = new AdminPanel();
+    /*
+    adminPanel.setClickHandler(new ClickHandler(){
 
-    // Add the nameField and sendButton to the RootPanel
-    // Use RootPanel.get() to get the entire body element
-    RootPanel.get("nameFieldContainer").add(nameField);
-    RootPanel.get("sendButtonContainer").add(sendButton);
-    RootPanel.get("errorLabelContainer").add(errorLabel);
-
-    // Focus the cursor on the name field when the app loads
-    nameField.setFocus(true);
-    nameField.selectAll();
-
-    // Create the popup dialog box
-    final DialogBox dialogBox = new DialogBox();
-    dialogBox.setText("Remote Procedure Call");
-    dialogBox.setAnimationEnabled(true);
-    final Button closeButton = new Button("Close");
-    // We can set the id of a widget by accessing its Element
-    closeButton.getElement().setId("closeButton");
-    final Label textToServerLabel = new Label();
-    final HTML serverResponseLabel = new HTML();
-    VerticalPanel dialogVPanel = new VerticalPanel();
-    dialogVPanel.addStyleName("dialogVPanel");
-    dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-    dialogVPanel.add(textToServerLabel);
-    dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-    dialogVPanel.add(serverResponseLabel);
-    dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-    dialogVPanel.add(closeButton);
-    dialogBox.setWidget(dialogVPanel);
-
-    // Add a handler to close the DialogBox
-    closeButton.addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
-        dialogBox.hide();
-        sendButton.setEnabled(true);
-        sendButton.setFocus(true);
-      }
-    });
+        
+        service.tempAddOntology(adminPanel.getTemplate(), new AsyncCallback<String>(){
 
-    // Create a handler for the sendButton and nameField
-    class MyHandler implements ClickHandler, KeyUpHandler {
-      /**
-       * Fired when the user clicks on the sendButton.
-       */
-      public void onClick(ClickEvent event) {
-        sendNameToServer();
-      }
-
-      /**
-       * Fired when the user types in the nameField.
-       */
-      public void onKeyUp(KeyUpEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          sendNameToServer();
-        }
-      }
-
-      /**
-       * Send the name from the nameField to the server and wait for a response.
-       */
-      private void sendNameToServer() {
-        // First, we validate the input.
-        errorLabel.setText("");
-        String textToServer = nameField.getText();
-        if (!FieldVerifier.isValidName(textToServer)) {
-          errorLabel.setText("Please enter at least four characters");
-          return;
-        }
-
-        // Then, we send the input to the server.
-        sendButton.setEnabled(false);
-        textToServerLabel.setText(textToServer);
-        serverResponseLabel.setText("");
-        greetingService.greetServer(textToServer, new AsyncCallback<String>() {
           public void onFailure(Throwable caught) {
-            // Show the RPC error message to the user
-            dialogBox.setText("Remote Procedure Call - Failure");
-            serverResponseLabel.addStyleName("serverResponseLabelError");
-            serverResponseLabel.setHTML(SERVER_ERROR);
-            dialogBox.center();
-            closeButton.setFocus(true);
+            // TODO Auto-generated method stub
+            Window.alert(caught.getMessage());
           }
 
           public void onSuccess(String result) {
-            dialogBox.setText("Remote Procedure Call");
-            serverResponseLabel.removeStyleName("serverResponseLabelError");
-            serverResponseLabel.setHTML(result);
-            dialogBox.center();
-            closeButton.setFocus(true);
+            // TODO Auto-generated method stub
+            Window.alert(result);
           }
         });
       }
-    }
-
-    // Add a handler to send the name to the server
-    MyHandler handler = new MyHandler();
-    sendButton.addClickHandler(handler);
-    nameField.addKeyUpHandler(handler);
+    });
+    */
+    //RootPanel.get().add(adminPanel.form);
+    
+    //FlowPanel testPanel = testPanel();
+    //RootPanel.get().add(testPanel);
+    
+//    MapsPanel panel = new MapsPanel();
+//    RootPanel.get("cmon").add(panel);
+//    RootPanel.get().add(panel);
+    echo("TEST");
+    
   }
+  
+  private void loadMapApi() {
+    echo("LoadMapApi");
+		boolean sensor = true;
+    
+    // load all the libs for use
+    ArrayList<LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+    loadLibraries.add(LoadLibrary.ADSENSE);
+    loadLibraries.add(LoadLibrary.DRAWING);
+    loadLibraries.add(LoadLibrary.GEOMETRY);
+    loadLibraries.add(LoadLibrary.PANORAMIO);
+    loadLibraries.add(LoadLibrary.PLACES);
+    
+    Runnable onLoad = new Runnable() {
+      public void run() {
+        System.out.println( "Map Api loaded");
+      }
+    };
+    
+    LoadApi.go(onLoad, loadLibraries, sensor);
+  }
+  
+  public void initLanding() {
+    echo("##Client: Initialize landing page");
+ 
+  	
+    final LandingPanel landingPanel = new LandingPanel();
+    // glass panel behind popUp
+    glass = new PopupPanel(false);
+    glass.setStyleName("rx-glass");
+    DOM.setStyleAttribute(glass.getElement(), "width", "100%");
+    DOM.setStyleAttribute(glass.getElement(), "height", "100%");
+    DOM.setStyleAttribute(glass.getElement(),
+        "backgroundColor", "#000");
+    //DOM.setStyleAttribute(glass.getElement(),"opacity", "0.50");
+//    glass.addStyleName("glassPanel");
+    ClickHandler nextBtnClickHandler = new ClickHandler() {
+      public void onClick(ClickEvent event) {
+        echo("Client: Next button clicked");
+        glass.hide();
+        menu.hide();
+        // Check if newbie
+        if(landingPanel.getNewbie())
+        	config.setKnowledgeMode(Configuration.KNOWLEDGE_NORMAL);
+        else
+        	config.setKnowledgeMode(Configuration.KNOWLEDGE_EXPERT);
+        connect(); 
+      }
+    };
+    landingPanel.setNextClickHandler(nextBtnClickHandler);
+    
+    menu = new PopupPanel(false);
+    menu.add(landingPanel);
+    menu.setStyleName("noBorder");
+  
+    
+    // Check logged in
+    final AuthRequest reqFb = new AuthRequest(LoginConstants.FACEBOOK_AUTH_URL, LoginConstants.FACEBOOK_CLIENT_ID)
+    .withScopes(LoginConstants.FACEBOOK_FRIENDLIST_SCOPE)
+    // Facebook expects a comma-delimited list of scopes
+    .withScopeDelimiter(",");
+    Storage stor = Storage.getLocalStorageIfSupported();
+    echo("Sotrage length: "+stor.getLength());
+    for(int i=0; i<stor.getLength();i++)
+    	echo(i+".Sotrage : "+stor.key(i));
+    echo("storage get : "+stor.getItem("278603465536665-----email,user_birthday,read_friendlists"));
+    echo("storage get friends: "+stor.getItem("276474835758653-----read_friendlists"));
+    echo("storage get google: "+stor.getItem("23285137063.apps.googleusercontent.com-----https://www.googleapis.com/auth/userinfo.profile"));
+    
+    
+   
+    //addClearTokens(landingPanel);
+    
+    glass.show();
+    menu.center();
+    
+    // Focus button
+    landingPanel.focus();
+    
+    // Test
+    Button butt = new Button("Logout");
+    butt.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent arg0) {
+				// TODO Auto-generated method stub
+				logout();
+			}});
+    
+    Button asd=new Button("kongregate");
+    asd.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent arg0) {
+//				getToken();
+				echo("kongregate login");
+				kongregateLogin();
+				
+			}});
+    
+    Button asd2=new Button("kongregate");
+    asd2.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent arg0) {
+				echo("rest test");
+				restTest();
+//				Window.Location.replace("/Application/rest?service=getUserScore"); 
+				
+			}});
+    
+    // hurr test
+    landingPanel.add(asd2);
+//    landingPanel.add(butt);
+    
+
+  }
+  
+  private void restTest(){
+  	String url = "/Application/rest?service=commitVerifications";
+  	url="/Application/rest?service=getHighscore&game=peas";
+  	url="/Application/rest?service=getLink" +
+  			"&userName=foo&userId=username-login: only name available" +
+  			"&verifiedLinks=55+33+11+1+2" +
+  			"&curLink=2" +
+  			"&nextLink=false" +
+  			"&verification=1" +
+  			"&linkset=dbpedia-linkedgeodata";
+  	url="/Application/rest?service=getLinksets";
+  	String data = "{ "+'"'+"verifiTest"+'"'+":"+'"'+"Test"+'"'+"}";
+  	echo(data);
+		
+  	RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(url));
+//  	builder.setHeader("Content-Type",
+//    "application/x-www-form-urlencoded");
+//  	builder.setHeader("Access-Control-Allow-Origin", "*");
+  	echo("REST: "+url);
+  	try {
+  	  Request request = builder.sendRequest(data, new RequestCallback() {
+  	    public void onError(Request request, Throwable exception) {
+  	       // Couldn't connect to server (could be timeout, SOP violation, etc.)
+  	    	echo("ERROR rest");
+  	    }
+
+				public void onResponseReceived(Request request, Response response) {
+					// TODO Auto-generated method stub
+					echo("client SUCCESS rest");
+					Window.alert(response.getText());
+					JSONValue jsonValue = JSONParser.parseStrict(response.getText());
+					System.out.println("jsonValue: "+jsonValue.toString());
+					JSONObject jsonObject = jsonValue.isObject(); // assert that this is an object
+					if (jsonObject == null) {
+					  // uh oh, it wasn't an object after
+					  // do error handling here
+						System.out.println("JSON payload did not describe an object");
+					  throw new RuntimeException("JSON payload did not describe an object");
+					}else
+						System.out.println("is object");
+					// Cast
+					System.out.println("#######SUBJECT: ");
+					JsoLinksetArray hS = jsonObject.getJavaScriptObject().cast();
+					System.out.println("casted");
+					parseLinksets(hS.getLinkset());
+					
+//					System.out.println("#######OBJECT: ");
+//					JsoLink h = jsonObject.getJavaScriptObject().cast();
+//					System.out.println("casted");
+//					parseInstance(h.getObject());
+//					String name = h.getSubject().getOntology().toString(); 
+//					Window.alert(name);
+//					System.out.println("%%%%%%%%%%%%%%"+h.getSubject().getOntology()+" %%%%%%%% "+h.getSubject().getPropertyNames());
+//					System.out.println("name: "+name);
+
+				}
+  	  });
+  	} catch (RequestException e) {
+  	  // Couldn't connect to server      
+  		echo("ERROR!");
+  	}
+//  	-------------------------------------------------------------------------------
+//  	try{  
+//      JsonpRequestBuilder builder = new JsonpRequestBuilder();
+//      builder.requestObject(url, new AsyncCallback<JavaScriptObject>(){
+//  
+//        public void onSuccess(JavaScriptObject fbUser) {
+//          //Window.alert("Retrieving identity -> success!");
+//          echo("SUCCESS");
+//          Window.alert(fbUser.toString());
+//          
+//        }
+//  
+//        public void onFailure(Throwable e) {
+//          displayError("ERROR: Couldn't retrieve JSON -> "+e.getMessage());
+//        }});
+//    }catch (Exception e) {
+//      displayError("ERROR: Couldn't retrieve JSON!");
+//    }
+  	
+  }
+  
+  public ArrayList<Linkset> parseLinksets(JsArray<JsoLinkset> linksetArray) {
+		echo("Client: Parse Linksets. Size = "+linksetArray.length());
+  	linksetList.clear();
+  	JsoLinkset lSet = null;
+  	Linkset linkset = null;
+  	for(int i = 0; i<linksetArray.length();i++){
+  		lSet = linksetArray.get(i);
+  		linkset = new Linkset();
+  		linkset.setSubject(lSet.getSubject());
+  		linkset.setObject(lSet.getObject());
+  		linkset.setPredicate(lSet.getPredicate());
+  		linkset.setDescription(lSet.getDescription());
+  		linkset.setDifficulty(lSet.getDifficulty());
+  		linksetList.add(linkset);
+  	}
+		return linksetList;
+	}
+
+	private Instance parseInstance(JsoInstance inst){
+  	echo("Client: Parse Instance: "+inst.getUri());
+  	Instance instance = new Instance();
+  	List<Property> properties = new ArrayList<Property>();
+  	
+  	// Get Property names
+  	Property prop = null;
+  	JsoProperty jOb = null;
+  	JsArray propArray = inst.getProperties();
+  	echo("Get Properties from JSON. Size: "+propArray.length());
+  	String name= null;
+  	String value = null;
+  	System.out.println("pNames: "+propArray.toString());
+  	for(int i = 0; i<propArray.length();i++){
+  		jOb = propArray.get(i).cast();
+  		name = jOb.getProperty();
+  		value = jOb.getValue();
+  		prop = new Property(name,value);
+  		properties.add(prop);
+//  		System.out.println(i+"pNames: "+name+ " value: "+value);
+  	}
+  	instance.setUri(inst.getUri());
+  	instance.setProperties(properties);
+  	System.out.println("uri: "+instance.getUri());
+  	for(int i = 0; i<inst.getProperties().length();i++){
+  		System.out.println(i+".: "+inst.getProperties().get(i).getProperty()+ " , v: "+inst.getProperties().get(i).getValue());
+  	}
+  	return instance;
+  }
+  
+  private void kongregateLogin(){
+
+  	 echo("Client: Kongregate Request");
+  	 setKongregateUser();
+//     String url = "http://www.kongregate.com/api/user_info.json?username=iq1i&friends=true";
+//     this.callbackKongregateRequest = new AsyncCallback<String>() { 
+//     public void onFailure(Throwable caught) {
+//       echo("Client: ERROR Get KongregateLogin! "+caught.getMessage());
+//       Window.alert("ERROR: Get KongregateLogin: "+caught.getMessage());
+//     }
+//     public void onSuccess(String stmt) {
+//     	echo("Client: Get KongregateLogin success!");
+//     	// Set user
+//     	setKongregateUser();
+//      Window.alert("Success Get KongregateLogin: "+stmt);
+//     }
+//   };
+//   
+//		service.kongregateRequest(url, callbackKongregateRequest);
+ 	
+  	
+  	
+  	
+//  	this.callbackKongregateLogin = new AsyncCallback<String>() { 
+//      public void onFailure(Throwable caught) {
+//        echo("Client: ERROR Get KongregateLogin! "+caught.getMessage());
+//        Window.alert("ERROR Get KongregateLogin: "+caught.getMessage());
+//      }
+//      public void onSuccess(String stmt) {
+//      	echo("Client: Get KongregateLogin success!");
+//        Window.alert("Success Get KongregateLogin: "+stmt);
+//      }
+//    };
+//    
+//		service.kongregateLogin("userId", "token", "apiKey", callbackKongregateLogin);
+  	
+  }
+  
+  public native void setKongregateUser() /*-{
+	  // Call instance method instanceFoo() on this
+	  //var name = $wnd.kongregate.kongregate.services.getUserId();
+
+	  $wnd.checkUserAuthenticated();
+	  var s = $wnd.userName;
+	  this.@org.aksw.verilinks.games.peaInvasion.client.PeaInvasion::setUserNameKongregate(Ljava/lang/String;)(s);
+  }-*/;
+
+  private void setUserNameKongregate(String name){
+  	if(name!=null){
+  		this.user.setName(name);
+//  		Window.alert("KongregateUserName: "+user.getName());
+  	}else{
+  		user.setGuest();
+  		Window.alert("Error: Couldn't get kongregate username! Therefore logged in as 'Guest'");
+  	}
+  	
+  }
+  private void fbRequestJsonp(){
+    fbRequestIdentityJsonp();
+  }
+  
+  private void fbRequestIdentityJsonp() {
+    echo("Client: Identity Request");
+    String url = "https://graph.facebook.com/me?access_token="+accessToken;
+    try{  
+      JsonpRequestBuilder builder = new JsonpRequestBuilder();
+      builder.requestObject(url, new AsyncCallback<JsoFacebookUser>(){
+  
+        public void onSuccess(JsoFacebookUser fbUser) {
+          //Window.alert("Retrieving identity -> success!");
+          user.setId(fbUser.getId());
+          user.setName(fbUser.getName());
+          echo("Retrieving identity -> success!");
+          echo("id: "+user.getId());
+          echo("name: "+user.getName());
+          
+          fbRequestFriendsJsonp();
+        }
+  
+        public void onFailure(Throwable e) {
+          displayError("ERROR: Couldn't retrieve JSON -> "+e.getMessage());
+        }});
+    }catch (Exception e) {
+      displayError("ERROR: Couldn't retrieve JSON!");
+    }
+  }
+  
+  private void fbRequestIdentityOnly() {
+    echo("Client: Identity Request");
+    String url = "https://graph.facebook.com/me?access_token="+accessToken;
+    try{  
+      JsonpRequestBuilder builder = new JsonpRequestBuilder();
+      builder.requestObject(url, new AsyncCallback<JsoFacebookUser>(){
+  
+        public void onSuccess(JsoFacebookUser fbUser) {
+//          Window.alert("Retrieving identity -> success!");
+          user.setId(fbUser.getId());
+          user.setName(fbUser.getName());
+          echo("Retrieving identity -> success!");
+          echo("id: "+user.getId());
+          echo("name: "+user.getName());
+          if(!user.getName().isEmpty())
+	          // Disable login
+	        	disableLogin();
+          else 
+          	echo("Auto-login: User is null!");
+        }
+  
+        public void onFailure(Throwable e) {
+          displayError("ERROR: Couldn't retrieve JSON -> "+e.getMessage());
+        }});
+    }catch (Exception e) {
+      displayError("ERROR: Couldn't retrieve JSON!");
+    }
+  }
+  
+  
+  private void fbRequestFriendsJsonp() {
+    echo("Client: Friend Request");
+    String url = "https://graph.facebook.com/me/friends?access_token="+accessToken;
+    try{
+      JsonpRequestBuilder builder = new JsonpRequestBuilder();
+      builder.requestObject(url, new AsyncCallback<JsoFacebookFriends>(){
+  
+        public void onSuccess(JsoFacebookFriends friends) {
+          Window.alert("Login successful! :)");
+          echo("SUCCESS: "+friends.getEntries());
+          echo("friends length: "+friends.getEntries().length());
+//          // Proint friends
+//          for(int i=0;i<friends.getEntries().length();i++){
+//            FacebookFriendsEntry entry = friends.getEntries().get(i);
+//            echo(i+".name: "+entry.getName());
+//          }
+  
+          disableLogin();
+        }
+  
+        public void onFailure(Throwable e) {
+          displayError("ERROR: Couldn't retrieve JSON -> "+e.getMessage());
+        }});
+    }catch (Exception e){
+      displayError("ERROR: Couldn't retrieve JSON!");
+    }
+  }
+  
+  private void googleRequestJsonp(){
+    googleRequestIdentityJsonp(true);
+  }
+  
+  /**
+   * Login Google id.
+   * @param bool show alert when success.
+   */
+  private void googleRequestIdentityJsonp(final boolean bool) {
+    echo("Client: Identity Request");
+    String url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token="+accessToken;
+    echo(url);
+    try{  
+      JsonpRequestBuilder builder = new JsonpRequestBuilder();
+      builder.requestObject(url, new AsyncCallback<JsoGoogleUser>(){
+  
+        public void onSuccess(JsoGoogleUser googleUser) {
+          //Window.alert("Retrieving identity -> success!");
+          user.setId(googleUser.getId());
+          user.setName(googleUser.getName());
+          echo("Retrieving identity -> success!");
+          echo("id: "+user.getId());
+          echo("name: "+user.getName());
+          if(!user.getName().isEmpty()){
+	          // Disable login
+	        	disableLogin();
+          	if(bool)
+            	Window.alert("Login successful! :)");
+          }else 
+          	echo("Auto-login: User is null!");
+          
+          //googleRequestFriendsJsonp();
+          
+  
+        }
+  
+        public void onFailure(Throwable e) {
+          displayError("ERROR: Couldn't retrieve JSON -> "+e.getMessage());
+        }});
+    }catch (Exception e) {
+      displayError("ERROR: Couldn't retrieve JSON!");
+    }
+  }
+  
+  
+//  
+//  private void fbRequest(String url){
+//    echo("URL: "+url);// SOP
+//    // Send request to server and catch any errors.
+//    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
+//
+//    try {
+//      Request request = builder.sendRequest(null, new RequestCallback() {
+//        public void onError(Request request, Throwable exception) {
+//          displayError("Couldn't retrieve JSON");
+//        }
+//
+//        public void onResponseReceived(Request request, Response response) {
+//          if (200 == response.getStatusCode()) {
+//            Window.alert(response.getText());
+//            echo(response.getStatusText());
+//            JSONValue jsonValue = JSONParser.parse(response.getText());
+//            JSONObject jsonObject = jsonValue.isObject();
+//            echo("NAME: "+jsonObject.get("name").toString());
+//            
+//
+//          } else {
+//            displayError("Couldn't retrieve JSON (" + response.getStatusText()
+//                + ")");
+//          }
+//        }
+//      });
+//    } catch (RequestException e) {
+//      displayError("Couldn't retrieve JSON: "+e.getMessage());
+//    }
+//  }
+  
+  private void disableLogin(){
+    tabPanel.disableLogin(user.getName());
+    tabPanel.enableStart();
+  }
+  
+  /**
+   * If can't get JSON, display error message.
+   * @param error
+   */
+  private void displayError(String error) {
+    Window.alert(error);
+  }
+  
+  // //////////////////////////////////////////////////////////////////////////
+  // CLEARING STORED TOKENS ///////////////////////////////////////////////////
+  // //////////////////////////////////////////////////////////////////////////
+
+  // Clears all tokens stored in the browser by this library. Subsequent calls
+  // to login() will result in the popup being shown, though it may immediately
+  // disappear if the token has not expired.
+  private void addClearTokens(LandingPanel panel) {
+    Button button = new Button("Clear stored tokens");
+    button.addClickHandler(new ClickHandler() {
+      public void onClick(ClickEvent event) {
+        Auth.get().clearAllTokens();
+        Window.alert("All tokens cleared");
+      }
+    });
+    panel.add(button);
+  }
+
+  
+  /**
+   * Create GUI
+   */
+  private void initGUI() {
+  	echo("Client: Init GUI");
+    this.verifyComponent = new VerifyComponent(template,config);
+   
+    // VerifyComponent Button handler 
+    PushButton trueButton = verifyComponent.getTrueButton();
+    trueButton.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent event) {
+				key1Pressed();
+				
+			}});
+    
+    PushButton falseButton = verifyComponent.getFalseButton();
+    falseButton.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent event) {
+				key2Pressed();
+				
+			}});
+    
+    PushButton unsureButton = verifyComponent.getUnsureButton();
+    unsureButton.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent event) {
+				key3Pressed();
+				
+			}});
+    
+    this.verifyButton = verifyComponent.getOkButton();
+    //TODO GameMessage
+    msgButton = new Button( "Game Messages" );
+    msgButton.setStyleName("gameMessage");
+    msgButton.setEnabled(false);
+    
+    // Link message
+    linkMsg = new Button( "Link Messages" );
+    linkMsg.setStyleName("gameMessage");
+    linkMsg.setEnabled(false);
+    
+    testButton = new Button( "Test2" );
+    //testButton.setEnabled(false);
+    // We can add style names to widgets
+    testButton.addStyleName("testButton");
+    
+ 
+    // Use RootPanel.get() to get the entire body element
+//    RootPanel rootPanel = RootPanel.get();
+    // Format
+    //rootPanel.setSize("1600", "800");
+//    rootPanel.getElement().getStyle().setPosition(Position.RELATIVE);
+//    rootPanel.setStyleName("root");
+
+    // Add to rootPanel
+    //rootPanel.add(verifyComponent,650,50);
+    //RootPanel.get("verifyContent").add(verifyComponent);
+    RootPanel.get().add(msgButton,0,399);
+//    RootPanel.get().add(linkMsg,RootPanel.get().getOffsetWidth()-350,399);
+    //rootPanel.add(testButton,90,680);
+
+    // Bottom Buttons
+  	// Show tutorial
+  	Button showTut = new Button ("Tutorial");
+  	showTut.addStyleName("myButton");
+  	showTut.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent event) {
+				showTutorial();
+				
+			}});
+  	
+  	
+  	Button showOverview = new Button ("Quick Overview");
+  	showOverview.addStyleName("myButton");
+  	
+  	initOverview(showOverview);
+
+  	HorizontalPanel bottom = new HorizontalPanel();
+  	bottom.add(showTut);
+  	bottom.add(showOverview);
+  	bottom.setHorizontalAlignment(HasAlignment.ALIGN_RIGHT);
+  	RootPanel.get("bottomButtons").add(bottom);
+  	
+    echo("Client: Init GUI end");
+  }
+  
+ 
+  
+  /**
+   * Create callbacks
+   */
+  private void initCallback()  {
+    
+    echo("Client: Init Callback");
+    // Receive new links, update Table
+    callbackGetLink = new AsyncCallback<rdfStatement>() {  
+      public void onFailure(Throwable caught) {
+        // TODO: Do something with errors.
+        msgButton.setText("Error receiving link: "+caught.getMessage());
+        System.out.println("Client: CallbackGetLink error -> "+caught.getMessage());
+        try {
+          throw caught;
+        } catch (IncompatibleRemoteServiceException e) {
+          // this client is not compatible with the server; cleanup and refresh the 
+          // browser
+          echo("Error: Client GetLink IncompatibleRemoteService");
+        } catch (InvocationException e) {
+          // the call didn't complete cleanly
+          echo("Error: Client GetLink InvocationException");
+        }  catch (Throwable e) {
+          // last resort -- a very unexpected exception
+          echo("Error: Client GetLink Throwable");
+        }
+        
+      }
+      public void onSuccess(rdfStatement stmt) {
+        //deflatten
+        System.out.println("\n###Client: Callback GetLink success###");
+        echo("Bonus: "+stmt.getBonus());
+        if ( !isFirstStatement) 
+        {
+	        // Calculate and add Bonus
+	        Bonus bonus = stmt.getBonus();
+	        processBonus(bonus);
+        }
+        else{
+        	isFirstStatement=false;
+        	echo("Set first false for stmt id: "+stmt.getId());
+        }
+        link = stmt;
+        // updae linkMsg
+        linkMsg.setText("Link difficulty: "+Balancing.getStringLinkDifficulty(stmt.getDifficulty()));
+        // Update VerifyComponent
+        updateTable(link,template);
+        DeferredCommand.addCommand(new Command()
+        {
+            public void execute()
+            {
+              verifyButton.setFocus(false);
+            }
+        });
+        // Set thisLink
+        thisLink = nextLink;
+        echo("----------------------------------");
+        echo("Got Statement:");
+        echo("id: "+link.getId());
+        echo("subject label: "+link.getSubject().getLabel());
+        echo("subject latitude: "+link.getSubject().getLatitude());
+        echo("subject longitude: "+link.getSubject().getLongitude());
+        echo("subject option: "+link.getSubject().getOptional());
+        echo("object label: "+link.getObject().getLabel());
+        echo("object latitude: "+link.getObject().getLatitude());
+        echo("object longitude: "+link.getObject().getLongitude());
+        echo("object option: "+link.getSubject().getOptional());
+        echo("object instanceType: "+link.getObject().getInstanceType());
+        echo("predi: "+link.getPredicate());
+        echo("counter: "+link.getCounter());
+        echo("bonus: "+link.getBonus());
+        echo("Client: This link is Eval_Link?: "+thisLink);
+        echo("----------------------------------");
+        System.out.println("###Client: Callback GetLink success###");
+      }
+    };
+    
+    // Send player's score
+    callbackSendScore = new AsyncCallback<String>() { 
+      public void onFailure(Throwable caught) {
+        // TODO: Do something with errors.
+        msgButton.setText(caught.getMessage());
+      }
+      public void onSuccess(String stmt) {
+        //deflatten
+        //rdfStatement object = new rdfStatement(stmt);
+        //verifyComponent.updateTable(object);
+        msgButton.setText("Game Message");
+        msgButton.setStyleName("gameMessage");
+        System.out.println("Score sent.");
+      }
+    };
+
+    callbackCommitVerifications = new AsyncCallback<String>(){
+
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				Window.alert("ERROR Commit Verifications Failure: "+caught.getMessage());
+				//echo("ERROR Commit Verifications Failure: "+caught.getMessage());
+				//msgButton.setText("ERROR Commit Verifications Failure: "+caught.getMessage());
+			}
+
+			public void onSuccess(String strength) {
+				//Window.alert("WIN Commit Verifications: "+result);
+				echo(" Commit Verifications success! userStrength: "+strength);
+				user.setStrength(strength);
+				//msgButton.setText("WIN Commit Verifications: "+result);
+				
+			}};
+    
+    echo("Client: Init Callback Done");
+  }
+  
+ 
+
+  /**
+   * Create EventHandler
+   */
+  private void initHandler() {
+  	echo("Client: Init Handler");
+  	echo("MyHandler");
+    // Add EventHandler
+//    MyHandler handler = new MyHandler();
+//    verifyButton.addClickHandler(handler);
+    msgButton.addClickHandler(new ClickHandler() {
+      public void onClick(ClickEvent event) {
+        //dialogBox.hide();
+        //msgButton.setEnabled(false);
+        //msgButton.setFocus(true);
+        //service.firstRequest(callback);
+        //highscoreRequest();
+        //System.out.println("kommschonnn");
+        //if(game.isReady())
+        {
+          msgButton.setEnabled(false);
+          firstQueryRequest();
+          game.resume();
+        }
+      }
+    });
+    
+    echo("testButton");
+    testButton.addClickHandler(new ClickHandler() {
+      public void onClick(ClickEvent event) {
+        //dialogBox.hide();
+        testButton.setEnabled(false);
+        //testButton.setFocus(true);
+        //service.firstRequest(callback);
+        //firstQueryRequest();
+        //Test current dir
+        System.out.println(GWT.getModuleBaseURL());
+        testButton.setText(GWT.getModuleBaseURL() );
+        //DBTool db = new DBTool();
+        //testButton.setText(db.bla());
+        templateRequest();
+        //linksetRequest();
+      }
+    });
+    echo("Client: Init Handler Done");
+  }
+
+ 
+  /**
+   * Initialize 2D platform game.
+   */
+  private void initGame() {
+  	echo("Client: Init Game");
+    game = new GameComponent();
+    
+    game.setApplication(this);
+    //VerticalPanel panel = new VerticalPanel();
+    HtmlAssetManager assets = HtmlPlatform.register().assetManager();
+    //assets.setPathPrefix("saim/");
+    PlayN.run(game);
+    echo("Client: Init Game Done");
+  }
+  
+  private void initLeavePage(){
+  	Window.addWindowClosingHandler(new Window.ClosingHandler() {
+      public void onWindowClosing(Window.ClosingEvent closingEvent) {
+//        closingEvent.setMessage("Do you really want to leave the page?");
+      	// Disconnect user from server
+      	disconnectUser();
+      }
+      
+    
+    });
+  }
+  
+  private void initStartTime(){
+  	this.startTime =System.currentTimeMillis();
+  	this.user.setStartTime(startTime);
+  	echo("Game Time Start: "+this.startTime);
+  }
+  
+  /**
+   * Initiliaize Tutorial Pop Up
+   */
+  private void initTutorial(){
+  	// Glass panel behind popUp
+    glass = new PopupPanel(false);
+    glass.setStyleName("rx-glass");
+    DOM.setStyleAttribute(glass.getElement(), "width", "100%");
+    DOM.setStyleAttribute(glass.getElement(), "height", "100%");
+    DOM.setStyleAttribute(glass.getElement(),
+        "backgroundColor", "#000");
+    DOM.setStyleAttribute(glass.getElement(),
+        "opacity", "0.30");
+  	
+  	final PopupPanel pop = new PopupPanel(false);
+  	
+  	TutorialPanel tutorialPanel = new TutorialPanel(); 
+  	
+  	ClickHandler skipHandler = new ClickHandler(){
+
+			public void onClick(ClickEvent arg0) {
+				// Set skip tutorial into local storage
+				setSkipTutorial();
+				firstQueryRequest();
+				glass.hide();
+        pop.hide();
+			}};
+  	tutorialPanel.setSkipClickHandler(skipHandler);
+  	
+  	pop.add(tutorialPanel);
+  	glass.add(pop);
+  	
+    
+    pop.center();
+    pop.setStyleName("noBorder");
+  	tutorialPanel.setGlassPanel(pop);
+  	glass.show();
+  	
+  }
+  
+  private void setSkipTutorial(){
+  	echo("Client: Set skip tutorial");
+  	Storage store = Storage.getLocalStorageIfSupported();
+  	store.setItem("skipTutorial", user.getName());
+  	echo("Client: Set skip tutorial Done");
+  }
+  
+  private boolean getSkipTutorial(){
+  	echo("Client: Get skip tutorial");
+  	String key=null;
+  	Storage store = Storage.getLocalStorageIfSupported();
+  	for(int i=0; i<store.getLength();i++){
+     	echo(i+".Sotrage : "+store.key(i));
+     	key=store.key(i);
+     	if(key.startsWith("skipTutorial") && store.getItem(key).equals(user.getName())){
+     		echo("Found token!: "+key+ " : "+ store.getItem(key));
+     		return true;
+     	}
+  	}
+  	return false;
+  }
+  
+  private void showTutorial(){
+  	// Pause game 
+  	if(!game.world.isPaused())
+  		game.pause();
+  	
+  	// Glass panel behind popUp
+    glass = new PopupPanel(false);
+    glass.setStyleName("rx-glass");
+    DOM.setStyleAttribute(glass.getElement(), "width", "100%");
+    DOM.setStyleAttribute(glass.getElement(), "height", "100%");
+    DOM.setStyleAttribute(glass.getElement(),
+        "backgroundColor", "#000");
+    DOM.setStyleAttribute(glass.getElement(),
+        "opacity", "0.30");
+  	
+  	final PopupPanel pop = new PopupPanel(false);
+  	
+  	TutorialPanel tutorialPanel = new TutorialPanel(); 
+  	
+  	// Change next text
+  	tutorialPanel.setNextText();
+  	
+  	ClickHandler skipHandler = new ClickHandler(){
+
+			public void onClick(ClickEvent arg0) {
+				glass.hide();
+        pop.hide();
+        game.resume();
+			}};
+  	tutorialPanel.setSkipClickHandler(skipHandler);
+  	
+  	pop.add(tutorialPanel);
+  	glass.add(pop);
+  	
+    glass.show();
+    pop.center();
+    pop.setStyleName("noBorder");
+  	tutorialPanel.setGlassPanel(pop);
+  }
+  
+  private void initOverview(Button pop){
+  
+  	VerticalPanel enemies = new VerticalPanel();
+  	DOM.setStyleAttribute(enemies.getElement(), "padding", "20px");
+  	HTML head = new HTML("<h2>Enemies</h2>");
+  	HTML html = new HTML("" +
+  			"<p><img src='Application/images/pea/enemy.png'/> Your everyday invader. Big, round and clumsy. He can roll around all day.</p>" +
+  			"<p><img src='Application/images/pea/enemyShooter2.png'/> This guy is on a strict diet. He's become so light that he overcame gravity, don't let him crash into the village.</p>" +
+  			"<p><img src='Application/images/pea/enemyCashier.png'/> Well known across the whole universe. The Cashier loves your coins, he will steal them on a regular basis. </p>" );
+  	Image enemyNormal = new Image("Application/images/pea/enemy.png");
+  	Image enemyPilot = new Image("Application/images/pea/enemyShooter2.png");
+  	Image enemyCashier = new Image("Application/images/pea/enemyCashier.png");
+  	HTML h1 = new HTML("Your everyday invader. Big, round and clumsy. His speciality is rolling.");
+  	HTML h2 = new HTML("This guy has the ability to fly. But he's not really good at it. Sometimes he just runs out of gas in midair.");
+  	HTML h3 = new HTML("The Cashier loves coins, especially your coins. He will steal them on a regular basis.");
+  	
+  	HorizontalPanel p1 = new HorizontalPanel();
+  	p1.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+  	p1.add(enemyNormal);
+  	p1.add(h1);
+  	p1.setSpacing(5);
+  	
+  	HorizontalPanel p2 = new HorizontalPanel();
+  	p2.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+  	p2.add(enemyPilot);
+  	p2.add(h2);
+  	p2.setSpacing(5);
+  	
+  	HorizontalPanel p3 = new HorizontalPanel();
+  	p3.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+  	p3.add(enemyCashier);
+  	p3.add(h3);
+  	p3.setSpacing(5);
+  	
+  	enemies.setSpacing(20);
+  	enemies.add(head);
+  	enemies.add(p1);
+  	enemies.add(p2);
+  	enemies.add(p3);
+//  	overview.add(enemyCashier);
+  	
+  	VerticalPanel prize = new VerticalPanel();
+  	DOM.setStyleAttribute(prize.getElement(), "padding", "20px");
+  	HTML prizeHTML = new HTML("<h2>Coin Distributions</h2></p>" +
+  			"<i>Reward for answering a question:</i></br><img src='Application/images/verification/true.png' />/<img src='Application/images/verification/false.png'/>: <font color='green'>  + 40</font> Coins" +
+  			"</br><img src='Application/images/verification/unsure.png'/>: <font color='green'>  + 20</font> Coins</p>" +
+  			"<p><i>Bonus:</i></br>Disagreement = 0 Coins</br>Agreement = <font color='green'>  + 10</font> to <font color='green'>  + 1000</font> Coins (Depending on question difficulty)" +
+  			"</br>Penalty = <font color='red'> - 400 </font>Coins</p>");
+  	prize.add(prizeHTML);
+  	
+  	final TabPanel tab = new TabPanel();
+//    tab.setAnimationDuration(1000);
+    tab.add(enemies, new HTML("Enemies"));
+    tab.add(prize, new HTML("Coins"));
+    tab.selectTab(0);
+    tab.setSize("600px","400px");
+    tab.getDeckPanel().setStyleName("no-border-style"); 
+    DOM.setStyleAttribute(tab.getElement(), "backgroundColor", "black");
+    DOM.setStyleAttribute(tab.getElement(), "color", "white");
+    DOM.setStyleAttribute(tab.getElement(), "fontWeight", "bolder");
+    
+  	final PopupPanel popUp = new PopupPanel(true);
+  	popUp.setAnimationEnabled(true);
+  	popUp.add(tab);
+  	popUp.setAnimationEnabled(true);
+    pop.addClickHandler(new ClickHandler(){
+			public void onClick(ClickEvent event) {
+				showOverview(popUp);
+			}});
+  	
+  }
+  
+  private void showOverview(PopupPanel pop){
+  	// Pause game 
+  	if(!game.world.isPaused())
+  		game.pause();
+  	
+  	pop.center();
+    pop.setStyleName("noBorder");
+  	pop.show();
+  }
+  
+  
+  
+  /**
+   * Initialize start menu for selecting linkset.
+   * Do autologin if needed.
+   */
+  private void initStartPanel() {
+//  	initHighscore();
+  	highscoreRequest();
+    tabPanel = new StartPanel(1.5, Unit.EM, config);
+    tabPanel.setLinkset(linksetList);
+    tabPanel.setHighscorePanel(highscorePanel);
+    tabPanel.initGUI();
+  
+    // glass panel behind popUp
+    glass = new PopupPanel(false);
+    glass.setStyleName("rx-glass");
+    DOM.setStyleAttribute(glass.getElement(), "width", "100%");
+    DOM.setStyleAttribute(glass.getElement(), "height", "100%");
+    DOM.setStyleAttribute(glass.getElement(),
+        "backgroundColor", "#000");
+   
+    menu = new PopupPanel(false);
+    menu.add(tabPanel);
+    DOM.setStyleAttribute(menu.getElement(), "border", "1px black solid");
+    DOM.setStyleAttribute(menu.getElement(), "padding", "0px");
+    glass.show();
+    menu.center();
+    
+    checkLoginNeeded();
+    
+  }
+  
+  private void checkLoginNeeded(){
+  	echo("##Client: Check if login is needed");
+  	// Check whether user is logged in (but not with kongregate)
+    if(config.getLoginNeeded()==true){
+    	echo("Yeah, it's needed");
+    	autoLogin();
+	    // Set button ClickHandler for StartPanel
+	    setStartPanelClickHandlers();
+    }else{
+    	echo("No, it's not needed.");
+    	// Kongregate Login
+    	kongregateLogin();
+   	 // Only need to set Start Button handler
+      ClickHandler startBtnClickHandler = new ClickHandler() {
+        public void onClick(ClickEvent event) {
+          echo("Client: Start button clicked");
+          // Check if necessary input entered
+          if(!tabPanel.isEmpty()) {
+            
+              if(tabPanel.getLinkset()!=null){// LinksSpec
+	              linkset = tabPanel.getLinkset();
+	              echo("Selected linkset: "+linkset);
+	              templateRequest();
+              }
+              else{
+              	Window.setStatus("Invalid Linkset");
+                Window.alert("Please select linkset!");
+              }
+            
+          }else {
+            Window.setStatus("Error");
+            Window.alert("No interlinked ontologies in database!");
+          }
+        }
+      };
+      tabPanel.setStartBtnClickHandler(startBtnClickHandler);
+      tabPanel.enableStart();
+    }	
+  	
+  }
+  
+  /** Set ClickHandler for StartPanel buttons*/
+  private void setStartPanelClickHandlers(){
+    // Start Button
+    ClickHandler startBtnClickHandler = new ClickHandler() {
+      public void onClick(ClickEvent event) {
+        echo("Client: Start button clicked");
+        // Check if necessary input entered
+        if(!tabPanel.isEmpty()) {
+          if (user.getName().length()>2) {
+            if(tabPanel.getLinkset()!=null){// LinksSpec
+            linkset = tabPanel.getLinkset();
+            echo("Selected linkset: "+linkset);
+            templateRequest();
+            }
+            else{
+            	Window.setStatus("Invalid Linkset");
+              Window.alert("Please select linkset!");
+            }
+          }
+          else {
+            Window.setStatus("Invalid UserName");
+            Window.alert("UserName has to be at least 3 characters long!");
+          }
+        }else {
+          Window.setStatus("Error");
+          Window.alert("No interlinked ontologies in database!");
+        }
+      }
+    };
+    tabPanel.setStartBtnClickHandler(startBtnClickHandler);
+    
+    // Login Button
+    ClickHandler loginBtnClickHandler = new ClickHandler() {
+      public void onClick(ClickEvent event) {
+      	if(tabPanel.loginSelected()){
+	      	login();
+        	tabPanel.getLoginButton().setEnabled(false);
+      	}
+      }
+    };
+    tabPanel.setLoginBtnClickHandler(loginBtnClickHandler);
+    
+    // Logout Button
+    ClickHandler logoutBtnClickHandler = new ClickHandler() {
+      public void onClick(ClickEvent event) {
+      	if(!user.getName().isEmpty()){
+	      	logout();
+      	}
+      }
+    };
+    tabPanel.setLogoutBtnClickHandler(logoutBtnClickHandler);
+    
+    // Add Links Button
+    ClickHandler addLinksBtnClickHandler = new ClickHandler() {
+      public void onClick(ClickEvent event) {
+        
+        glass.hide();
+        menu.hide();
+      }
+    };
+    tabPanel.setAddLinksBtnClickHandler(addLinksBtnClickHandler);
+    
+    // Process Task Button
+    ClickHandler processTaskBtnClickHandler = new ClickHandler() {
+      public void onClick(ClickEvent event) {
+
+      }
+    };
+    tabPanel.setProcessTaskBtnClickHandler(processTaskBtnClickHandler);
+  
+  }
+  
+  /** 
+   * Check whether user is logged in, to disableLogin().
+   * @return isLoggedin?
+   */
+  private void autoLogin(){
+  	echo("##Client: Autologin");
+  	Storage store = Storage.getLocalStorageIfSupported();
+  	if(store.getLength()==0){
+  		echo("User is not logged in!");
+  		return;
+  	}
+  	else{
+  		// Search for token
+  	  echo("Search for accessToken in html5 local storage..");
+  	  String key;
+  	  
+  	  // Facebook
+  	  echo("Facebook token");
+  		for(int i=0; i<store.getLength();i++){
+       	echo(i+".Sotrage : "+store.key(i));
+       	if(store.key(i).startsWith(LoginConstants.FACEBOOK_CLIENT_ID)){
+       		key=store.key(i);
+       		echo("Found token!: "+key);
+       		accessToken=store.getItem(key).substring(0, store.getItem(key).indexOf("---"));
+       		echo("Token: "+accessToken);
+       		fbRequestIdentityOnly();
+       		echo("User is already logged in!");
+       		return;
+       	}
+  	  }
+  		
+  		// Google
+  		echo("Google token");
+  		for(int i=0; i<store.getLength();i++){
+       	echo(i+".Sotrage : "+store.key(i));
+       	if(store.key(i).startsWith(LoginConstants.GOOGLE_CLIENT_ID)){
+       		key=store.key(i);
+       		echo("Found token!: "+key);
+       		accessToken=store.getItem(key).substring(0, store.getItem(key).indexOf("---"));
+       		echo("Token: "+accessToken);
+       		googleRequestIdentityJsonp(false);
+       		echo("User is already logged in!");
+       		return;
+       	}
+  	  }
+  	}
+
+  }
+  
+  private void getToken(){
+  	 final AuthRequest reqFb = new AuthRequest(LoginConstants.FACEBOOK_AUTH_URL, LoginConstants.FACEBOOK_CLIENT_ID)
+     .withScopes(LoginConstants.FACEBOOK_FRIENDLIST_SCOPE)
+     // Facebook expects a comma-delimited list of scopes
+     .withScopeDelimiter(",");
+		 AUTH.login(reqFb, new Callback<String, Throwable>() {
+		   public void onSuccess(String token) {
+		     // Access token
+		     Window.alert("Got an OAuth token:\n" + token + "\n" + "Token expires in " + AUTH.expiresIn(reqFb) + " ms\n");
+		     accessToken=token;
+
+		     
+		   }
+		
+			public void onFailure(Throwable reason) {
+				// TODO Auto-generated method stub
+				Window.alert("Get Token fail: "+reason.getMessage());
+				}
+			});
+	
+  }
+ 
+//  private void logout(){
+//  	echo("Logout:");
+//  	String redirect ="http://127.0.0.1:8888/Application/oauthWindow.html";
+//  	String tok = "AAAD7c9Bf7j0BACZAQAAhZCEEZB5ZBSn0R7x6AWV6QXPa9kjM9cUFZB0JFyo2MA7MpTWriRo74DJslcfXHUKISopExmIwA1xoCMc6OHCtlO2nZByO947ktN";
+////  	String url = "https://graph.facebook.com/me/friends?access_token="+accessToken;
+////  	String url="https://www.facebook.com/logout.php?next="+redirect+"&access_token="+accessToken;
+////  	String url = "http://www.hpgloe.com/json/getrec/?lat=37.234&lon=-122.234";
+//  	String url ="http://www.kongregate.com/api/authenticate.json?user_id=765&game_auth_token=AuthToken&api_key=MyApiKey";
+//  	
+//  	
+//  	try{
+//      JsonpRequestBuilder builder = new JsonpRequestBuilder();
+//      builder.setCallbackParam("json");
+//      builder.requestObject(url, new AsyncCallback<JavaScriptObject>(){
+//  
+//        public void onSuccess(JavaScriptObject friends) {
+//          Window.alert("Logout successful");
+//          echo("storage length: "+Storage.getLocalStorageIfSupported().getLength());
+//        }
+//  
+//        public void onFailure(Throwable e) {
+//          displayError("ERROR: Couldn't retrieve JSON -> "+e.getMessage());
+//        }});
+//    }catch (Exception e){
+//      displayError("ERROR: Couldn't retrieve JSON!");
+//    }
+//  	
+//  	echo("Logout Done!");
+//  }
+  
+  private void logout(){
+  	echo("Logout");
+  	// Clear tokens
+    Auth.get().clearAllTokens();
+    // Clear login info
+    String loggedOutUser = this.user.getName();
+    this.user=new User();
+    this.accessToken=null;
+    tabPanel.enableLogin();
+    echo("'"+loggedOutUser+"' was logged out!");
+    Window.alert("'"+loggedOutUser+"' was logged out!");
+  	echo("Logout Done");
+  }
+  private void login(){
+
+    echo("Login:");
+      // AuthRequest
+    String selectedLogin =tabPanel.getSelectedLogin();
+    if(selectedLogin.equals(tabPanel.FACEBOOK_LOGIN)) {
+      echo(tabPanel.FACEBOOK_LOGIN);
+      final AuthRequest reqFb = new AuthRequest(LoginConstants.FACEBOOK_AUTH_URL, LoginConstants.FACEBOOK_CLIENT_ID)
+          .withScopes(LoginConstants.FACEBOOK_FRIENDLIST_SCOPE)
+          // Facebook expects a comma-delimited list of scopes
+          .withScopeDelimiter(",");
+      AUTH.login(reqFb, new Callback<String, Throwable>() {
+        public void onSuccess(String token) {
+          // Access token
+          //Window.alert("Got an OAuth token:\n" + token + "\n" + "Token expires in " + AUTH.expiresIn(reqFb) + " ms\n");
+          accessToken=token;
+          // fbRequest
+          fbRequestJsonp();
+          
+        }
+  
+        public void onFailure(Throwable caught) {
+          Window.alert("Error:\n" + caught.getMessage());
+          // Set Login Button back to enabled, so user can try again
+          tabPanel.getLoginButton().setEnabled(true);
+        }
+      });
+    }else if(selectedLogin.equals(tabPanel.GOOGLE_LOGIN)){
+      echo(tabPanel.GOOGLE_LOGIN);
+      final AuthRequest reqGoogle = new AuthRequest(LoginConstants.GOOGLE_AUTH_URL, LoginConstants.GOOGLE_CLIENT_ID)
+      .withScopes(LoginConstants.PROFILE_SCOPE);
+      AUTH.login(reqGoogle, new Callback<String, Throwable>() {
+        public void onSuccess(String token) {
+          // Access token
+          //Window.alert("Got an OAuth token:\n" + token + "\n"+ "Token expires in " + AUTH.expiresIn(reqGoogle) + " ms\n");
+          accessToken=token;
+          // googleRequest
+          googleRequestJsonp();
+        }
+    
+        public void onFailure(Throwable caught) {
+          Window.alert("Error:\n" + caught.getMessage());
+        }
+      });
+      
+    }else if(selectedLogin.equals(tabPanel.USERNAME_LOGIN)){
+      echo(tabPanel.USERNAME_LOGIN);
+      usernameLogin();
+      
+    }
+    
+  }
+  
+  private void usernameLogin() {
+  	user.setId(Message.USERNAME_LOGIN);
+    user.setName(tabPanel.getEnteredName());
+    Window.alert("Login successful! :)");
+		disableLogin(); 
+//		if (tabPanel.getEnteredName().length()>2) {
+//			user.setId(Message.USERNAME_LOGIN);
+//      user.setName(tabPanel.getEnteredName());
+//			disableLogin();      
+//    }
+//    else {
+//      Window.setStatus("Invalid UserName");
+//      Window.alert("UserName has to be at least 3 characters long!");
+//    }
+	}
+
+  
+  /**
+   * Init popup for displaying highscore
+   */
+  private void initHighscore() {
+    
+    
+    /*
+    final PopupPanel glass = new PopupPanel();
+    glass.setStyleName("rx-glass");
+    DOM.setStyleAttribute(glass.getElement(), "width", "100%");
+    DOM.setStyleAttribute(glass.getElement(), "height", "100%");
+    
+    DOM.setStyleAttribute(glass.getElement(),
+        "backgroundColor", "#000");
+    DOM.setStyleAttribute(glass.getElement(),
+        "opacity", "0.70");
+ 
+    */
+    
+    
+    
+    highscorePanel = new HighscorePanel(startOfGame);
+    
+	  if(startOfGame==false){ 
+	
+	  	// Create the popup dialog box
+	    popup= new PopupPanel(false);
+//	    popup.setTitle("Game End");
+	    popup.setAnimationEnabled(true);
+	    popup.setStyleName("highscorepanel");
+	    //DOM.setStyleAttribute(popup.getElement(), "z-index", "10");
+	    //DOM.setStyleAttribute(popup.getElement(), "width", "100%");
+	    //DOM.setStyleAttribute(popup.getElement(), "height", "100%");
+	  	
+	    // Add a handler to close the popup
+	    ClickHandler closeHandler = new ClickHandler() {
+	      public void onClick(ClickEvent event) {
+	        echo("Highscore close!");
+	      	popup.hide();
+	        //msgButton.setEnabled(true);
+	        //msgButton.setFocus(true);
+	        game.worldLoaded = true;
+	        verifyButton.setEnabled(true);
+	        newLevel();
+	      }
+	    };
+	    // Add a handler to close the popup and send players highscore to server
+	    ClickHandler submitHandler = new ClickHandler() {
+	      public void onClick(ClickEvent event) {
+	      	echo("Highscore submit!");
+	      	//String score = Integer.toString(game.world.getScore());
+	        //String player = nameInput.getText();
+	        sendScoreToServer();
+	        popup.hide();
+	        //msgButton.setEnabled(true);
+	        //msgButton.setFocus(true);
+	        game.worldLoaded = true;
+	        verifyButton.setEnabled(true);
+	        newLevel();
+	      }
+	    };
+	    
+	    echo("Add Highscore Handler");
+	    highscorePanel.setSubmitBtnClickHandler(submitHandler);
+	    highscorePanel.setCloseBtnClickHandler(closeHandler);
+	    
+	    popup.setWidget(highscorePanel);
+  	}
+    
+    
+  }
+
+  /**Is InputListening from GameComponent blocked?*/
+  public boolean isInputDisabled()  {
+    return this.disableInput;
+  }
+  
+  /**Is InputListening from GameComponent blocked?*/
+  public boolean isStartOfLevel()  {
+    return this.startOfLevel;
+  }
+  
+  public void setStartOfLevel(boolean b){
+  	this.startOfLevel = b;
+  }
+ 
+  
+  /**
+   * Show highscore popup
+   * @param stmt
+   */
+  public void showHighscore(String[] stmt) {
+    echo("##Client: show highscore##");
+    highscorePanel.reset();
+//  	highscorePanel.setStartOfGame(startOfGame);
+    
+    // Update highscoreList
+    highscorePanel.generateHighscoreList(stmt);
+ 
+    
+    if(startOfGame==false){
+
+      this.verifyButton.setEnabled(false);
+      // Update score
+      String score = Integer.toString(this.game.world.getInfoText().getScore());
+      highscorePanel.setScore(score);
+    	
+//    	highscorePanel.setStartOfLevel(false);
+	    popup.center();
+	    popup.show();
+    }
+//    else {
+//    	highscorePanel.setStartOfLevel(true);
+//    }
+    echo("##Client: show highscore END##");
+  }
+  
+  /**
+   * Add money to players budget. Update money from GameWorld and InfoText.
+   * @param money
+   */
+  public void addMoney(int money) {
+    game.world.addMoney(money);
+    game.world.getInfoText().updateMoney(game.world.getMoney());
+  }
+  
+  /**
+   * Process bonus. Check  bonus and print bonus related message to text field.
+   * Add verification to VerificationStatistics 
+   * @param bonus money to add
+   */
+  public void processBonus(Bonus eval) {
+  	int bonus = eval.getBonus();
+  	int finalBonus = Balancing.getBonus(bonus,eval.getDifficulty());
+    echo("bonus: "+bonus + " , diff: "+eval.getDifficulty()+ " , finalBonus: "+finalBonus);
+    
+  	echo("##Client: Process bonus= "+bonus+" ##");
+    String msg = null; 
+    if(bonus == GameConstants.BONUS_NONE && !notSure){ //disagreement
+      setDisagreement();
+    }
+    if (notSure){// -1
+      setNotSure(bonus);
+    }
+    else if (bonus==GameConstants.BONUS_PENALTY) {// False
+    	setPenalty();
+    }
+    else if (bonus == GameConstants.BONUS_HUGE || bonus == GameConstants.BONUS_MEDIUM) {// Bonus
+    	setAgreement(finalBonus);
+    }
+    else if(bonus== GameConstants.BONUS_FIRST){
+    	setFirstVerification(bonus);
+    }
+    
+    
+    // documentation of verification
+    verificationStats.addEvaluation(bonus, notSure);
+  
+    addMoney(finalBonus);
+    notSure=false;
+    echo("##Client: Process bonus done ##");
+  }
+  
+//  
+//  
+//  public void processLinkset(ArrayList<String> list){
+//    
+//    ontologyList = list;
+//  }
+//  
+  /**
+   * Asynchronous call of server's userVerification method.
+   * Send verification and linkset information to the server and wait for a response.
+   */
+  private void sendVerificationToServer(int selection) {
+  	echo("\n### Client: Send verification to server ###");
+  	
+  	// disable verify buttons
+  	verifyComponent.disableButtons();
+  	this.verifyLock = true;
+  	
+  	// Check if users credibility should be checked
+  	checkUserCredibility();
+  	
+  	// Sound
+//  	game.getSound().playSend();
+  	
+    // Add temp. money for verification
+    int money=MONEY_FOR_VERIFICATION; // VALID, NOT VALID
+    if(selection == GameConstants.UNSURE) { // NOT SURE
+      money=MONEY_FOR_NOT_SURE;
+      notSure=true;
+    }
+    addMoney(money);
+    
+    // Change verifyButton
+    verifyButton.setEnabled(false);
+    verifyButton.setText("Verification send to server!");
+    
+    // Get Verification
+    verification = new Verification(link.getId(),selection);
+    verificationStats.addVerification(verification);
+    
+    // Callback
+    service.userVerification(verificationStats.getCompleteList(),linkset.getName(),user, thisLink,nextLink,callbackGetLink);
+    echo("CLIENT: thisLink = "+thisLink);
+    echo("CLIENT: nextLink = "+nextLink);
+    
+    timeOut();   
+    echo("### Client: Send verification to server done. ###");
+  }
+  
+  private void checkUserCredibility(){
+  	int min = 4;
+  	int max =5;
+  	int rnd = min + (int)(Math.random() * ((max - min) + 1));
+  	echo("rnd: "+rnd);
+//  	int rnd = 7;
+  	if(this.verificationStats.getList().size() % rnd == rnd-1){
+  		this.checkUserCredibility=true;
+  		nextLink = Message.EVAL_LINK;
+  		echo("debug: TRUE . size: "+this.verificationStats.getList().size() );
+  	}else {
+  		nextLink=Message.NORMAL_LINK;
+  		this.checkUserCredibility=false;
+  		echo("debug: FALSE . size: "+this.verificationStats.getList().size());
+  	}
+  }
+  
+  private void commitVerifications(){
+  	echo("Commit Verification?");
+  	// Set level duration
+  	user.calcCurrentLevelTime(System.currentTimeMillis());
+  	echo("#penalties: "+verificationStats.getCountPenalty());
+  	echo("#size: "+verificationStats.getList().size());
+  	int agree = verificationStats.getCountAgreed();
+  	int disagree = verificationStats.getCountDisagreed();
+  	int penalty = verificationStats.getCountPenalty();
+  	int unsure = verificationStats.getCountUnsure();
+  	echo("agree: "+agree+" disagree: "+disagree+"penalty: "+penalty+" unsure:"+unsure);
+  	echo("Error limit: "+ERROR_LIMIT);
+  	echo("CalcErrorRate: "+calcErrorRate());
+  	if(calcErrorRate()<= ERROR_LIMIT){
+  		this.user.setCredible(true);
+  		echo("Commit Link Verifications!");
+  	}else {
+  		this.user.setCredible(false);
+  		echo("Too many false verifications! Link Verifications won't be commited!");
+  	}
+  	service.commitVerifications(this.verificationStats.getList(),agree,disagree,unsure,penalty,this.user,callbackCommitVerifications);
+		
+  	// Submit verificaqtions stats to kongregate
+  	if(config.isKongregate()==true)
+  	submitVerifyStatsToKongregate(verificationStats.getList().size()+"",
+  				verificationStats.getCountAgreed()+"",verificationStats.getCountPenalty()+"");
+//  	Window.alert("java Submit verify stats done!");
+  	// Reset List for this level
+  	this.verificationStats.reset();
+  	echo("Reset verificationStats List for this level");
+  	
+  }
+  
+  private double calcErrorRate(){
+  	double errorRate = ((double) verificationStats.getCountPenalty() )/((double) verificationStats.getList().size());
+  	echo("pen: "+verificationStats.getCountPenalty()+ ", verified: "+verificationStats.getList().size()+" , error: "+errorRate);
+  	
+  	return errorRate;
+  }
+  
+  public native void submitVerifyStatsToKongregate(String countVerify, String countAgree, String countPenalty) /*-{
+	  // Call instance method instanceFoo() on this
+	  //var name = $wnd.kongregate.kongregate.services.getUserId();
+	
+	  $wnd.submitVerifyStats(countVerify,countAgree,countPenalty);
+	  
+	  var s = $wnd.userName;
+	  this.@org.aksw.verilinks.games.peaInvasion.client.Application::setUserNameKongregate(Ljava/lang/String;)(s);
+	}-*/;
+  
+  /**
+   * Asynchronous call of server's firsRequest method.
+   * Send request with linkset and wait for responds of new semantic web link to verify and bonus.
+   */
+  public void firstQueryRequest() {
+	  echo("Client: First Query Request");
+    service.firstRequest(user,linkset.getName(),callbackGetLink);
+    this.disableInput = false;
+  
+  }
+  
+  /**
+   * Asynchronous call of highscoreRequest method.
+   * Requests the highscores from the server and wait for responds. 
+   */
+  public void highscoreRequest() {
+  	echo("##Client: Highscore Request##");
+  	initHighscore();
+    if(startOfGame==false)
+    	game.worldLoaded = false;
+    // Receive highscore from server
+    callbackGetScore = new AsyncCallback<String[]>() {
+      public void onFailure(Throwable caught) {
+        // TODO: Do something with errors.
+      	//        verifyButton.setText(caught.getMessage());
+      	echo("ERROR: Receiving HighscoreList!");
+      }
+      public void onSuccess(String[] stmt) {
+        //deflatten
+        System.out.println("Highscore list received.");
+        showHighscore(stmt);
+      }
+    };
+    service.highscoreRequest(callbackGetScore);
+    echo("##Client: Highscore Request Done##");
+  }
+  
+  public void sendScoreToServer() {
+    String score = Integer.toString(this.game.world.getInfoText().getScore());
+    echo("sendScoreToServer: "+score);
+    // TODO wokring??
+    // Send to Kongregate server
+    if (config.isKongregate()==true)
+    	sendScoreToKongregate(score);
+    
+    service.sendScore(user.getName(),score,callbackSendScore); // Verilink server
+    
+   
+  }
+  
+  public native void sendScoreToKongregate(String score) /*-{
+//  	$wnd.alert("java Submit score: "+score);
+	  $wnd.submitScore(score);
+	}-*/;
+  
+  /**
+   * Request template from server.
+   */
+  public void templateRequest() {
+    System.out.println("####Template Request###");
+    String subjectName = linkset.getSubject();
+    final String objectName = linkset.getObject();
+    System.out.println("Names: "+subjectName+"-"+objectName);
+    
+    // Receive highscore from server
+    callbackGetTemplate = new AsyncCallback<TemplateLinkset>() {
+      public void onFailure(Throwable caught) {
+        // TODO: Do something with errors.
+        verifyButton.setText("Error: "+caught.getMessage());
+        System.out.println("Client: Callback get Template error!");
+      }
+      public void onSuccess(TemplateLinkset stmt) {
+        //deflatten
+        System.out.println("Client: Callback get Template success: "+stmt.getSubject().getOntology()+"-"+stmt.getObject().getOntology());
+        echo("Receiving Template:");
+        echo("predicate: "+stmt.getPredicate());
+        echo("subject type: "+stmt.getSubject().getType());
+        echo("subject prop size: "+stmt.getSubject().getProperties().size());
+        echo("%%%%%%%%%%%%");
+        Window.alert("Client: Callback get Template success: "+stmt.getSubject().getOntology()+"-"+stmt.getObject().getOntology()+" Pred: "+stmt.getPredicate());
+        template=stmt;
+        
+        // template set in instancePanel is still null -> set new template
+        
+        initGUI();
+        initCallback();
+        initHandler();
+        sendUser();
+        
+      }
+    };
+    
+    // TODO hurr: template in templatelinkset umaendern uebrall -> especially updateTable
+    
+    // subject template first, afterwards object template
+    service.templateRequest(subjectName+"-"+objectName, callbackGetTemplate);
+  }
+  
+//  /** 
+//   * Request for list of interlinked ontologies.
+//   */
+//  protected void linksetRequest() {
+//    // Receive highscore from server
+//    callbackGetLinkset = new AsyncCallback<ArrayList<Linkset>>() {
+//      public void onFailure(Throwable caught) {
+//        // TODO: Do something with errors.
+//        //verifyButton.setText(caught.getMessage());
+//      }
+//      public void onSuccess(ArrayList<Linkset> stmt) {
+//        //deflatten
+//        System.out.println("Client: Linkset count: "+stmt.size()+"\n");
+//        //verifyButton.setText("LO Success"+stmt.size()+","+stmt.get(0));
+//        //showHighscore(stmt);
+//        linksetList=stmt;
+////        processLinkset(stmt);
+//        initStartPanel();
+//      }
+//    };
+//    service.linksetRequest(callbackGetLinkset);
+//    
+//  }
+  
+  
+  
+  
+ 
+  /**
+   * Update VerifyComponent's tables
+   * @param stmt new rdfStatement to verify
+   */
+  private void updateTable(rdfStatement stmt, TemplateLinkset template) {
+    verifyComponent.updateStatement(stmt, template);  
+  }
+  
+  public void key1Pressed() {
+  	if(!verifyLock()){
+  		DOM.setStyleAttribute(this.verifyComponent.getTrueButton().getElement(),"border","2px solid black");
+      this.sendVerificationToServer(GameConstants.TRUE);
+  	}
+  }
+  
+  public void key2Pressed() {
+    if(!verifyLock()){
+    	DOM.setStyleAttribute(this.verifyComponent.getFalseButton().getElement(),"border","2px solid black");
+      this.sendVerificationToServer(GameConstants.FALSE);
+  	}
+  }
+  
+  public void key3Pressed() {
+//    if(numKeyCache==3 && !verifyLock())
+//      this.sendVerificationToServer();
+//    else {
+//      this.verifyComponent.setNotSureRadioButton(true);
+//      setNumKeyCache(3);
+//    }
+    if(!verifyLock()){
+    	DOM.setStyleAttribute(this.verifyComponent.getUnsureButton().getElement(),"border","2px solid black");
+      
+//      this.verifyComponent.setNotSureRadioButton(true);
+      this.sendVerificationToServer(GameConstants.UNSURE);
+  	}
+  }
+  
+  /**
+   * Set key cache
+   * @param key
+   */
+  public void setNumKeyCache(int key) {
+  	game.getSound().playClick();
+    this.numKeyCache=key;
+  }
+  
+  private void setFirstVerification(int bonus){
+  	echo("Process Link-Evaluation: First Verification");
+  	String msg="You are the first to verify this statement! " +
+  			"<< "+bonus+" Coins >> Bonus!";
+    game.firstVerification();
+    msgButton.setText(msg);
+    msgButton.setStyleName("gameMessage");
+  }
+  
+  private void setAgreement(int bonus){
+  	echo("Process Link-Evaluation: Agreement");
+  	String msg="Agreement! << "+bonus+" Coins >> Bonus!";
+    game.agreement();
+    if(game.isSpecialEvent()){
+    	bonus = 2*bonus;
+      msg="Agreement! << "+bonus+" Coins >> Bonus! "+game.SPECIAL_REACHED+" agreements in a row! Big Daddy is on his way!";
+      
+    }
+    msgButton.setText(msg);
+    msgButton.setStyleName("gameMessage");
+  }
+  
+  private void setDisagreement(){
+  	echo("Process Link-Evaluation: Disagreement");
+  	String msg="Disagreement! No Bonus!";
+    game.disagreement();
+    msgButton.setText(msg);
+    msgButton.setStyleName("gameMessageDisagreement");
+  }
+  
+  private void setPenalty(){
+  	echo("Process Link-Evaluation: Penalty");
+    String msg="False Verification! << "+GameConstants.BONUS_PENALTY+" Coins >> Penalty!";
+    game.penalty();
+    msgButton.setText(msg);
+    msgButton.setStyleName("gameMessagePenalty");
+  }
+  
+  private void setNotSure(int bonus){
+  	echo("Process Link-Evaluation: Not sure");
+  	String msg="You weren't sure."; 
+  	msgButton.setText(msg);
+    msgButton.setStyleName("gameMessageNotSure");
+  }
+  
+  
+  /** Connect to server, to get linkset. Check if server is running. */
+  private void connect() {
+    // o serverconnect t
+    callbackConnect = new AsyncCallback<String>() { 
+      public void onFailure(Throwable caught) {
+        Window.alert(caught.getMessage());
+        msgButton.setText(caught.getMessage());
+      }
+      public void onSuccess(String stmt) {
+        if(stmt.equals(Message.MSG_NOT_RUNNING)) {
+          serverRunning = false;
+          Window.alert(stmt);
+        }
+        else {
+          serverRunning = true;
+          System.out.println(stmt);
+          linksetRequest();
+          
+        }
+      }
+    };
+    
+    service.connect(callbackConnect);
+  }
+  
+  /** Timer for sending verification*/
+  private void timeOut(){
+ // Set up Timer
+    Timer t = new Timer(){
+      @Override
+      public void run() {
+        verifyButton.setEnabled(true);
+        verifyButton.setText("VERIFY");
+        verifyLock=false;
+        // disable verify buttons
+      	verifyComponent.enableButtons();
+      }
+    };
+    t.schedule(1800);    
+  }
+  
+  /** Is verification mechanism locked? */
+  private boolean verifyLock() {
+    return verifyLock;
+  }
+  
+  private void echo(String msg){
+    System.out.println(msg);
+  }
+  
+  public void sendUser(){
+    echo("Client: Send user to server!");
+    callbackSendUser = new AsyncCallback<String>(){
+
+      public void onFailure(Throwable arg0) {
+        Window.alert("SendUser Error: "+arg0.getMessage());
+        echo("SendUser Error: "+arg0.getMessage());
+      }
+
+      public void onSuccess(String str) {
+        echo("SendUser Success. Strength: "+str);
+        user.setStrength(str);
+        setDifficulty(linkset.getDifficulty());
+        startOfGame=false;
+        initGame();
+        initStartTime();
+        initLeavePage();
+        glass.hide();
+        menu.hide();
+        // Check if user tutorial should be skipped
+        if(!getSkipTutorial())
+        	initTutorial();
+        else{
+        	firstQueryRequest();
+        }
+      }};
+    service.sendUser(user, callbackSendUser);
+  }
+
+  /**
+   * Disconnect user from server. Send session end for statistics.
+   */
+  public void disconnectUser(){
+  	echo("Client: Disconnect user from server!");
+    callbackDisconnectUser = new AsyncCallback<Void>(){
+
+      public void onFailure(Throwable arg0) {
+//        Window.alert("DisconnectUser Error: "+arg0.getMessage());
+        echo("DisconnectUser Error: "+arg0.getMessage());
+      }
+
+      public void onSuccess(Void arg0) {
+        //Window.alert("Success: "+arg0);
+        echo("DisconnectUser Success: "+arg0);
+      }};
+    user.calcPlayTime(System.currentTimeMillis());
+    service.disconnectUser(user, callbackDisconnectUser);
+  }
+  
+	public void setWin(final boolean end) {
+		this.msgButton.setText("Hell Yeah!");
+		this.msgButton.setStyleName("gameMessage");
+		this.disableInput=true;
+		// Glass panel behind popUp
+		glass.clear();
+    glass = new PopupPanel(false);
+    glass.setStyleName("rx-glass");
+    DOM.setStyleAttribute(glass.getElement(), "width", "100%");
+    DOM.setStyleAttribute(glass.getElement(), "height", "100%");
+    DOM.setStyleAttribute(glass.getElement(),
+        "backgroundColor", "#000");
+    DOM.setStyleAttribute(glass.getElement(),
+        "opacity", "0.30");
+  	
+  	final PopupPanel pop = new PopupPanel(false);
+  	pop.setStyleName("statisticsPanel");
+  	// Button
+  	Button next = new Button("Continue");
+  	next.addStyleName("myButton");
+  	VerticalPanel btnPanel = new VerticalPanel();
+  	btnPanel.setSpacing(5);
+  	btnPanel.add(next);
+  	next.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent arg0) {
+				if(end)
+        	highscoreRequest();
+        else
+        	newLevel();
+				glass.hide();
+        pop.hide();
+			}});
+  	// Head
+  	HTML head = new HTML("You WIN!");
+  	head.setStyleName("win_head");
+  	// Image
+  	StatisticsPanel stats = new StatisticsPanel(getStatistics());
+  	
+  	// Text
+  	HTML textHTML = new HTML("Wow! You've successfully cleared the level.<br/>" +
+  			"Let's take a look at your stats.");
+  	textHTML.setStyleName("win_text");
+  	VerticalPanel panel = new VerticalPanel();
+  	panel.add(head);
+  	panel.add(textHTML);
+  	panel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+  	panel.add(stats);
+  	panel.add(btnPanel);
+  	
+  	pop.add(panel);
+  	glass.add(pop);
+  	
+    glass.show();
+    pop.center();
+    
+//    next.setFocus(true);
+    // Send Verification
+    commitVerifications();
+	}
+	
+	public void setLose() {
+		this.msgButton.setText("What the ..");
+		this.msgButton.setStyleName("gameMessageDisagreement");
+		this.disableInput=true;
+		// Glass panel behind popUp
+    glass = new PopupPanel(false);
+    glass.setStyleName("rx-glass");
+    DOM.setStyleAttribute(glass.getElement(), "width", "100%");
+    DOM.setStyleAttribute(glass.getElement(), "height", "100%");
+    DOM.setStyleAttribute(glass.getElement(),
+        "backgroundColor", "#000");
+    DOM.setStyleAttribute(glass.getElement(),
+        "opacity", "0.30");
+  	
+  	final PopupPanel pop = new PopupPanel(false);
+  	pop.setStyleName("statisticsPanel");
+  	// Button
+  	Button next = new Button("Continue");
+  	next.addStyleName("myButton");
+  	VerticalPanel btnPanel = new VerticalPanel();
+  	btnPanel.setSpacing(5);
+  	btnPanel.add(next);
+  	next.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent arg0) {
+				highscoreRequest();
+				glass.hide();
+        pop.hide();
+			}});
+  	// Head
+  	HTML head = new HTML("You Lose!");
+  	head.setStyleName("lose_head");
+  	// Image
+  	StatisticsPanel stats = new StatisticsPanel(getStatistics());
+  	
+  	// Text
+  	HTML textHTML = new HTML("Too bad. You've lost the game.<br/>" +
+  			"Let's take a look at your stats");
+  	textHTML.setStyleName("lose_text");
+  	
+  	VerticalPanel panel = new VerticalPanel();
+  	panel.add(head);
+  	panel.add(textHTML);
+  	panel.setHorizontalAlignment(VerticalPanel.ALIGN_CENTER);
+  	panel.add(stats);
+  	panel.add(btnPanel);
+  	
+  	pop.add(panel);
+  	glass.add(pop);
+  	
+    glass.show();
+    pop.center();
+//    next.setFocus(true);
+    
+    // Commit Verification
+    commitVerifications();
+	}
+  
+	private void newLevel(){
+		this.msgButton.setText("Let's go!");
+		this.msgButton.setStyleName("gameMessage");
+		game.resetSpecial();
+		game.world.newLevel();
+		this.disableInput = false;
+		this.startOfLevel = true;
+	}
+	
+	private Statistics getStatistics(){
+		Statistics statistics = new Statistics();
+		statistics.setUser(user);
+		statistics.setScore(game.world.getScore());
+		statistics.setMoney(game.world.getMoney());
+		statistics.setLevel(game.world.getLevel());
+		statistics.setVerification(verificationStats);
+		
+		return statistics;
+	}
+//	
+//	public void difficultyRequest(){
+//
+//
+//		service.difficultyRequest(linkset.getName(),callbackGetDifficulty);
+//	}
+//	
+
+	private void setDifficulty(String diff) {
+		this.difficulty = diff;
+		
+	}
+
+	public String getDifficulty() {
+		// TODO Auto-generated method stub
+		return this.difficulty;
+	}
+
+	public void setUserCurrentLevel(int lvl) {
+		if(user!=null)
+			user.setCurrentLevel(lvl);
+		
+	}
+
+	public void setCurrentLevelStartTime() {
+		if(this.user!=null)
+			this.user.setCurrentLevelStartTime(System.currentTimeMillis());
+		
+	}
+	
+	private double calcDifficulty(double difficulty){
+		return Balancing.getLinkDifficulty(difficulty);
+	}
+
+	public User getUser() {
+		// TODO Auto-generated method stub
+		return this.user;
+	}
+	
+	
 }

@@ -52,7 +52,58 @@
       <classifier>sources</classifier>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>com.googlecode.playn</groupId>
+    	<artifactId>playn-core</artifactId>
+    	<version>1.0.3</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
+    <dependency>
+    	<groupId>com.googlecode.playn</groupId>
+    	<artifactId>playn-html</artifactId>
+    	<version>1.0.3</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
+    <dependency>
+    	<groupId>com.googlecode.playn</groupId>
+    	<artifactId>playn-java</artifactId>
+    	<version>1.0.3</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
+    <dependency>
+    	<groupId>com.googlecode.playn</groupId>
+    	<artifactId>playn-jbox2d</artifactId>
+    	<version>1.0.3</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
+    <dependency>
+    	<groupId>com.googlecode.playn</groupId>
+    	<artifactId>playn-webgl</artifactId>
+    	<version>1.0.3</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
+    
+    
+     <!-- local mvn repo -->
+    <dependency>
+    	<groupId>com.google.gwt.maps</groupId>
+    	<artifactId>gwt-maps-v3-api</artifactId>
+    	<version>1.0</version>
+    	<type>jar</type>
+    </dependency>
+    <dependency>
+    	<groupId>com.google.gwt.ajaxloader</groupId>
+    	<artifactId>ajaxloader</artifactId>
+    	<version>1.0</version>
+    	<type>jar</type>
+    </dependency>
   </dependencies>
+
 
   <build>
     <!-- Generate compiled stuff in the folder used for developing mode -->
