@@ -23,7 +23,7 @@
 
   <servlet-mapping>
     <servlet-name>restServlet</servlet-name>
-    <url-pattern>/Application/rest</url-pattern>
+    <url-pattern>/VeriLinks/rest</url-pattern>
   </servlet-mapping>
   
   <servlet>
@@ -33,7 +33,7 @@
 
   <servlet-mapping>
     <servlet-name>uploadServlet</servlet-name>
-    <url-pattern>/Application/upload</url-pattern>
+    <url-pattern>/VeriLinks/upload</url-pattern>
   </servlet-mapping>
 
   <!-- Default page to serve -->

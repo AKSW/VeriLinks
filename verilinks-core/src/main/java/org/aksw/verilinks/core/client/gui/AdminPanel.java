@@ -280,8 +280,6 @@ public class AdminPanel extends VerticalPanel {
 
   }
 
-  
-
 	public VerticalPanel initLeftGUI() {
     VerticalPanel panel = new VerticalPanel();
     

@@ -37,6 +37,7 @@ public class Link {
 		this.objectUri=objectUri;
 		this.predicate=predicate;
 		this.counter=counter;
+		this.id=id;
 		
 		
 	}

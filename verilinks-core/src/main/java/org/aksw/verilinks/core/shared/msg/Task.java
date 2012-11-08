@@ -13,6 +13,17 @@ public class Task implements IsSerializable{
    */
   private String[] task;
   
+  private String subject;
+  private String object;
+  private String predicate;
+  private String description;
+  private String difficulty;
+  private String linkFile;
+  private String date;
+  private String linkset;
+  
+  
+  
   public Task(){
     super();
     task = new String[SIZE];
@@ -100,6 +111,126 @@ public class Task implements IsSerializable{
   public String getLinkset(){
   	return this.task[7];
   }
+
+
+
+//public String[] getTask() {
+//	return task;
+//}
+//
+//
+//
+//public void setTask(String[] task) {
+//	this.task = task;
+//}
+//
+//
+//
+//public String getSubject() {
+//	return subject;
+//}
+//
+//
+//
+//public void setSubject(String subject) {
+//	this.subject = subject;
+//}
+//
+//
+//
+//public String getObject() {
+//	return object;
+//}
+//
+//
+//
+//public void setObject(String object) {
+//	this.object = object;
+//}
+//
+//
+//
+//public String getPredicate() {
+//	return predicate;
+//}
+//
+//
+//
+//public void setPredicate(String predicate) {
+//	this.predicate = predicate;
+//}
+//
+//
+//
+//public String getDescription() {
+//	return description;
+//}
+//
+//
+//
+//public void setDescription(String description) {
+//	this.description = description;
+//}
+//
+//
+//
+//public String getDifficulty() {
+//	return difficulty;
+//}
+//
+//
+//
+//public void setDifficulty(String difficulty) {
+//	this.difficulty = difficulty;
+//}
+//
+//
+//
+//public String getLinkFile() {
+//	return linkFile;
+//}
+//
+//
+//
+//public void setLinkFile(String linkFile) {
+//	this.linkFile = linkFile;
+//}
+//
+//
+//
+//public String getDate() {
+//	return date;
+//}
+//
+//
+//
+//public void setDate(String date) {
+//	this.date = date;
+//}
+//
+//
+//
+//public String getLinkset() {
+//	return linkset;
+//}
+//
+//
+//
+//public void setLinkset(String linkset) {
+//	this.linkset = linkset;
+//}
+//
+//
+//
+//public static String getSeperator() {
+//	return SEPERATOR;
+//}
+//
+//
+//
+//public static int getSize() {
+//	return SIZE;
+//}
 
 
   

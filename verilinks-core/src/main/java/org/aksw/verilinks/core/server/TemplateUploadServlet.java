@@ -148,18 +148,17 @@ public class TemplateUploadServlet extends HttpServlet {
 
 					if (itemName.equals(AdminPanel.FILE)) {
 						fileName = fileItem.getName();
-						/*
-						 * // Debug show received file
-						 * System.out.println("FieldName:    "
-						 * +fileItem.getFieldName());
-						 * System.out.println("Name:    "+fileItem.getName());
-						 * System
-						 * .out.println("Contenttype:    "+fileItem.getContentType
-						 * ());
-						 * System.out.println("Size:    "+fileItem.getSize());
-						 * System
-						 * .out.println("String:    "+fileItem.getString()); //
-						 */
+
+						// Debug show received file
+						System.out.println("FieldName:    "
+								+ fileItem.getFieldName());
+						System.out.println("Name:    " + fileItem.getName());
+						System.out.println("Contenttype:    "
+								+ fileItem.getContentType());
+						System.out.println("Size:    " + fileItem.getSize());
+//						System.out
+//								.println("String:    " + fileItem.getString()); //
+
 						// get only the file name not whole path
 						if (fileName != null) {
 							fileName = FilenameUtils.getName(fileName);
@@ -247,7 +246,7 @@ public class TemplateUploadServlet extends HttpServlet {
 			prefix += '/';
 		}
 		// resourcePath = prefix+"WEB-INF/classes/";
-		String resourcePath = prefix + "Application/";
+		String resourcePath = prefix + "VeriLinks/";
 		System.out.println("prefix: " + prefix);
 		System.out.println("resourcePath: " + resourcePath);
 

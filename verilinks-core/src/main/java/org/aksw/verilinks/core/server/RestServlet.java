@@ -2,11 +2,13 @@ package org.aksw.verilinks.core.server;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -18,7 +20,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -26,6 +31,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+
 
 import org.aksw.verilinks.core.shared.Balancing;
 import org.aksw.verilinks.core.shared.Message;
@@ -35,35 +42,47 @@ import org.aksw.verilinks.core.shared.msg.Link;
 import org.aksw.verilinks.core.shared.msg.Linkset;
 import org.aksw.verilinks.core.shared.msg.Property;
 import org.aksw.verilinks.core.shared.msg.Score;
+import org.aksw.verilinks.core.shared.msg.Task;
 import org.aksw.verilinks.core.shared.msg.User;
 import org.aksw.verilinks.core.shared.msg.Userdata;
+import org.aksw.verilinks.core.shared.msg.Verification;
+import org.aksw.verilinks.core.shared.templates.TemplateLinkset;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openjena.atlas.json.JSON;
+import org.openjena.atlas.json.JsonArray;
 import org.openjena.atlas.json.JsonObject;
 import org.openjena.atlas.json.JsonValue;
+import org.xml.sax.SAXException;
 
 public class RestServlet extends HttpServlet {
 
 	/** User List */
 	private HashMap<String, User> userList;
-	
+
 	private String GET_USER_SCORE = "getUserScore";
 	private String GET_HIGHSCORE = "getHighscore";
 	private String GET_USERDATA = "getUserdata"; // connect method
 	private String GET_LINK = "getLink";
 	private String GET_LINKSETS = "getLinksets";
 	private String GET_TEMPLATE = "getTemplate";
-	
+	private String GET_TASKS = "getTasks";
+	private String PERFORM_TASKS = "performTasks";
 	private String CHECK_STATUS = "checkStatus";
-	
-	
+
 	private String POST_COMMIT_VERIFICATIONS = "commitVerifications";
 	private String POST_SCORE = "postScore";
 	private String POST_LEVEL_STATS = "postLevelStats";
+
 	
+	private static final int VALID = 1;
+	private static final int NOT_VALID = 0;
+	private static final int UNSURE = -1;
+	private static final int SURE_POSITIVE = 1;
+	private static final int SURE_NEGATIVE = -2;
+
 	
 	/** Resource path */
 	private String resourcePath = null;
@@ -77,9 +96,8 @@ public class RestServlet extends HttpServlet {
 	private static final double EVAL_NEGATIVE = -1;
 	private static final double EVAL_FIRST = -2;
 
-	private static final double VALID = 1;
-	private static final double NOT_VALID = 0;
-	private static final double UNSURE = -1;
+
+	private boolean taskSuccess;
 
 	/** Prefix Map **/
 	private HashMap<String, String> prefixMap;
@@ -88,12 +106,129 @@ public class RestServlet extends HttpServlet {
 	public void init() throws ServletException {
 		super.init();
 		echo("Init Server");
-		
-		//users
-		userList = new HashMap<String,User>();
-		
+
 		initPath();
+
+		// users
+		userList = new HashMap<String, User>();
+
+		// Check if necessary files exist
+		if (!checkFiles()) {
+			echo("####Server: Initialize Server failed. System files missing");
+			return;
+		}
+
+		// Check if database exist
+		if (!checkDbExist()) {
+			createDatabase();
+		}
+
+		// Check if MySQL Server is running
+		if (!checkMySqlServer()) {
+			return;
+		} else {
+			// Init data
+			restart();
+		}
+
+	}
+
+	private void restart() {
 		initPrefix();
+		// this.running = true;
+	}
+
+	private boolean checkFiles() {
+		echo("##Check if files exist##");
+		boolean exist = true;
+		// dbIniFile
+		if (!(new File(resourcePath + dbIniFile).isFile())) {
+			exist = false;
+			echo("Error: " + dbIniFile + " not found! ");
+		} else
+			echo("Found " + dbIniFile);
+		// templateFile
+		if (!(new File(resourcePath + templateFile).isFile())) {
+			exist = false;
+			echo("Error: " + templateFile + " not found! ");
+		} else
+			echo("Found " + templateFile);
+		// prefixFile
+		if (!(new File(resourcePath + prefixFile).isFile())) {
+			exist = false;
+			echo("Error: " + prefixFile + " not found! ");
+		} else
+			echo("Found " + prefixFile);
+		echo("##Check if files exist done##\n");
+		return exist;
+	}
+
+	private boolean checkMySqlServer() {
+		echo("##Server: Check if MySQL-Server running##");
+		DBTool db = new DBTool(resourcePath + dbIniFile);
+		boolean b;
+		if (db.getConnection() == null) {
+			echo("##Server: ERROR MySQL-Server not running##");
+			b = false;
+		} else {
+			echo("##Server: MySQL-Server is running##");
+			b = true;
+		}
+		try {
+			db.getConnection().close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return b;
+	}
+
+	private boolean checkDbExist() {
+		echo("##Server: Check if veri-links database exists##");
+		boolean exist = false;
+		// 1.connect to db
+		DBTool db = new DBTool(resourcePath + dbIniFile);
+		String dbExistQuery = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '"
+				+ db.getDatabase() + "'";
+		echo("Query: " + dbExistQuery);
+		db.setDatabase("");
+		db.createUrl();
+		Connection con = db.getConnection();
+		try {
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery(dbExistQuery);
+			if (rs.next()) {
+				echo("Veri-Links db exists");
+				exist = true;
+			} else {
+				echo("Veri-Links db doesn't exists");
+				exist = false;
+			}
+		} catch (Exception e) {
+			echo("Server Error: Couldn't check whether database exists or not! Check iniFile.");
+		}
+		echo("##Server: Check if veri-links database exists done##\n");
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return exist;
+	}
+
+	private void createDatabase() {
+		echo("##Server: Create Database##");
+		// 1.connect to db
+		DBTool db = new DBTool(resourcePath + dbIniFile);
+		try {
+			db.createDatabase();
+			echo("##Server: Create Database Success##\n");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			echo("##Server: ERROR Create Database Failed##\n");
+		}
 	}
 
 	public void initPath() {
@@ -117,14 +252,14 @@ public class RestServlet extends HttpServlet {
 		if (service.equals(POST_COMMIT_VERIFICATIONS)) // Commit Verification
 			response = commitVerification(req);
 		if (service.equals(POST_SCORE)) // Post score
-			response = postScore(req.getParameter("userId"),req.getParameter("userName"),req.getParameter("score"),req.getParameter("game"));
+			response = postScore(req.getParameter("userId"),
+					req.getParameter("userName"), req.getParameter("score"),
+					req.getParameter("game"));
 		if (service.equals(POST_LEVEL_STATS)) // Post score
 			response = postLevelStats(req);
-
+		resp.addHeader("Access-Control-Allow-Origin", "*");
 		resp.getWriter().write(response);
 	}
-
-
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -137,24 +272,31 @@ public class RestServlet extends HttpServlet {
 		echo("Req: " + service);
 		String response = null;
 		if (service.equals(GET_USERDATA)) // Userdata
-			response = getUserdata(req.getParameter("userId"), req.getParameter("userName")).toString();
+			response = getUserdata(req.getParameter("userId"),
+					req.getParameter("userName")).toString();
 		else if (service.equals(GET_HIGHSCORE)) // Highscore
 			response = getHighscore(req.getParameter("game")).toString();
 		else if (service.equals(GET_LINK)) // Link
-			response = getLink(req.getParameter("userId"), req.getParameter("userName"),  
-					req.getParameter("linkset"), req.getParameter("nextLink"), 
+			response = getLink(req.getParameter("userId"),
+					req.getParameter("userName"), req.getParameter("linkset"),
+					req.getParameter("nextLink"),
 					req.getParameter("verifiedLinks"),
-					req.getParameter("curLink"), req.getParameter("verification"))
-					.toString();
+					req.getParameter("curLink"),
+					req.getParameter("verification")).toString();
 		else if (service.equals(GET_LINKSETS)) // Linkset
 			response = getLinkset().toString();
 		else if (service.equals(GET_TEMPLATE))
 			response = getTemplate();
+		else if (service.equals(GET_TASKS))
+			response = getTasks().toString();
+		else if (service.equals(PERFORM_TASKS))
+			response = taskPerform();
 		else if (service.equals(CHECK_STATUS))
 			response = "Server running!";
-		
+
 		// CORS
-//		resp.addHeader("Access-Control-Allow-Origin", "http://localhost:8080");
+		// resp.addHeader("Access-Control-Allow-Origin",
+		// "http://localhost:8080");
 		resp.addHeader("Access-Control-Allow-Origin", "*");
 
 		resp.setContentType("application/json");
@@ -167,32 +309,29 @@ public class RestServlet extends HttpServlet {
 		resp.getWriter().write(response);
 	}
 
-	
-
-
-	private String postScore(String id,
-			String userName, String score, String game) {	
+	private String postScore(String id, String userName, String score,
+			String game) {
 		Connection con = null;
 		try {
 			DBTool db = new DBTool(resourcePath + dbIniFile);
 			con = db.getConnection();
-			String query = "INSERT IGNORE INTO highscore VAUES ('"+id+"' , '"+userName+"' ,"+score+")";
+			String query = "INSERT IGNORE INTO highscore VAUES ('" + id
+					+ "' , '" + userName + "' ," + score + ")";
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate(query);
 			con.close();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			echo("SQL ERROR: " + e.getMessage());
 			return e.getMessage();
-		} 
+		}
 		return "Post score successfully!";
 	}
 
 	private String postLevelStats(HttpServletRequest req) {
 		// Parse stats
-		
-		
+
 		Connection con = null;
 		try {
 			DBTool db = new DBTool(resourcePath + dbIniFile);
@@ -201,34 +340,264 @@ public class RestServlet extends HttpServlet {
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate(query);
 			con.close();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			echo("SQL ERROR: " + e.getMessage());
 			return e.getMessage();
-		} 
+		}
 		return "Post level stats successfully!";
 	}
 
-	
 	private String commitVerification(HttpServletRequest req) {
-		StringBuffer jb = new StringBuffer();
-		String line = null;
-		try {
-			BufferedReader reader = req.getReader();
-			while ((line = reader.readLine()) != null){
-				jb.append(line);
-				JsonObject j = JSON.parse(line);
-				JsonValue eval = j.get("verifiTest");
-				System.out.println("EVAL: "+eval.toString());
+		echo("CommitVerification: " + req);
+		if (req.getParameterMap().size() != 2) {
+			echo("param: " + req.getParameterMap().size());
+			return "Error: Invalid request parameters!";
+		}
+		
+		// ParseJson
+		ArrayList<Verification> verifications =null;
+		User user = new User();
+		List<String> requestParameterNames = Collections
+				.list((Enumeration<String>) req.getParameterNames());
+		for (String parameterName : requestParameterNames) {
+			echo("param Name: " + parameterName);
+			if (!parameterName.equals("service")){
+				// veri
+				verifications = parseJson(parameterName);
+				// user
+				JsonObject j = JSON.parse(parameterName);
+				String userId = j.get("userId").toString();
+				String userName = j.get("userName").toString();
+				user.setId(userId);
+				user.setName(userName);
+				user.setCredible(true);
 			}
-		} catch (Exception e) { /* report an error */
+		}
+		
+	
+		
+		// Connect to db
+		DBTool db = new DBTool(resourcePath + dbIniFile);
+		Connection con = db.getConnection();
+
+		// add into db
+		updateDB(con, verifications, 0, 0, 0, 0, user, user.isCredible());
+
+//		// Get user strength
+//		String userStrength = getUserStrength(con,user);
+
+		// Close db connection
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		echo("POST data: " + jb.toString());
-		return jb.toString();
+		echo("Commitverification done: ");
+		return "done";
 	}
 
+	private ArrayList<Verification> parseJson(String data) {
+		echo("Parse Json: " + data);
+		ArrayList<Verification> arr = new ArrayList<Verification>();
+		
+		try {
+			JsonObject j = JSON.parse(data);
+//			String userId = j.get("userId").toString();
+//			String userName = j.get("userName").toString();
+			JsonValue veriValue = j.get("verification");
+			echo("verivalue: " + veriValue);
+
+			JsonArray veriArray = veriValue.getAsArray();
+			echo("veriArray size: " + veriArray.size());
+			for (int i = 0; i < veriArray.size(); i++) {
+				JsonObject c = JSON.parse(veriArray.get(i).toString());
+				String verification = c.get("veri").toString();
+				String id = c.get("id").toString();
+
+				echo("i: " + id);
+				echo("v: " + verification);
+				Verification v = new Verification();
+				v.setId(Integer.parseInt(id));
+				v.setSelection(Integer.parseInt(verification));
+				arr.add(v);
+			}
+		} catch (Exception e) {
+			echo("error:" + e.getMessage());
+		}
+		return arr;
+	}
+
+	
+
+	/**
+	 * Update db
+	 * @param con
+	 * @param verifications currentList
+	 * @param agree
+	 * @param disagree
+	 * @param unsure
+	 * @param penalty
+	 * @param user
+	 * @return userStrength
+	 */
+	private void updateDB(Connection con,
+			ArrayList<Verification> verifications, int agree, int disagree, int unsure, int penalty, User user, boolean credible) {
+
+		echo("##Server: Commit Verifications of User " + user.getName() + "####");
+		
+
+		// Links statistics
+		updateLinksStatistics(con, verifications, user, credible);
+		
+		// User statistics
+//		updateUserStatistics(con, verifications, agree, disagree, unsure, penalty, user);
+		
+		
+//		return msg;
+	}
+
+	private void updateUserStatistics(Connection con, ArrayList<Verification> verifications, int agree,  int disagree, int unsure, int penalty, User user) {
+		String sqlQuery=null;
+		Statement dbStmt=null;
+		
+		// Gaming stats
+		if(user.getCurrentLevel()<4){
+			try {
+				echo("\n>>>>Update GameStats for user '" + user.getName() + "'");
+				// Level cleared
+				sqlQuery = "UPDATE user SET `Level"
+						+ user.getCurrentLevel() + "Cleared` = (`Level"+user.getCurrentLevel()+"Cleared` +1) "
+						+ "WHERE `" + PropertyConstants.DB_TABLE_USER_ID +"` = '"+user.getId()+"' AND `"
+						+ PropertyConstants.DB_TABLE_USER_NAME +"` = '"+user.getName()+"' ";
+				dbStmt = con.createStatement();
+				dbStmt.executeUpdate(sqlQuery);
+				echo("Update level cleared query: "+sqlQuery);
+				// Duration for level
+				double time = user.getCurrentLevelTime()/1000;
+				sqlQuery = "UPDATE user SET `Level"
+					+ user.getCurrentLevel() + "Time` = (`Level"+user.getCurrentLevel()+"Time` +"+ time+") "
+					+ "WHERE `" + PropertyConstants.DB_TABLE_USER_ID +"` = '"+user.getId()+"' AND `"
+					+ PropertyConstants.DB_TABLE_USER_NAME +"` = '"+user.getName()+"' ";
+				echo("Update level cleared TIME query: "+sqlQuery);
+				dbStmt.executeUpdate(sqlQuery);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		// Verification stats
+		try {
+			// Agree
+			String sqlAgree = "update user set Agreement = (Agreement + "+agree+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			echo(sqlAgree);
+			// Disagree
+			String sqlDisagree = "update user set Disagreement = (Disagreement + "+disagree+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			echo(sqlDisagree);
+			// Unsure
+			String sqlUnsure = "update user set Unsure = (Unsure + "+unsure+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			echo(sqlUnsure);
+			// Penalty
+			String sqlPenalty = "update user set Penalty = (Penalty + "+penalty+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			echo(sqlPenalty);
+			// All
+			String sqlAll = "update user set Verified = (Verified + "+verifications.size()+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			echo(sqlAll);
+			dbStmt = con.createStatement();
+			if(agree!=0)
+					dbStmt.executeUpdate(sqlAgree);
+			if(disagree!=0)
+				dbStmt.executeUpdate(sqlDisagree);
+			if(unsure!=0)
+				dbStmt.executeUpdate(sqlUnsure);
+			if(penalty!=0)
+				dbStmt.executeUpdate(sqlPenalty);
+			dbStmt.executeUpdate(sqlAll);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	}
+
+
+	private void updateLinksStatistics(Connection con, ArrayList<Verification> verifications, User user, boolean credible) {
+		if (credible== false){
+			echo("User: "+user.getName()+" had too many false verifications! Don't save decisions!");
+			return;
+		}
+		String msg = null;
+		String sqlQuery, sqlQueryVerify;
+		Statement dbStmt;
+		Link rdfStmt;
+		Verification veri;
+		int id;
+		int selection;
+
+		for (int i = 0; i < verifications.size(); i++) {
+			veri = verifications.get(i);
+			id = veri.getId();
+			selection = veri.getSelection();
+			// update counter in db
+			try {
+				echo("\n>>>>Update statements with ID '" + id + "'");
+				sqlQuery = "UPDATE links SET `"
+						+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_COUNTER + "`= `"
+						+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_COUNTER
+						+ "` + 1 WHERE `" + PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID
+						+ "` = " + id;
+				dbStmt = con.createStatement();
+				dbStmt.executeUpdate(sqlQuery);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			// update selection
+			if (selection != UNSURE) {
+				try {
+
+					if (selection == VALID) {
+						sqlQuery = "UPDATE links SET `"
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_POSITIVE + "`= `"
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_POSITIVE
+								+ "` + 1 WHERE `"
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID + "` = " + id;
+						sqlQueryVerify = "INSERT INTO `"
+								+ PropertyConstants.DB_TABLE_NAME_POSITIVE + "` VALUES ('" + id
+								+ "' , '" + user.getId() + "', '"+user.getName()+"')";
+					} else {
+						sqlQuery = "UPDATE links SET `"
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_NEGATIVE + "`= `"
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_NEGATIVE
+								+ "` + 1 WHERE `"
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID + "` = " + id;
+						sqlQueryVerify = "INSERT INTO `"
+								+ PropertyConstants.DB_TABLE_NAME_NEGATIVE + "` VALUES ('" + id
+								+ "' , '" + user.getId() + "','"+user.getName()+"')";
+					}
+					dbStmt = con.createStatement();
+					dbStmt.executeUpdate(sqlQuery);
+					dbStmt.executeUpdate(sqlQueryVerify);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else{ //if not sure do nothing in db, just inc norSureCounter of statement
+				echo("Evaluation: Unsure(-1)  ---> Do Nothing in links table");
+			}
+			msg = "Commit verifications of user " + user.getName() + " successful";
+		}
+		if (msg == null){
+			msg = "Commit verifications of user " + user.getName() + " failed";
+		}
+		echo(msg);
+	}
+	
 	private boolean isJSONPRequest(HttpServletRequest httpRequest) {
 		String callbackMethod = httpRequest.getParameter("callback");
 		return (callbackMethod != null && callbackMethod.length() > 0);
@@ -242,11 +611,12 @@ public class RestServlet extends HttpServlet {
 	 * Get link
 	 * 
 	 * @param rawLinks
-	 *          already verified links
+	 *            already verified links
 	 * @return link
 	 */
 	private JSONObject getLink(String userId, String userName, String linkset,
-			String nextLink, String verifiedLinks, String curLink, String verification) {
+			String nextLink, String verifiedLinks, String curLink,
+			String verification) {
 		echo("rawLinks: " + verifiedLinks);
 
 		// Connect to db
@@ -265,53 +635,61 @@ public class RestServlet extends HttpServlet {
 		try {
 			JSONObject subject = new JSONObject();
 			JSONObject object = new JSONObject();
-			
+
 			JSONObject prop = null;
 			JSONArray propArray = new JSONArray();
-			
+
 			// Subject
 			subject.put("uri", link.getSubject().getUri());
-//			subject.put("ontology", link.getSubject().getOntology());
+			// subject.put("ontology", link.getSubject().getOntology());
 			List<Property> subjectProp = link.getSubject().getProperties();
-			for(int i=0;i<subjectProp.size();i++){
-//				subject.put(subjectProp.get(i).getProperty(), subjectProp.get(i).getValue());
+			for (int i = 0; i < subjectProp.size(); i++) {
+				// subject.put(subjectProp.get(i).getProperty(),
+				// subjectProp.get(i).getValue());
 				prop = new JSONObject();
 				prop.put("property", subjectProp.get(i).getProperty());
 				prop.put("value", subjectProp.get(i).getValue());
+				echo("s: " + prop.toString());
 				propArray.put(prop);
 			}
+			echo("subjectProp size: " + subjectProp.size());
 			// Property names
 			subject.put("properties", propArray);
-	
+
 			// Object
+			propArray = new JSONArray();
 			object.put("uri", link.getObject().getUri());
 			List<Property> objectProp = link.getObject().getProperties();
-			for(int i=0;i<objectProp.size();i++){
-//				object.put(objectProp.get(i).getProperty(), objectProp.get(i).getValue());
-				prop=new JSONObject();
+			for (int i = 0; i < objectProp.size(); i++) {
+				// object.put(objectProp.get(i).getProperty(),
+				// objectProp.get(i).getValue());
+				prop = new JSONObject();
 				prop.put("property", objectProp.get(i).getProperty());
 				prop.put("value", objectProp.get(i).getValue());
+				echo("o: " + prop.toString());
 				propArray.put(prop);
 			}
+			echo("objectProp size: " + subjectProp.size());
 			// Property names
 			object.put("properties", propArray);
-			
-//			// Properties
-//			JSONObject obProp = new JSONObject();
-//			// for(){
-//			// properties.put(arg0, arg1);
-//			// }
-//			JSONArray obPropNames = new JSONArray();
-//			obPropNames.put("http://www.w3.org/2000/01/rdf-schema#label");
-//			obPropNames.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-//			obPropNames.put("http://dbpedia.org/ontology/abstract");
-//			
-//			obProp.put("label", link.getObject().getLabel());
-//			obProp.put("type", link.getObject().getType());
-//			object.put("properties", obProp);
-//			object.put("propNames", obPropNames);
-			
+
+			// // Properties
+			// JSONObject obProp = new JSONObject();
+			// // for(){
+			// // properties.put(arg0, arg1);
+			// // }
+			// JSONArray obPropNames = new JSONArray();
+			// obPropNames.put("http://www.w3.org/2000/01/rdf-schema#label");
+			// obPropNames.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+			// obPropNames.put("http://dbpedia.org/ontology/abstract");
+			//
+			// obProp.put("label", link.getObject().getLabel());
+			// obProp.put("type", link.getObject().getType());
+			// object.put("properties", obProp);
+			// object.put("propNames", obPropNames);
+
 			// Link
+			linkJson.put("id", link.getId());
 			linkJson.put("subject", subject);
 			linkJson.put("object", object);
 			linkJson.put("predicate", link.getPredicate());
@@ -321,7 +699,7 @@ public class RestServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		// Close db connection
 		try {
 			con.close();
@@ -329,33 +707,47 @@ public class RestServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return linkJson;
 	}
 
 	/**
 	 * Get new link from db
+	 * 
 	 * @param userName
 	 * @param userId
 	 * @param linkset
-	 * @param nextLinkType evaluationLink or normal
-	 * @param verifiedLinks from user verified links
+	 * @param nextLinkType
+	 *            evaluationLink or normal
+	 * @param verifiedLinks
+	 *            from user verified links
 	 * @return
 	 */
-	private Link getNewLink(String userName, String userId,
-			String linkset, String nextLinkType, String verifiedLinks) {
+	private Link getNewLink(String userName, String userId, String linkset,
+			String nextLinkType, String verifiedLinks) {
 		echo("Get new statement for client '" + linkset + "'");
-
 		// Only get statements, which were not shown yet
-		String[] verifications = verifiedLinks.split(" ");
-		String notIn = getNotInQuery(verifications);
-
+		echo("verifiedLinks: " + verifiedLinks);
+		String notIn = "";
+		if (verifiedLinks != null) {
+			String[] verifications = null;
+			if (verifiedLinks.contains(" ")) {
+				echo("contains +");
+				verifications = verifiedLinks.split(" ");
+			} else {
+				verifications = new String[1];
+				verifications[0] = verifiedLinks;
+				echo("solo");
+			}
+			notIn = getNotInQuery(verifications);
+		}
+		echo("Connect DB");
 		// 1.connect to db
 		DBTool db = new DBTool(resourcePath + dbIniFile);
 		Connection con = db.getConnection();
-
+		echo("nextLink: ");
 		boolean nextLink = Boolean.parseBoolean(nextLinkType);
-
+		echo("generate slq");
 		int id = 0;
 		Link statement = null;
 		Statement stmt = null;
@@ -365,7 +757,7 @@ public class RestServlet extends HttpServlet {
 		String SQLqueryLinks = generateLinkQuery(userName, userId, linkset,
 				nextLinkType, verifiedLinks, con);
 		echo("SQLqueryLinks: " + SQLqueryLinks);
-		
+
 		// Execute Query
 		try {
 			stmt = con.createStatement();
@@ -378,19 +770,22 @@ public class RestServlet extends HttpServlet {
 				// TODO: change linkedOntologies into linkset
 				statement = new Link(rs.getInt("ID"), rs.getString("Subject"),
 						rs.getString("Predicate"), rs.getString("Object"),
-						rs.getString("linkedOntologies"), rs.getInt("Counter"), notSure); 
-				echo("link: " + rs.getInt("ID") + " , " + rs.getString("Subject")
-						+ " , " + rs.getString("Predicate") + " , "
-						+ rs.getString("Object") + " , " + rs.getDouble("Confidence")
-						+ " , " + rs.getInt("Counter") + " , " + rs.getDouble("Difficulty"));
+						rs.getString("linkedOntologies"), rs.getInt("Counter"),
+						notSure);
+				echo("link: " + rs.getInt("ID") + " , "
+						+ rs.getString("Subject") + " , "
+						+ rs.getString("Predicate") + " , "
+						+ rs.getString("Object") + " , "
+						+ rs.getDouble("Confidence") + " , "
+						+ rs.getInt("Counter") + " , "
+						+ rs.getDouble("Difficulty"));
 				statement.setDifficulty(rs.getDouble("Difficulty"));
 			} else { // If no result, query again
 				echo("Get new statement fail. Query again!");
 				SQLqueryLinks = "select * from links, difficulty where links.ID=difficulty.ID AND links.linkedOntologies='"
 						+ linkset
 						+ "' and links.Confidence not in (1,-1,-2) "
-						+ notIn
-						+ " order by links.Counter limit 1";
+						+ notIn + " order by links.Counter limit 1";
 				echo("SQLqueryLinks: " + SQLqueryLinks);
 				rs = stmt.executeQuery(SQLqueryLinks);
 				if (rs.next()) {
@@ -399,13 +794,17 @@ public class RestServlet extends HttpServlet {
 							- rs.getInt("Negative");
 					statement = new Link(rs.getInt("ID"),
 							rs.getString("Subject"), rs.getString("Predicate"),
-							rs.getString("Object"), rs.getString("linkedOntologies"),
-							rs.getInt("Counter"), notSure); // TODO: change linkedOntologies
-																							// into linkset
-					echo("link: " + rs.getInt("ID") + " , " + rs.getString("Subject")
-							+ " , " + rs.getString("Predicate") + " , "
-							+ rs.getString("Object") + " , " + rs.getDouble("Confidence")
-							+ " , " + rs.getInt("Counter") + " , "
+							rs.getString("Object"),
+							rs.getString("linkedOntologies"),
+							rs.getInt("Counter"), notSure); // TODO: change
+															// linkedOntologies
+															// into linkset
+					echo("link: " + rs.getInt("ID") + " , "
+							+ rs.getString("Subject") + " , "
+							+ rs.getString("Predicate") + " , "
+							+ rs.getString("Object") + " , "
+							+ rs.getDouble("Confidence") + " , "
+							+ rs.getInt("Counter") + " , "
 							+ rs.getDouble("Difficulty"));
 					statement.setDifficulty(rs.getDouble("Difficulty"));
 				} else {
@@ -413,23 +812,27 @@ public class RestServlet extends HttpServlet {
 					SQLqueryLinks = "select * from links, difficulty where links.ID = difficulty.ID and links.linkedOntologies='"
 							+ linkset
 							+ "' and links.Confidence not in (-1) "
-							+ notIn
-							+ " order by rand() limit 1";
+							+ notIn + " order by rand() limit 1";
 					echo("SQLqueryLinks: " + SQLqueryLinks);
 					rs = stmt.executeQuery(SQLqueryLinks);
 					if (rs.next()) {
 						echo("Got Statement " + rs.getInt("ID"));
-						int notSure = rs.getInt("Counter") - rs.getInt("Positive")
-								- rs.getInt("Negative");
+						int notSure = rs.getInt("Counter")
+								- rs.getInt("Positive") - rs.getInt("Negative");
 						statement = new Link(rs.getInt("ID"),
-								rs.getString("Subject"), rs.getString("Predicate"),
-								rs.getString("Object"), rs.getString("linkedOntologies"),
-								rs.getInt("Counter"), notSure); // TODO: change linkedOntologies
-																								// into linkset
-						echo("link: " + rs.getInt("ID") + " , " + rs.getString("Subject")
-								+ " , " + rs.getString("Predicate") + " , "
-								+ rs.getString("Object") + " , " + rs.getDouble("Confidence")
-								+ " , " + rs.getInt("Counter") + " , "
+								rs.getString("Subject"),
+								rs.getString("Predicate"),
+								rs.getString("Object"),
+								rs.getString("linkedOntologies"),
+								rs.getInt("Counter"), notSure); // TODO: change
+																// linkedOntologies
+																// into linkset
+						echo("link: " + rs.getInt("ID") + " , "
+								+ rs.getString("Subject") + " , "
+								+ rs.getString("Predicate") + " , "
+								+ rs.getString("Object") + " , "
+								+ rs.getDouble("Confidence") + " , "
+								+ rs.getInt("Counter") + " , "
 								+ rs.getDouble("Difficulty"));
 						statement.setDifficulty(rs.getDouble("Difficulty"));
 					}
@@ -445,8 +848,8 @@ public class RestServlet extends HttpServlet {
 			e.printStackTrace();
 			echo("Server ERROR: Get new statement: " + e.getMessage());
 		}
-		echo("##Server: Get new statement with id = " + id + " for client from "
-				+ linkset + " done ##");
+		echo("##Server: Get new statement with id = " + id
+				+ " for client from " + linkset + " done ##");
 
 		return highlight(statement);
 	}
@@ -464,7 +867,7 @@ public class RestServlet extends HttpServlet {
 		int i = 0;
 		List<Property> subjectProp = new ArrayList<Property>();
 		List<Property> objectProp = new ArrayList<Property>();
-		
+
 		// Subject
 		echo("Query subject instance: ");
 		sqlInstanceQuery = "SELECT * FROM "
@@ -476,15 +879,15 @@ public class RestServlet extends HttpServlet {
 		while (rs.next()) {
 			prop = rs.getString("Property");
 			val = parse(rs.getString("Value"));
-			subjectProp.add(new Property(prop,val));
-			echo(i+".property of subject instance: "+prop+" >> "+val);
+			subjectProp.add(new Property(prop, val));
+			echo(i + ".property of subject instance: " + prop + " >> " + val);
 			i++;
 		}
-		echo("property size: "+subjectProp.size());
-		if(subjectProp.size()==0)
-				echo("Query subject instance failed!");
+		echo("property size: " + subjectProp.size());
+		if (subjectProp.size() == 0)
+			echo("Query subject instance failed!");
 		// Object
-		i=0;
+		i = 0;
 		echo("Query object instance: ");
 		sqlInstanceQuery = "SELECT * FROM "
 				+ PropertyConstants.DB_TABLE_NAME_INSTANCES + " WHERE "
@@ -495,37 +898,49 @@ public class RestServlet extends HttpServlet {
 		while (rs.next()) {
 			prop = rs.getString("Property");
 			val = parse(rs.getString("Value"));
-			objectProp.add(new Property(prop,val));
-			echo(i+".property of subject instance: "+prop+" >> "+val);
+			objectProp.add(new Property(prop, val));
+			echo(i + ".property of subject instance: " + prop + " >> " + val);
 			i++;
-		} 
-		echo("property size: "+objectProp.size());
-		if(objectProp.size()==0)
+		}
+		echo("property size: " + objectProp.size());
+		if (objectProp.size() == 0)
 			echo("Query object instance failed!");
-		
-		Instance subjectInstance = new Instance(statement.getSubjectUri(),subjectProp);
-		Instance objectInstance = new Instance(statement.getObjectUri(),objectProp);
+
+		Instance subjectInstance = new Instance(statement.getSubjectUri(),
+				subjectProp);
+		Instance objectInstance = new Instance(statement.getObjectUri(),
+				objectProp);
 		statement.setSubject(subjectInstance);
 		statement.setObject(objectInstance);
-		
+
 		return statement;
 	}
 
 	private String generateLinkQuery(String userName, String userId,
-			String linkset, String nextLinkType, String verifiedLinks, Connection con) {
+			String linkset, String nextLinkType, String verifiedLinks,
+			Connection con) {
 		String SQLqueryLinks = null;
 
 		// Only get statements, which were not shown yet
-		String[] verifications = verifiedLinks.split(" ");
-		String notIn = getNotInQuery(verifications);
+		String notIn = "";
+		String[] verifications;
+		if (verifiedLinks != null) {
+			verifications = verifiedLinks.split(" ");
 
+			notIn = getNotInQuery(verifications);
+		} else
+			verifications = new String[1];
 		boolean nextLink = Boolean.parseBoolean(nextLinkType);
-
+		echo("generateLink nextLink");
 		// normal
 		if (verifications.length < 3) {
-			echo("Get Easy Link! Number of verifications: " + verifications.length);
+			echo("Get Easy Link! Number of verifications: "
+					+ verifications.length);
 			SQLqueryLinks = "SELECT * FROM easy_questions,links WHERE easy_questions.ID=links.ID and easy_questions.linkedOntologies='"
-					+ linkset + "' " + notIn + " order by easy_questions.Counter limit 1";
+					+ linkset
+					+ "' "
+					+ notIn
+					+ " order by easy_questions.Counter limit 1";
 		} else if (nextLink == Message.NORMAL_LINK) {
 			boolean isVerifiedLink = isVerifiedLink();
 			if (isVerifiedLink == false) {// Minimum
@@ -533,11 +948,11 @@ public class RestServlet extends HttpServlet {
 				SQLqueryLinks = "select * from links, difficulty where links.ID = difficulty.ID AND links.linkedOntologies='"
 						+ linkset
 						+ "' and links.Confidence not in (1,-1,-2) "
-						+ notIn
-						+ " order by links.Counter limit 1";
+						+ notIn + " order by links.Counter limit 1";
 			} else { // Already validated
 				echo("Get Verified Link!");
-				// take: link Difficulty, user strength, not already verified links
+				// take: link Difficulty, user strength, not already verified
+				// links
 				try {
 					// Get user strength
 					double userStrength = getUserStrength(userName, userId, con);
@@ -552,7 +967,8 @@ public class RestServlet extends HttpServlet {
 
 				} catch (SQLException e) {
 					e.printStackTrace();
-					echo("Server ERROR: Get already verified link: " + e.getMessage());
+					echo("Server ERROR: Get already verified link: "
+							+ e.getMessage());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -582,7 +998,8 @@ public class RestServlet extends HttpServlet {
 			echo("Query Difficulty success: id = " + rs.getInt("ID")
 					+ " Difficulty: " + difficulty);
 		} else
-			echo("Server MYSQL Error: Couldn't retrieve difficulty for id = " + id);
+			echo("Server MYSQL Error: Couldn't retrieve difficulty for id = "
+					+ id);
 		return difficulty;
 	}
 
@@ -605,12 +1022,12 @@ public class RestServlet extends HttpServlet {
 		return notIn;
 	}
 
-	private double getUserStrength(String userName, String userId, Connection con)
-			throws SQLException {
+	private double getUserStrength(String userName, String userId,
+			Connection con) throws SQLException {
 		double userStrength = 0;
 		String sqlUserStrength = "(Select strength " + "from user_strength "
-				+ "where UserName='" + userName + "' " + "And UserID= '" + userId
-				+ "' )";
+				+ "where UserName='" + userName + "' " + "And UserID= '"
+				+ userId + "' )";
 		echo("sqlUserStrength: " + sqlUserStrength);
 		Statement stmt = con.createStatement();
 		ResultSet rs = stmt.executeQuery(sqlUserStrength);
@@ -647,9 +1064,11 @@ public class RestServlet extends HttpServlet {
 				double confidence = rs.getDouble("Confidence");
 				// Calculate bonus
 				echo("Query Threshold success: id = " + rs.getInt("ID")
-						+ " Threshold : " + threshold + " Confidence: " + confidence);
+						+ " Threshold : " + threshold + " Confidence: "
+						+ confidence);
 				echo("What kind of link should be queried?");
-				if (confidence == 1 || confidence == -2) { // manually verified links
+				if (confidence == 1 || confidence == -2) { // manually verified
+															// links
 					echo("-> manual verified links with Confidence = {1,-2}");
 					if ((confidence == 1 && verification == VALID)
 							|| (confidence == -2 && verification == NOT_VALID))
@@ -662,16 +1081,19 @@ public class RestServlet extends HttpServlet {
 					// bonus = GameConstants.BONUS_MEDIUM;
 					// else if(0.7<=threshold) // huge reward
 					// bonus = GameConstants.BONUS_HUGE;
-					if (threshold == 0) // db value = null means stmt not verified yet
-															// (counter = 0)
+					if (threshold == 0) // db value = null means stmt not
+										// verified yet
+										// (counter = 0)
 						eval = EVAL_FIRST;
 					else
 						eval = threshold;
 				}
 				echo("Eval: " + eval);
-			} else
+			} else {
 				echo("Server MYSQL Error: Couldn't retrieve threshold for ID = "
 						+ curLink);
+				return -1;
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -682,6 +1104,7 @@ public class RestServlet extends HttpServlet {
 
 	/**
 	 * Connect user and get userdata
+	 * 
 	 * @param id
 	 * @param userName
 	 * @param linkset
@@ -702,7 +1125,8 @@ public class RestServlet extends HttpServlet {
 						rs.getString("UserName"), 0, // hScore
 						null, // user strength
 						rs.getInt("Verified"), // numVeri
-						rs.getInt("Agreement"), rs.getInt("Disagreement"),rs.getInt("Unsure"),rs.getInt("Penalty"));
+						rs.getInt("Agreement"), rs.getInt("Disagreement"),
+						rs.getInt("Unsure"), rs.getInt("Penalty"));
 				// Highscore
 				// String hScoreQuery =
 				// "SELECT * FROM `highscores` WHERE `UserID` = '"+id+"' and `UserName` = '"+userName+"'";
@@ -728,7 +1152,7 @@ public class RestServlet extends HttpServlet {
 				userJson.put("#disagree", u.getNumDisagree());
 				userJson.put("#unsure", u.getNumUnsure());
 				userJson.put("#penalty", u.getNumPenalty());
-				
+
 			} else
 				// Create new db entry
 				insertNewPlayer(id, userName);
@@ -749,17 +1173,23 @@ public class RestServlet extends HttpServlet {
 		echo("##Add User##");
 		User user = new User();
 		user.setId(id);
-		user.setName(userName);		
+		user.setName(userName);
 		userList.put(id, user);
 		String strength = null;
 		try {
 			DBTool db = new DBTool(resourcePath + dbIniFile);
 			Connection con = db.getConnection();
 			String sqlQuery = "INSERT IGNORE INTO `"
-					+ PropertyConstants.DB_TABLE_NAME_USER + "` VALUES ('" + id + "' , '"
-					+ userName + "', 15,5,0,0,0," + // agree, disagree, unsure, penalty,
-																					// allVerif (init a:15,d:5 => 15/20
-																					// richtigen)
+					+ PropertyConstants.DB_TABLE_NAME_USER + "` VALUES ('" + id
+					+ "' , '" + userName + "', 15,5,0,0,0," + // agree,
+																// disagree,
+																// unsure,
+																// penalty,
+																// allVerif
+																// (init
+																// a:15,d:5 =>
+																// 15/20
+																// richtigen)
 					"0,0," + // gamesplayed, gametime
 					"0,0,0,0,0,0)"; // level
 			echo("Query: " + sqlQuery);
@@ -773,7 +1203,7 @@ public class RestServlet extends HttpServlet {
 
 	private JSONObject test(String game) {
 		echo("####Server: Highscore Request####");
-		echo("game = "+game);
+		echo("game = " + game);
 		JSONObject hScoreJson = new JSONObject();
 
 		JSONObject sBuff = null;
@@ -781,27 +1211,25 @@ public class RestServlet extends HttpServlet {
 		try {
 			JSONArray hScoreArray = new JSONArray();
 			Score s = null;
-				s = new Score("test", "id", 2);
-				sBuff = new JSONObject();
-				sBuff.put("name", s.getName());
-				sBuff.put("id", "blaa");
-				sBuff.put("score", s.getScore());
-							
-			echo("####Server: Highscore Request Done####\n");
-		
-			
+			s = new Score("test", "id", 2);
+			sBuff = new JSONObject();
+			sBuff.put("name", s.getName());
+			sBuff.put("id", "blaa");
+			sBuff.put("score", s.getScore());
 
-		}  catch (JSONException e) {
+			echo("####Server: Highscore Request Done####\n");
+
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			echo("JSON error####\n");
 		}
 		return sBuff;
 	}
-	
+
 	private JSONObject getHighscore(String game) {
 		echo("####Server: Highscore Request####");
-		echo("game = "+game);
+		echo("game = " + game);
 		JSONObject hScoreJson = new JSONObject();
 		int i = 0;
 		try {
@@ -817,10 +1245,10 @@ public class RestServlet extends HttpServlet {
 				s = new Score(rs.getString(1), "id", rs.getInt(2));
 				sBuff = new JSONObject();
 				sBuff.put("name", s.getName());
-				if(s.getId()==null)
+				if (s.getId() == null)
 					sBuff.put("id", "null");
 				else
-				sBuff.put("id", s.getId());
+					sBuff.put("id", s.getId());
 				sBuff.put("score", s.getScore());
 				hScoreArray.put(sBuff);
 				i++;
@@ -831,7 +1259,6 @@ public class RestServlet extends HttpServlet {
 			// Out
 			hScoreJson.put("highscore", hScoreArray);
 			hScoreJson.put("bla", "test");
-			
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -872,12 +1299,12 @@ public class RestServlet extends HttpServlet {
 						.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_OBJECT));
 				linkset.setPredicate(rs
 						.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_PREDICATE));
-				linkset
-						.setDescription(rs
-								.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DESCRIPTION));
+				linkset.setDescription(rs
+						.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DESCRIPTION));
 				linkset.setDifficulty(rs
 						.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DIFFICULTY));
-				linkset.setId(rs.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID));
+				linkset.setId(rs
+						.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID));
 				tmp.add(linkset);
 				i++;
 				// echo(tmp.get(i)+" i "+i);
@@ -921,7 +1348,8 @@ public class RestServlet extends HttpServlet {
 	private boolean isVerifiedLink() {
 		Random gen = new Random();
 		double r = gen.nextDouble();
-		echo("isVerifiedLink? r= " + r + " eFactor=" + Balancing.EXPLORATION_FACTOR);
+		echo("isVerifiedLink? r= " + r + " eFactor="
+				+ Balancing.EXPLORATION_FACTOR);
 		if (r < Balancing.EXPLORATION_FACTOR)
 			return false;
 		else
@@ -929,26 +1357,242 @@ public class RestServlet extends HttpServlet {
 	}
 
 	private String getTemplate() {
-		String file ="";
-		try{
-		  FileInputStream fstream = new FileInputStream(this.resourcePath+this.templateFile);
-		  // Get the object of DataInputStream
-		  DataInputStream in = new DataInputStream(fstream);
-		  BufferedReader br = new BufferedReader(new InputStreamReader(in));
-		  String strLine;
-		  //Read File Line By Line
-		  while ((strLine = br.readLine()) != null)   {
-		  // Print the content on the console
-		  	file = file +strLine;
-		  }
-		  //Close the input stream
-		  in.close();
-		    }catch (Exception e){//Catch exception if any
-		  System.err.println("Error: " + e.getMessage());
-		  }
-		  return file;
+		String file = "";
+		try {
+			String templateFile = "template.json";
+			FileInputStream fstream = new FileInputStream(this.resourcePath
+					+ templateFile);
+			// Get the object of DataInputStream
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String strLine;
+			// Read File Line By Line
+			while ((strLine = br.readLine()) != null) {
+				// Print the content on the console
+				file = file + strLine;
+			}
+			// Close the input stream
+			in.close();
+		} catch (Exception e) {// Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
+		return file;
 	}
-	
+
+	private JSONObject getTasks() {
+		echo("getTasks ==> ");
+		JSONObject tJson = null;
+		JSONArray tasks = new JSONArray();
+		JSONObject tasksJson = new JSONObject();
+
+		BufferedReader br = null;
+		String buffer;
+		String[] split = new String[Task.SIZE + 1];
+
+		try {
+			br = new BufferedReader(new FileReader(resourcePath + "linkFiles/"
+					+ "task.tk"));
+			while ((buffer = br.readLine()) != null) {
+				split = buffer.split(Task.SEPERATOR);
+				// For debugging
+				for (int i = 0; i < split.length; i++)
+					echo("Split: " + split[i]);
+
+				if (split[Task.SIZE].equals("1")
+						|| split[0].equals("[subject]"))
+					// Only Send tasks with done-value=0
+					continue;
+
+				Task t = new Task();
+				t.setTask(split);
+
+				tJson = new JSONObject();
+				tJson.put("subject", t.getSubject());
+				tJson.put("object", t.getObject());
+				tJson.put("predicate", t.getPredicate());
+				tJson.put("description", t.getDescription());
+				tJson.put("difficulty", t.getDifficulty());
+				tJson.put("date", t.getDate());
+				tJson.put("file", t.getFile());
+				tJson.put("linkset", t.getLinkset());
+
+				tasks.put(tJson);
+			}
+			// all tasks
+			tasksJson.put("tasks", tasks);
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+
+		echo("getTasks => Done\n");
+		return tasksJson;
+	}
+
+	/**
+	 * Communication method. Read task-file "task.tk" and search for
+	 * "to-do tasks" (done-value = 0). Create temporary task-file "task.tmp" to
+	 * write modifications. At the end delete original task-file and rename
+	 * temporary task-file to "task.tk".
+	 */
+	public String taskPerform() {
+		echo(" Perform Task");
+		String msg = "Error Performing Task";
+		taskSuccess = false;
+		String originalTaskFilePath = resourcePath + "linkFiles/" + "task.tk";
+		String tempTaskFilePath = resourcePath + "linkFiles/" + "task.tmp";
+		BufferedReader br = null;
+		BufferedWriter brWrite = null;
+		String buffer;
+		String[] split = new String[Task.SIZE + 1];
+		int i = 0;
+		try {
+			// Open file to read
+			br = new BufferedReader(new FileReader(originalTaskFilePath));
+			// Create tempFile for writing
+			brWrite = new BufferedWriter(new FileWriter(tempTaskFilePath));
+
+			// Read lines
+			while ((buffer = br.readLine()) != null) {
+				split = buffer.split(Task.SEPERATOR);
+				// /*Test method
+				echo("{Test} Show split:");
+				for (int j = 0; j < split.length; j++)
+					echo("split[" + j + "]: " + split[j]);
+				echo("buffer: " + buffer + "\n");
+				// */
+				if ((split[Task.SIZE].equals("1"))
+						|| (split[0].equals("[subject]"))) {
+					// If task-file has to-do task
+					brWrite.write(buffer);
+					brWrite.newLine();
+					continue;
+				}
+				Task t = new Task();
+				t.setTask(split);
+				echo("\n<<<<<< " + i + ".Task, Subject: " + t.getSubject()
+						+ ", Object: " + t.getObject() + ", File: "
+						+ t.getFile() + " >>>>>>\n");
+				if (insertLinksIntoDB(t)) {
+					// Write to tempFile
+					brWrite.write(split[0] + Task.SEPERATOR + split[1]
+							+ Task.SEPERATOR + split[2] + Task.SEPERATOR
+							+ split[3] + Task.SEPERATOR + split[4]
+							+ Task.SEPERATOR + split[5] + Task.SEPERATOR
+							+ split[6] + Task.SEPERATOR + split[7]
+							+ Task.SEPERATOR + "1");
+					taskSuccess = true;
+				} else
+					brWrite.write(split[0] + Task.SEPERATOR + split[1]
+							+ Task.SEPERATOR + split[2] + Task.SEPERATOR
+							+ split[3] + Task.SEPERATOR + split[4]
+							+ Task.SEPERATOR + split[5] + Task.SEPERATOR
+							+ split[6] + Task.SEPERATOR + split[7]
+							+ Task.SEPERATOR + "0");
+
+				brWrite.newLine();
+			}
+
+			msg = "Server: Performing Tasks successfully!";
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				// Close Reader and Writer
+				if (br != null)
+					br.close();
+				if (brWrite != null)
+					brWrite.close();
+
+				// Delete original task-file
+				File fDelete = new File(originalTaskFilePath);
+				boolean delete = fDelete.delete();
+				if (delete)
+					echo("Delete template file success");
+				else
+					echo("Delete template file failed");
+				// Rename tempTaskFile
+				File fRename = new File(tempTaskFilePath);
+				boolean rename = fRename
+						.renameTo(new File(originalTaskFilePath));
+				if (rename)
+					echo("Rename template file success");
+				else
+					echo("Rename template file failed");
+				/*
+				 * if (taskSuccess) restart();
+				 */
+				restart();
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		echo("####Server: Performing Tasks successfully!####\n");
+		return msg;
+	}
+
+	// TODO insert another table-column for deleting/logging links
+	/**
+	 * Returns true if Querying rdf-statements successful
+	 */
+	private boolean insertLinksIntoDB(Task t) {
+		echo("##Server: Insert links into database##");
+		String msg = null;
+		boolean status = false;
+		RDFHandler rdf = new RDFHandler(resourcePath + "linkFiles/"
+				+ t.getFile(), resourcePath + "db_settings.ini", resourcePath
+				+ templateFile, t);
+		echo("Path: " + t.getFile() + "\nxmlPath: " + resourcePath
+				+ templateFile);
+		XMLTool xml = new XMLTool(resourcePath + templateFile);
+		try {
+			xml.readTemplateFile();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		TemplateLinkset template = xml.getLinkset(t.getLinkset());
+
+		// echo("Names: "+name+" , "+name_2);
+		if (t.getFile().endsWith(".xml"))
+			msg = rdf.start(template, RDFHandler.formatXML);
+		else
+			msg = rdf.start(template, RDFHandler.formatNT);
+		echo("Status of querying  and adding links: " + msg + " ");
+		echo("##Server: Insert links into database done##\n");
+		status = true;
+		return status;
+	}
+
 	/**
 	 * Parse method. Remove brackets and replace prefix with abbreviation
 	 */
@@ -960,21 +1604,25 @@ public class RestServlet extends HttpServlet {
 		String buffer;
 		String parsed = "";
 
-		if (removedBrackets.contains(PropertyConstants.SEPERATOR_PROPERTY_VALUE)) {
+		if (removedBrackets
+				.contains(PropertyConstants.SEPERATOR_PROPERTY_VALUE)) {
 			int numberOfTypes = s.split(" ; ").length;
 			String split[] = new String[numberOfTypes];
 			// split
-			split = removedBrackets.split(PropertyConstants.SEPERATOR_PROPERTY_VALUE);
-			for (int i = 0; i < numberOfTypes; i++) { // For every type set prefix
+			split = removedBrackets
+					.split(PropertyConstants.SEPERATOR_PROPERTY_VALUE);
+			for (int i = 0; i < numberOfTypes; i++) { // For every type set
+														// prefix
 				// echo("Split :"+i+" "+split[i]);
 				split[i] = setPrefix(split[i]);
 			}
 			// Concat to 1 string
 			for (int j = 0; j < split.length; j++) {
 				if (j != split.length - 1)
-					parsed += split[j] + PropertyConstants.SEPERATOR_PROPERTY_VALUE; // add
-																																						// \n
-																																						// ??
+					parsed += split[j]
+							+ PropertyConstants.SEPERATOR_PROPERTY_VALUE; // add
+																			// \n
+																			// ??
 				else
 					parsed += split[j];
 				// echo(j+".parsed split: "+parsed);
@@ -1003,8 +1651,9 @@ public class RestServlet extends HttpServlet {
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				split = line.split(",");
-				prefixMap.put(split[1], split[0]); // Switch key and value (key=url,
-																						// val=abbr.)
+				prefixMap.put(split[1], split[0]); // Switch key and value
+													// (key=url,
+													// val=abbr.)
 
 			}
 		} catch (FileNotFoundException e) {
@@ -1034,7 +1683,8 @@ public class RestServlet extends HttpServlet {
 		int endingPosition = 0;
 		// string contains prefix?
 		if (s.contains("http://")) {
-			if (s.contains("#")) { // separator = '#' like 'http://purl.org/NET/dady#'
+			if (s.contains("#")) { // separator = '#' like
+									// 'http://purl.org/NET/dady#'
 				position = s.lastIndexOf('#') + 1;
 				shorten = s.substring(0, position);
 				prefix = replaceWithPrefix(shorten);
@@ -1074,10 +1724,10 @@ public class RestServlet extends HttpServlet {
 			return "";
 	}
 
-	private long getCurTime(){
+	private long getCurTime() {
 		return System.currentTimeMillis();
 	}
-	
+
 	private void echo(String s) {
 		System.out.println("[Server]: " + s);
 	}
