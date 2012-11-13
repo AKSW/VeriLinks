@@ -26,6 +26,10 @@ public class Userdata {
 		
 	}
 
+	public Userdata() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public String getName() {
 		return name;
 	}

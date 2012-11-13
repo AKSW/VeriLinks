@@ -1,5 +1,9 @@
 package org.aksw.verilinks.games.peaInvasion.client.panels;
 
+import java.util.ArrayList;
+
+import org.aksw.verilinks.games.peaInvasion.shared.msg.Score;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Button;
@@ -134,25 +138,25 @@ public class HighscorePanel extends VerticalPanel{
    * Update ListBox highscoreList
    * @param highscore
    */
-  public void generateHighscoreList(String[] highscore) {
+  public void generateHighscoreList(ArrayList<Score> highscore) {
     int j =1;
     String name =null;
-    for (int i = 1; i<highscore.length+1;i++) {
-      if (i % 2 == 1){
-      	name = highscore[i-1];
-//      	echo(name);
+    int score = 0;
+    for (int i = 0; i<highscore.size();i++) {
+     
+      	name = highscore.get(i).getName();
+      	score = highscore.get(i).getScore();
       	if(name==null){
       		name = "<i>none</i>";
       		hsNamePanel.add(new HTML(name));
       	}
       	else
       		hsNamePanel.add(new HTML("<b>"+name+"</b>"));
-      }else{
-        hsScorePanel.add(new HTML(highscore[i-1]));
+      	hsScorePanel.add(new HTML(score+""));
       
-      hsRankPanel.add(new Label(Integer.toString(j)));
-      j++;
-      }
+      hsRankPanel.add(new Label(Integer.toString(i+1)));
+
+      
     }
   }
 

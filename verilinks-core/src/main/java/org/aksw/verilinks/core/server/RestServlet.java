@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
-
 import org.aksw.verilinks.core.shared.Balancing;
 import org.aksw.verilinks.core.shared.Message;
 import org.aksw.verilinks.core.shared.PropertyConstants;
@@ -71,6 +70,8 @@ public class RestServlet extends HttpServlet {
 	private String GET_TASKS = "getTasks";
 	private String PERFORM_TASKS = "performTasks";
 	private String CHECK_STATUS = "checkStatus";
+
+	private String DISCONNECT_USER = "disconnectUser";
 
 	private String POST_COMMIT_VERIFICATIONS = "commitVerifications";
 	private String POST_SCORE = "postScore";
@@ -291,6 +292,8 @@ public class RestServlet extends HttpServlet {
 			response = getTasks().toString();
 		else if (service.equals(PERFORM_TASKS))
 			response = taskPerform();
+		else if (service.equals(DISCONNECT_USER))
+			response = disconnectUser(req.getParameter("userName"),req.getParameter("userId"),req.getParameter("time"));
 		else if (service.equals(CHECK_STATUS))
 			response = "Server running!";
 
@@ -368,8 +371,10 @@ public class RestServlet extends HttpServlet {
 				verifications = parseJson(parameterName);
 				// user
 				JsonObject j = JSON.parse(parameterName);
-				String userId = j.get("userId").toString();
-				String userName = j.get("userName").toString();
+				JsonObject jUser = j.get("user").getAsObject();
+				
+				String userId = jUser.get("id").toString();
+				String userName = jUser.get("name").toString();
 				user.setId(userId);
 				user.setName(userName);
 				user.setCredible(true);
@@ -624,7 +629,9 @@ public class RestServlet extends HttpServlet {
 		Connection con = db.getConnection();
 
 		// Evaluate verification
-		double eval = evaluateVerification(curLink, verification, con);
+		double eval = 0;
+		if(verification != null)
+			eval = evaluateVerification(curLink, verification, con);
 
 		// Get link
 		Link link = getNewLink(userName, userId, linkset, nextLink,
@@ -1377,6 +1384,54 @@ public class RestServlet extends HttpServlet {
 			System.err.println("Error: " + e.getMessage());
 		}
 		return file;
+	}
+	
+
+	private String disconnectUser(String id, String name,
+			String playTime) {
+		echo("##Disconect User##");
+		String msg="User "+name +"Disconnected!";
+		if(userList.remove("id") != null){
+			echo(msg);
+
+			// Inc times played counter
+			String sqlQuery = "UPDATE `"+ PropertyConstants.DB_TABLE_NAME_USER + 
+					"` SET  `" +PropertyConstants.DB_TABLE_USER_GAMESPLAYED+"` = (`"+PropertyConstants.DB_TABLE_USER_GAMESPLAYED+"` + 1) "+  
+					"WHERE `"+PropertyConstants.DB_TABLE_USER_ID+"` = '"+id+"' AND "+
+					"`"+PropertyConstants.DB_TABLE_USER_NAME+"` = '"+name+"'";
+			echo("Times played Query: " + sqlQuery);
+			
+			// Set duration of game
+			double time =  Integer.valueOf(playTime)/1000;
+			echo("User "+name+ " played "+time+" seconds!");
+			String sqlQuery2 = "UPDATE `"+ PropertyConstants.DB_TABLE_NAME_USER + 
+					"` SET  `" +PropertyConstants.DB_TABLE_USER_PLAYTIME+"` = (`"+PropertyConstants.DB_TABLE_USER_PLAYTIME+"` + " + time+") "+  
+					"WHERE `"+PropertyConstants.DB_TABLE_USER_ID+"` = '"+id+"' AND "+
+					"`"+PropertyConstants.DB_TABLE_USER_NAME+"` = '"+name+"'";
+			echo("PlayTime Query: " + sqlQuery2);
+			
+			DBTool db = new DBTool(resourcePath + dbIniFile);
+			Connection con = db.getConnection();
+			try {
+				Statement stmt = con.createStatement();
+				stmt.executeUpdate(sqlQuery);
+				stmt.executeUpdate(sqlQuery2);
+			} catch (Exception e) {
+				echo("SQL Server Error: Couldn't disconnect user!.");
+			} finally {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}else{
+			msg = "Server Error: User = "+name+" wasn't found! Couldn't calculate play time!";
+			echo(msg);
+		}
+		
+		return msg;
 	}
 
 	private JSONObject getTasks() {

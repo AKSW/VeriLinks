@@ -12,6 +12,10 @@ public class Score {
 	
 	}
 
+	public Score() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public String getName() {
 		return name;
 	}
