@@ -21,12 +21,12 @@ public class GameHoldMessage {
   public GameHoldMessage() {
 
     // Load Images
-    win = assetManager().getImage("Application/images/msg/winMsg.png");
-    lose = assetManager().getImage("Application/images/msg/loseMsg.png");
-    pause = assetManager().getImage("Application/images/msg/pauseMsg.png");
-    start = assetManager().getImage("Application/images/msg/readyMsg.png");
-    end = assetManager().getImage("Application/images/msg/endMsg.png");
-    blank  = assetManager().getImage("Application/images/msg/blankMsg.png");
+    win = assetManager().getImage("PeaInvasion/images/msg/winMsg.png");
+    lose = assetManager().getImage("PeaInvasion/images/msg/loseMsg.png");
+    pause = assetManager().getImage("PeaInvasion/images/msg/pauseMsg.png");
+    start = assetManager().getImage("PeaInvasion/images/msg/readyMsg.png");
+    end = assetManager().getImage("PeaInvasion/images/msg/endMsg.png");
+    blank  = assetManager().getImage("PeaInvasion/images/msg/blankMsg.png");
     // Image Layer
     layer = graphics().createImageLayer(start);
     layer.setScale(0.06f);

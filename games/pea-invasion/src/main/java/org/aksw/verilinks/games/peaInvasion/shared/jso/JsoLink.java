@@ -15,13 +15,17 @@ public class JsoLink extends JavaScriptObject{
 		return this.confidence;
 	}-*/;
 	
-	public final native double getDifficulty() /*-{
+	public final native String getDifficulty() /*-{
 		return this.difficulty;
 	}-*/;
+	
+	public final native String getEval() /*-{
+	return this.prevLinkEval;
+}-*/;
 
-	public final native int getCounter() /*-{
-		return this.counter;
-	}-*/;
+//	public final native int getCounter() /*-{
+//		return this.counter;
+//	}-*/;
 
 	public final native JsoInstance getSubject() /*-{
 		return this.subject;

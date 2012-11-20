@@ -37,7 +37,7 @@ public class FakeBlock extends Entity {
 
   @Override
   public String getImagePath() {
-    return "Application/images/Block-Normal2.png";
+    return "PeaInvasion/images/Block-Normal2.png";
   }
 
   @Override

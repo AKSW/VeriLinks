@@ -113,7 +113,7 @@ public class Portal extends StaticPhysicsEntity implements PhysicsEntity.HasCont
 
   @Override
   public String getImagePath() {
-    return "Application/images/Block-Normal2.png";
+    return "PeaInvasion/images/Block-Normal2.png";
   }
 
   @Override

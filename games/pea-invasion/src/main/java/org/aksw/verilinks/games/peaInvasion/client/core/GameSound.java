@@ -29,27 +29,27 @@ public class GameSound {
 	private Sound moan;
 	
 	public GameSound(){
-		this.coin=assetManager().getSound("Application/sounds/coin");
-		this.hit=assetManager().getSound("Application/sounds/hit");
-		this.pea=assetManager().getSound("Application/sounds/pea");
-		this.enemyWave=assetManager().getSound("Application/sounds/enemyWave");
+		this.coin=assetManager().getSound("PeaInvasion/sounds/coin");
+		this.hit=assetManager().getSound("PeaInvasion/sounds/hit");
+		this.pea=assetManager().getSound("PeaInvasion/sounds/pea");
+		this.enemyWave=assetManager().getSound("PeaInvasion/sounds/enemyWave");
 		this.enemyWave.setVolume((float) 0.7);
-		this.enemyWave2=assetManager().getSound("Application/sounds/enemyWave2");
-		this.moan = assetManager().getSound("Application/sounds/moan");
-		this.bgLevel1=assetManager().getSound("Application/sounds/bg/bgLevel1");
+		this.enemyWave2=assetManager().getSound("PeaInvasion/sounds/enemyWave2");
+		this.moan = assetManager().getSound("PeaInvasion/sounds/moan");
+		this.bgLevel1=assetManager().getSound("PeaInvasion/sounds/bg/bgLevel1");
 		
-		this.win=assetManager().getSound("Application/sounds/end/win");
+		this.win=assetManager().getSound("PeaInvasion/sounds/end/win");
 		this.win.setVolume((float) 0.8);
-		this.lose=assetManager().getSound("Application/sounds/end/lose");
+		this.lose=assetManager().getSound("PeaInvasion/sounds/end/lose");
 		
 		this.level=bgLevel1;
 		this.level.setLooping(true);
 		
-		this.click=assetManager().getSound("Application/sounds/click");
-		this.send=assetManager().getSound("Application/sounds/send");
-		this.first=assetManager().getSound("Application/sounds/first");
-		this.agree=assetManager().getSound("Application/sounds/agree");
-		this.disagree=assetManager().getSound("Application/sounds/disagree");
+		this.click=assetManager().getSound("PeaInvasion/sounds/click");
+		this.send=assetManager().getSound("PeaInvasion/sounds/send");
+		this.first=assetManager().getSound("PeaInvasion/sounds/first");
+		this.agree=assetManager().getSound("PeaInvasion/sounds/agree");
+		this.disagree=assetManager().getSound("PeaInvasion/sounds/disagree");
 	}
 
 	public Sound getCurrentLvl(){

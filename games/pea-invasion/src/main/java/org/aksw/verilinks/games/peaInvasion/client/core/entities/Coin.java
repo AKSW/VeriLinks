@@ -26,7 +26,7 @@ public class Coin{
 	private boolean isCashier;
 	
 	public Coin(GameWorld gameWorld, Entity entity){
-		Image img = assetManager().getImage("Application/images/info/coin.png");
+		Image img = assetManager().getImage("PeaInvasion/images/info/coin.png");
 		layer= graphics().createImageLayer(img);
 		layer.setTranslation(x, y);
 		layer.setScale(0.015f);
@@ -42,7 +42,7 @@ public class Coin{
 	}
 	
 	public Coin(GameWorld gameWorld, Entity entity, boolean isReverse){
-		Image img = assetManager().getImage("Application/images/info/coin.png");
+		Image img = assetManager().getImage("PeaInvasion/images/info/coin.png");
 		layer= graphics().createImageLayer(img);
 		layer.setTranslation(x, y);
 		layer.setScale(0.015f);

@@ -51,13 +51,13 @@ public class Pea extends Mine {
   public String getImagePath() {
     //return "images/chrome.png";
 //    return "Application/images/peaNormal.png";
-  	return "Application/images/pea/peaViolet.png";
+  	return "PeaInvasion/images/pea/peaViolet.png";
   }
   
   public String getImagePathHit() {
     //return "images/chrome.png";
 //    return "Application/images/peaglow.png";
-  	return "Application/images/pea/peaViolet_hit.png";
+  	return "PeaInvasion/images/pea/peaViolet_hit.png";
   }
 
   @Override

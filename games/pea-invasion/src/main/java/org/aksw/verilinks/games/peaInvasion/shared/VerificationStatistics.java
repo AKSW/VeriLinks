@@ -108,4 +108,9 @@ public class VerificationStatistics implements IsSerializable{
 		// TODO Auto-generated method stub
 		return this.countUnsure;
 	}
+
+	public String getJson() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

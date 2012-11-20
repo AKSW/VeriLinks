@@ -15,8 +15,8 @@ import com.google.gwt.user.client.Timer;
 public class PeaBig extends Mine{
 
   public static String TYPE = "PeaBig";
-  public static String IMAGE = "Application/images/peasprites.png";
-  public static String JSON = "Application/sprites/peasprite.json";
+  public static String IMAGE = "PeaInvasion/images/peasprites.png";
+  public static String JSON = "PeaInvasion/sprites/peasprite.json";
   public static String JSON_WITH_IMAGE = "Application/sprites/peasprite2.json";
 
   private static final int MY_SPEED = 0;
@@ -40,12 +40,12 @@ public class PeaBig extends Mine{
   @Override
   public String getImagePath() {
     //return "images/chrome.png";
-    return "Application/images/peaNormal.png";
+    return "PeaInvasion/images/peaNormal.png";
   }
   
   public String getImagePathHit() {
     //return "images/chrome.png";
-    return "Application/images/peaglow.png";
+    return "PeaInvasion/images/peaglow.png";
   }
 
   @Override

@@ -250,7 +250,7 @@ public class StartPanel extends TabPanel{
         nameInput.setReadOnly(true);
         nameInput.addStyleName("startPanel_nameInput-disabled");
       }});
-    Image fbImage = new Image("Application/images/login/facebook-login.png");
+    Image fbImage = new Image("PeaInvasion/images/login/facebook-login.png");
     fbImage.setStyleName("startPanel_loginImage");
     fb = new ToggleButton(fbImage);
     fb.setStyleName("image-ToggleButton");

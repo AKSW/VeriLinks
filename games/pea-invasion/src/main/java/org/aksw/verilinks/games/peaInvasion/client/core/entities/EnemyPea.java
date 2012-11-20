@@ -33,13 +33,13 @@ public class EnemyPea extends Enemy{
   public String getImagePath() {
 //    return "Application/images/Enemy2.png";
     //return "images/pea.png";
-  	return "Application/images/pea/enemy.png";
+  	return "PeaInvasion/images/pea/enemy.png";
   }
   
   public String getImagePathHit() {
 //    return "Application/images/Enemy2Hit2.png";
     //return "images/pea.png";
-  	return "Application/images/pea/enemy_hit.png";
+  	return "PeaInvasion/images/pea/enemy_hit.png";
   }
   
 

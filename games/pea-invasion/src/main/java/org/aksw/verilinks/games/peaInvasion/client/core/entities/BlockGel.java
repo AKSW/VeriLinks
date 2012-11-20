@@ -44,6 +44,6 @@ public class BlockGel extends Block {
 
   @Override
   public String getImagePath() {
-    return "Application/images/Block-Gel.png";
+    return "PeaInvasion/images/Block-Gel.png";
   }
 }

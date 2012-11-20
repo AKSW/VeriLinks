@@ -15,6 +15,8 @@ import org.aksw.verilinks.games.peaInvasion.shared.PropertyConstants;
 //import org.aksw.verilinks.games.peaInvasion.shared.Template;
 import org.aksw.verilinks.games.peaInvasion.shared.rdfInstance;
 import org.aksw.verilinks.games.peaInvasion.shared.rdfStatement;
+import org.aksw.verilinks.games.peaInvasion.shared.msg.Instance;
+import org.aksw.verilinks.games.peaInvasion.shared.msg.Link;
 import org.aksw.verilinks.games.peaInvasion.shared.templates.TemplateInstance;
 import org.aksw.verilinks.games.peaInvasion.shared.templates.TemplateLinkset;
 
@@ -32,14 +34,13 @@ public class VerifyComponent extends HorizontalPanel {
 	private HTML predicateHTML;
 
 	// Panel
+	private VerticalPanel subPanel;
+	private VerticalPanel obPanel;
 	private VerticalPanel predicatePanel;
-
-	private InstancePanel subjectPanel;
-	private InstancePanel objectPanel;
-
+	
 	private VerticalPanel subjectImagePanel;
 	private VerticalPanel objectImagePanel;
-	private final String noImage = "Application/images/noImage.png";
+	private final String noImage = "PeaInvasion/images/noImage.png";
 
 	private TemplateInstance subjectTemplate;
 	private TemplateInstance objectTemplate;
@@ -70,28 +71,27 @@ public class VerifyComponent extends HorizontalPanel {
 
 	}
 
-	public void updateStatement(rdfStatement link, TemplateLinkset temp) {
+	public void updateStatement(Link stmt, TemplateLinkset temp) {
 
 		System.out.println("\n##VerifyComponent: Update Table##");
 
 		System.out.println("Using templates: "+temp.getSubject().getOntology()+
 				"-"+temp.getObject().getOntology() + "'");
 
-		rdfInstance instanceSubject = link.getSubject();
-		rdfInstance instanceObject = link.getObject();
+		Instance instanceSubject = stmt.getSubject();
+		Instance instanceObject = stmt.getObject();
 
-		if(config.isKongregate() || config.isSimple())
-			updateKongregate(link);
-		else if (!isBothMapInstances)
-			updateNormal(link);
-		else
-			updateBothMaps(link);
+		// here
+//		if(config.isKongregate() || config.isSimple())
+//			updateKongregate(stmt);
+//		else if (!isBothMapInstances)
+//			updateNormal(stmt);
+//		else
+//			updateBothMaps(stmt);
+		updateNormal(stmt);
 
 		// Predicate panel
-		predicateHTML = new HTML(parsePredicate(link.getPredicate()));
-		predicateHTML.addStyleName("predicateHTML");
-		predicatePanel.clear();
-		predicatePanel.add(predicateHTML);
+		DOM.getElementById("predicate").setInnerHTML(parsePredicate(stmt.getPredicate()));
 
 		// Image panel
 		// Subject image
@@ -149,49 +149,36 @@ public class VerifyComponent extends HorizontalPanel {
 	 * 
 	 * @param newLink
 	 */
-	private void updateNormal(rdfStatement link) {
+	private void updateNormal(Link stmt) {
 		echo("Update normal");
-		rdfInstance instanceSubject = link.getSubject();
-		rdfInstance instanceObject = link.getObject();
+		Instance instanceSubject = stmt.getSubject();
+		Instance instanceObject = stmt.getObject();
 		System.out.println("Set subject panel");
-		subjectPanel.clear();
-		subjectPanel.setTemplate(subjectTemplate);
-		subjectPanel.setLabel(removeDuplicate(instanceSubject.getLabel()));
-		subjectPanel.setUri(instanceSubject.getUri());
-		// Remove namespace for semantic-web newbies
-		if (config.getKnowledgeMode().equals(Configuration.KNOWLEDGE_EXPERT))
-			subjectPanel.setType(instanceSubject.getType());
-		else
-			subjectPanel.setType(removeNamespace(instanceSubject.getType()));
-
-		subjectPanel.setSpecific(instanceSubject.getOptional());
-		if (instanceSubject.getInstanceType().equals(
-				PropertyConstants.TEMPLATE_TYPE_MAP)) {
-			subjectPanel.setLatitude(instanceSubject.getLatitude());
-			subjectPanel.setLongitude(instanceSubject.getLongitude());
+		subPanel.clear();
+		subPanel.add(new HTML(removeDuplicate(instanceSubject.getLabel())));
+		subPanel.add(new HTML(instanceSubject.getUri()));
+		subPanel.add(new HTML(instanceSubject.getOptional()));
+		
+		echo("subjectTemplate type: "+subjectTemplate.getType());
+		if (subjectTemplate.getType().equals("map")) {
+			subPanel.add(new HTML("MAPTYPE"));
+//			subjectPanel.setLatitude(instanceSubject.getLatitude());
+//			subjectPanel.setLongitude(instanceSubject.getLongitude());
 		}
-		subjectPanel.refresh();
 		System.out.println("Subject Uri: " + instanceSubject.getUri());
 		System.out.println("Set subject panel done");
 
 		System.out.println("Set object panel");
-		objectPanel.clear();
-		objectPanel.setTemplate(objectTemplate);
-		objectPanel.setLabel(removeDuplicate(instanceObject.getLabel()));
-		objectPanel.setUri(instanceObject.getUri());
-		if (config.getKnowledgeMode().equals(Configuration.KNOWLEDGE_EXPERT))
-			objectPanel.setType(instanceObject.getType());
-		else
-			objectPanel.setType(removeNamespace(instanceObject.getType()));
-		objectPanel.setSpecific(instanceObject.getOptional());
-		if (instanceObject.getInstanceType().equals(
-				PropertyConstants.TEMPLATE_TYPE_MAP)) {
-			objectPanel.setLatitude(instanceObject.getLatitude());
-			objectPanel.setLongitude(instanceObject.getLongitude());
+		obPanel.clear();
+		obPanel.add(new HTML(removeDuplicate(instanceObject.getLabel())));
+		obPanel.add(new HTML(instanceObject.getUri()));
+		obPanel.add(new HTML(instanceObject.getOptional()));
+		echo("objectTemplate.getType(): "+objectTemplate.getType());
+		if (objectTemplate.getType().equals("map")) {
+			obPanel.add(new HTML("map"));
+//			objectPanel.setLatitude(instanceObject.getLatitude());
+//			objectPanel.setLongitude(instanceObject.getLongitude());
 		}
-		objectPanel.refresh();
-		// TODO: instancePanel im Hintergrund von Map
-		// objectPanel.initGUI();
 		System.out.println("Object Uri: " + instanceObject.getUri());
 		System.out.println("Set object panel done");
 
@@ -452,20 +439,21 @@ public class VerifyComponent extends HorizontalPanel {
 		echo("subjectTemplate type: " + subjectTemplate.getType());
 		echo("objectTemplate type: " + objectTemplate.getType());
 		// Subject and object Both map-type instances
-		if (config.isKongregate() || config.isSimple()){
-			initKongregate();
-		}
-		else{
-			if (subjectTemplate.getType().equals(PropertyConstants.TEMPLATE_TYPE_MAP) == true
-				&& objectTemplate.getType().equals(PropertyConstants.TEMPLATE_TYPE_MAP) == true) {
-				this.isBothMapInstances = true;
-				initBothMapInstances();
-			} 
-			else { // at least 1 text-type instance
-				this.isBothMapInstances = false;
-				initNormal();
-			}
-		}
+//		if (config.isKongregate() || config.isSimple()){
+//			initKongregate();
+//		}
+//		else{
+//			if (subjectTemplate.getType().equals(PropertyConstants.TEMPLATE_TYPE_MAP) == true
+//				&& objectTemplate.getType().equals(PropertyConstants.TEMPLATE_TYPE_MAP) == true) {
+//				this.isBothMapInstances = true;
+//				initBothMapInstances();
+//			} 
+//			else { // at least 1 text-type instance
+//				this.isBothMapInstances = false;
+//				initNormal();
+//			}
+//		}
+		initNormal();
 		echo("##VerifyComponent: Init VerifyComponent End");
 	}
 
@@ -476,12 +464,12 @@ public class VerifyComponent extends HorizontalPanel {
 		echo("Init Normal");
 		this.setSpacing(2);
 
-		// subject
-		this.subjectPanel = new InstancePanel(subjectTemplate, true, config);
-
-		// object
-		this.objectPanel = new InstancePanel(objectTemplate, false, config);
-
+		this.subPanel = new VerticalPanel();
+		subPanel.add(new HTML("init"));
+		
+		this.obPanel = new VerticalPanel();
+		obPanel.add(new HTML("init ob"));
+		
 		// predicate (middlePanel)
 		initMiddlePanel();
 
@@ -537,10 +525,10 @@ public class VerifyComponent extends HorizontalPanel {
 		// ButtonGroup
 		HorizontalPanel r1Panel = new HorizontalPanel();
 		r1Panel.setHorizontalAlignment(ALIGN_CENTER);
-		trueButton = new PushButton(new Image("Application/images/verification/trueButton.png"));
+		trueButton = new PushButton(new Image("PeaInvasion/images/verification/trueButton.png"));
 		r1Panel.add(trueButton);
 		
-		falseButton = new PushButton(new Image("Application/images/verification/falseButton.png"));
+		falseButton = new PushButton(new Image("PeaInvasion/images/verification/falseButton.png"));
 		HorizontalPanel r2Panel = new HorizontalPanel();
 		r2Panel.setHorizontalAlignment(ALIGN_CENTER);
 		r2Panel.add(falseButton);
@@ -554,7 +542,7 @@ public class VerifyComponent extends HorizontalPanel {
 //		r3Panel.add(k3);
 //		r3Panel.add(i3);
 //		r3Panel.setSpacing(2);
-		unsureButton = new PushButton(new Image("Application/images/verification/unsureButton.png"));
+		unsureButton = new PushButton(new Image("PeaInvasion/images/verification/unsureButton.png"));
 		r3Panel.add(unsureButton);
 		
 		VerticalPanel rdbtnPanel = new VerticalPanel();
@@ -612,7 +600,9 @@ public class VerifyComponent extends HorizontalPanel {
 			return null;
 		if (image.equals(PropertyConstants.NO_DECLARATION))
 			return image;
-		String end = image.substring(1, image.length() - 1);
+		String end =image;
+		if (image.contains("<"))
+		end = image.substring(1, image.length() - 1);
 		System.out.println("parsed: " + end);
 		return end;
 	}

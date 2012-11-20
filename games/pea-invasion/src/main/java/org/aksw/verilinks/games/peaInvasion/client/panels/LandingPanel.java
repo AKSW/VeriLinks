@@ -43,14 +43,14 @@ public class LandingPanel extends VerticalPanel{
   }
 
   private void initGUI() {
-  	Image peaImage = new Image("Application/images/landingPage/landingPage_peas.png");
+  	Image peaImage = new Image("PeaInvasion/images/landingPage/landingPage_peas.png");
     peaImage.setHeight("200px");
     peaImage.setStyleName("landingPanel_peaImage");
     DOM.setStyleAttribute(peaImage.getElement(), "marginRight", "15px");
     DOM.setStyleAttribute(peaImage.getElement(), "marginTop", "20px");
     DOM.setStyleAttribute(peaImage.getElement(), "border", "1px solid lightgrey");
     
-    Image enemyImage = new Image("Application/images/landingPage/landingPage_enemy.png");
+    Image enemyImage = new Image("PeaInvasion/images/landingPage/landingPage_enemy.png");
     enemyImage.setHeight("150px");
     DOM.setStyleAttribute(enemyImage.getElement(), "margin", "10px");
 //    DOM.setStyleAttribute(enemyImage.getElement(), "marginLeft", "10px");
@@ -73,13 +73,13 @@ public class LandingPanel extends VerticalPanel{
    
     HTML important = new HTML(
         "<a href='#' class='infoLanding'>[1] Fight the enemy troops and increase your score!" +
-        "<span><img src='Application/images/landingPage/landingPage_screenshot.png' class='imageLanding' alt='screenshot' height='170'/>"  +
+        "<span><img src='PeaInvasion/images/landingPage/landingPage_screenshot.png' class='imageLanding' alt='screenshot' height='170'/>"  +
         "<br>Use your 'Peas' to hinder the enemy troops from reaching the left side of the game screen. With every defeated enemy, your score will increase." +
         "<br><br>The game mechanics are similiar to a <br>Tower Defense game." +
 //        "<br><br>So.. do you have the ability to climb up to the the top of the highscore list?!" 
         "</span></a>"+
         "<br><a href='#' class='infoLanding'>[2] Answer the quiz to gain coins!" +
-        "<span><img src='Application/images/landingPage/landingPage_screenshot2.png' alt='screenshot' width='500' float='none' border='1px solid black'/>"+
+        "<span><img src='PeaInvasion/images/landingPage/landingPage_screenshot2.png' alt='screenshot' width='500' float='none' border='1px solid black'/>"+
         "<br>Answer the quiz to earn coins, so you can buy new troops. The more coins you have, the better you can defend and achieve a higher score. " +
         "<br><br>Your answers will be compared with the answers of other users. If the majority agrees with your decision you'll get a coin- and score bonus!"+
         "</span></a>"

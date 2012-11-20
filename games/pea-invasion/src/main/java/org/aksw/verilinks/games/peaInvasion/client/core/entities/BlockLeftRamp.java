@@ -43,6 +43,6 @@ public class BlockLeftRamp extends Block {
 
   @Override
   public String getImagePath() {
-    return "Application/images/Block-LeftRamp.png";
+    return "PeaInvasion/images/Block-LeftRamp.png";
   }
 }

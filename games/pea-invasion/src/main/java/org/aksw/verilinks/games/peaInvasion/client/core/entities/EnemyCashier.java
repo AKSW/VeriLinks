@@ -31,17 +31,17 @@ public class EnemyCashier extends Enemy{
 
   @Override
   public String getImagePath() {
-    return "Application/images/pea/enemyCashier.png";
+    return "PeaInvasion/images/pea/enemyCashier.png";
     //return "images/pea.png";
   }
   
   public String getImagePathHit() {
-    return "Application/images/pea/enemyCashier_hit.png";
+    return "PeaInvasion/images/pea/enemyCashier_hit.png";
     //return "images/pea.png";
   }
   
   public String getImagePathFell() {
-	    return "Application/images/pea/enemyCashier_fell.png";
+	    return "PeaInvasion/images/pea/enemyCashier_fell.png";
 	    //return "images/pea.png";
 	  }
 	  

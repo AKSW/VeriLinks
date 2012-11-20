@@ -9,7 +9,7 @@ public class GameJava {
 
   public static void main(String[] args) {
     JavaAssetManager assets = JavaPlatform.register().assetManager();
-    assets.setPathPrefix("net/saim/game/resources");
+    assets.setPathPrefix("org/aksw/verilinks/games/peaInvasion/resources");
     PlayN.run(new GameComponent());
   }
 }

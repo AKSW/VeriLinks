@@ -109,15 +109,15 @@ public class TutorialPanel extends VerticalPanel {
 	}
 
 	private void initImages(){
-		image0 = new Image("Application/images/tutorial/tutorialIntro.png");
-		image1 = new Image("Application/images/tutorial/tutorialControls.png");
-		image2 = new Image("Application/images/tutorial/tutorialControls2.png");
-		image3 = new Image("Application/images/tutorial/tutorialControls3.png");
-		image4 = new Image("Application/images/tutorial/tutorialGoal.png");
-		image5 = new Image("Application/images/tutorial/tutorialGoal2.png");
-		image6 = new Image("Application/images/tutorial/tutorialGoal3.png");
-		image7 = new Image("Application/images/tutorial/tutorialUnits.png");
-		image8 = new Image("Application/images/tutorial/tutorialVerify2.png");
+		image0 = new Image("PeaInvasion/images/tutorial/tutorialIntro.png");
+		image1 = new Image("PeaInvasion/images/tutorial/tutorialControls.png");
+		image2 = new Image("PeaInvasion/images/tutorial/tutorialControls2.png");
+		image3 = new Image("PeaInvasion/images/tutorial/tutorialControls3.png");
+		image4 = new Image("PeaInvasion/images/tutorial/tutorialGoal.png");
+		image5 = new Image("PeaInvasion/images/tutorial/tutorialGoal2.png");
+		image6 = new Image("PeaInvasion/images/tutorial/tutorialGoal3.png");
+		image7 = new Image("PeaInvasion/images/tutorial/tutorialUnits.png");
+		image8 = new Image("PeaInvasion/images/tutorial/tutorialVerify2.png");
 		
 		image0.setStyleName("tutorialPanel_image");
 		image1.setStyleName("tutorialPanel_image");
@@ -344,23 +344,14 @@ public class TutorialPanel extends VerticalPanel {
 						+"<br>The actually displayed quiz may vary from game to game."
 //						+ "<br>and if you have the slightest doubt, better choose 'Not Sure' or click the <b>http-links</b> for further information."
 						+ "<br><br>Thanks for your attention. Now have some fun and start playing! :)<br>");
-
-//		textHTML
-//		.setHTML("Decide whether this statement is True <img src='Application/images/verification/true.png'/> or False <img src='Application/images/verification/false.png'/>. If you don't have a clue, choose Unsure <img src='Application/images/verification/unsure.png'/>." +
-//				"</br></br>You earn coins for answering questions correctly, which you can use to buy new units. " +
-//				"</br>The more difficult the questions are, the higher your reward." +
-//				"</br>If you incorrectly answer a question, you get a penalty." +
-//				"</br>If the player community has no agreement on the answer of a question," +
-//				"</br>you get only few coins as bonus for answering the questions (we do not know the correct answer - it is all up to the players). " +
-//				"</br></br>Shortcut-Keys: Push <img src='Application/images/verification/key1.png'/> for True, <img src='Application/images/verification/key1.png'/> for False and <img src='Application/images/verification/key1.png'/> for Unsure. </br>Thanks for your attention. Now have some fun and start playing! :)");
 		textHTML
-		.setHTML("Decide whether this statement is True <img src='Application/images/verification/true.png'/> or False <img src='Application/images/verification/false.png'/>. If you don't have a clue, choose Unsure <img src='Application/images/verification/unsure.png'/>." +
+		.setHTML("Decide whether this statement is True <img src='PeaInvasion/images/verification/true.png'/> or False <img src='PeaInvasion/images/verification/false.png'/>. If you don't have a clue, choose Unsure <img src='PeaInvasion/images/verification/unsure.png'/>." +
 				"</br></br>You earn coins for answering questions correctly, which you can use to buy new units. " +
 				"</br>The more difficult the questions are, the higher your reward. " +
 				"If you incorrectly answer a question, you get a penalty. " +
 				"</br>If the player community has no agreement on the answer of a question, " +
 				"you get only few coins as bonus for answering the questions (we do not know the correct answer - it is all up to the players). " +
-				"</br></br><b>Shortcut-Keys:</b> Push <img src='Application/images/verification/key1.png'/> for True, <img src='Application/images/verification/key2.png'/> for False and <img src='Application/images/verification/key3.png'/> for Unsure. " +
+				"</br></br><b>Shortcut-Keys:</b> Push <img src='PeaInvasion/images/verification/key1.png'/> for True, <img src='PeaInvasion/images/verification/key2.png'/> for False and <img src='PeaInvasion/images/verification/key3.png'/> for Unsure. " +
 				"</br></br>Thanks for your attention. Now have some fun and start playing! :)");
 		
 		DOM.setStyleAttribute(textHTML.getElement(), "width", "850px");
@@ -374,7 +365,7 @@ public class TutorialPanel extends VerticalPanel {
 		// Topic
 		topicHTML.setHTML("Verification");
 		// Image
-		picURL = "Application/images/tutorial/tutorialVerify2.png";
+		picURL = "PeaInvasion/images/tutorial/tutorialVerify2.png";
 		pic.setUrl(picURL);
 		
 		// Text

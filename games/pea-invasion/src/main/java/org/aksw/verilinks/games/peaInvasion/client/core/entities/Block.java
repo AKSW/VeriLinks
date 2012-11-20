@@ -60,6 +60,6 @@ public class Block extends StaticPhysicsEntity {
 
   @Override
   public String getImagePath() {
-    return "Application/images/Block-Normal.png";
+    return "PeaInvasion/images/Block-Normal.png";
   }
 }

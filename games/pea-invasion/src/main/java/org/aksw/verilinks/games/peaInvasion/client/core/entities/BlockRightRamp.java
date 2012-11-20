@@ -44,6 +44,6 @@ public class BlockRightRamp extends Block {
 
   @Override
   public String getImagePath() {
-    return "Application/images/Block-RightRamp.png";
+    return "PeaInvasion/images/Block-RightRamp.png";
   }
 }

@@ -41,25 +41,25 @@ public class InfoText {
     peaLayer.add(layer);
     
     // Image Layers
-    Image score = assetManager().getImage("Application/images/info/score.png");
+    Image score = assetManager().getImage("PeaInvasion/images/info/score.png");
     System.out.println("WIDTH: "+score.width());
     ImageLayer scoreLayer =  graphics().createImageLayer(score);
     scoreLayer.setScale(0.03f);
     scoreLayer.setTranslation(0.2f, 0.2f);
     
-    Image gold = assetManager().getImage("Application/images/info/gold.png");
+    Image gold = assetManager().getImage("PeaInvasion/images/info/gold.png");
     System.out.println("WIDTH: "+gold.width());
     ImageLayer goldLayer =  graphics().createImageLayer(gold);
     goldLayer.setScale(0.012f);
     goldLayer.setTranslation(0.65f, 1.2f);
     
-    Image level = assetManager().getImage("Application/images/info/level.png");
+    Image level = assetManager().getImage("PeaInvasion/images/info/level.png");
     System.out.println("WIDTH: "+level.width());
     ImageLayer levelLayer =  graphics().createImageLayer(level);
     levelLayer.setScale(0.03f);
     levelLayer.setTranslation(42f, 0.2f);
     
-    Image mode = assetManager().getImage("Application/images/info/mode.png");
+    Image mode = assetManager().getImage("PeaInvasion/images/info/mode.png");
     System.out.println("WIDTH: "+mode.width());
     ImageLayer modeLayer =  graphics().createImageLayer(mode);
     modeLayer.setScale(0.03f);

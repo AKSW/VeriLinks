@@ -36,7 +36,7 @@ public class Loader {
     final GameWorld gameWorld = new GameWorld(worldLayer);
 
     // Level Path
-    String level = "Application/levels/lvl"+lvl+".json";
+    String level = "PeaInvasion/levels/lvl"+lvl+".json";
     // load the level
     PlayN.assetManager().getText(level, new ResourceCallback<String>() {
       public void done(String resource) {

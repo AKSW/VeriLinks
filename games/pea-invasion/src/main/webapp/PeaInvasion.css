@@ -1,34 +1,1118 @@
 /** Add css rules here for your application. */
+body {
 
+	margin: 0px auto;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+}
 
-/** Example rules used by the template application (remove for your app) */
 h1 {
-  font-size: 2em;
-  font-weight: bold;
-  color: #777777;
-  margin: 40px 0px 70px;
-  text-align: center;
+	width: 100%;
+	font-size: 2em;
+	font-weight: bold;
+	color: white;
+	margin: 0px;
+	text-align: center;
+	background-color: #39538E;
+	border-bottom: 1px dashed black;
+	-webkit-box-shadow: 0 8px 6px -10px black;
+	-moz-box-shadow: 0 8px 6px -10px black;
+	box-shadow: 0 8px 6px -10px black;
+}
+
+
+table.upperContent {
+	margin: 0px auto 7px;
+	text-align: center;
+	border-bottom-width: 1px;
+	border-bottom-style: dashed;
+	border-bottom-color: #5c525c;
+}
+
+#playn-root {
+	z-index: 0;
+	padding: 0px 3px 6px;
+	/*
+	border-top-width:5px;
+	border-top-style:dashed;
+	border-top-color:#D3D3D3;
+	
+	border-bottom-width:5px;
+    border-bottom-style:dashed;
+    border-bottom-color:#D3D3D3;
+    */
+}
+
+img.load {
+	
+}
+
+img.image {
+	width: 110px;
+	border-width: 1px;
+	border-style: dashed;
+	border-color: #D3D3D3;
+	padding: 0px;
+}
+/** Images */
+#imageSubject,#imageObject {
+	padding: 0px;
+	background-color: white;
+	color: white;
+	text-decoration: none;
+}
+
+#imageSubject a.small,#imageSubject a.small:visited {
+	width: 110px;
+	display: block;
+}
+
+#imageObject a.small,#imageObject a.small:visited {
+	width: 110px;
+	display: block;
+}
+
+#imageSubject a img,#imageObject a img {
+	width: 110px;
+	border-width: 1px;
+	border-style: dashed;
+	border-color: #D3D3D3;
+	padding: 0px;
+}
+
+#imageSubject a.small:hover,#imageObject a.small:hover {
+	width: 110px;
+}
+
+#imageSubject a .large,#imageObject a .large {
+	width: 0;
+	height: 0;
+	display: block;
+	visibility: hidden;
+}
+
+#imageSubject a.small:hover .large {
+	display: block;
+	position: absolute;
+	top: 110px;
+	left: 20px;
+	width: auto;
+	height: auto;
+	visibility: visible;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	z-index: 200;
+}
+
+#imageObject a.small:hover .large {
+	display: block;
+	position: absolute;
+	top: 110px;
+	right: 20px;
+	width: auto;
+	height: auto;
+	visibility: visible;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	z-index: 200;
+}
+
+td.imageTable {
+	vertical-align: bottom;
+	padding-bottom: 40px;
+}
+
+#imageSubject {
+	
+}
+
+#imageObject {
+	
+}
+
+/** VerifyComponent elements**/
+table.lowerContent {
+	background-color: #BECBEA;
+	margin: 3px auto;
+	padding: 4px 7px;
+	text-align: center;
+	/*
+	border-style: dashed solid;
+	border-width: 1px;
+	border-color: #D3D3D3;
+	*/
+	-moz-box-shadow: 1px 3px 2px 0px lightgrey;
+	-webkit-box-shadow: 1px 3px 2px 0px lightgrey;
+	box-shadow: 1px 3px 2px 0px lightgrey;
+}
+
+#subject {
+	border-style: dashed solid;
+	border-width: 1px;
+	border-color: #999199;
+}
+
+#object {
+	border-style: dashed solid;
+	border-width: 1px;
+	border-color: #999199;
+}
+
+#bottomButtons {
+	margin: 8px;
+	margin-bottom: 0px;
+	font-size: small;
+}
+
+#bottomContent {
+	font-style: italic;
+	font-size: small;
+	color: gray;
+	text-align: right;
+	margin: 5px;
+}
+
+.verifyComponent_instancePanel {
+	border-style: dashed solid;
+	border-width: 1px;
+	border-color: #999199;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.instancePanel_mapInfoPanel {
+	background-color: white;
+	padding: 2px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: lightgray;
+	background-color: white;
+	opacity: 0.9;
+}
+
+.infoWindowHTML {
+	text-align: left;
+}
+
+#verifyComponent_mapsPanel {
+	margin-left: auto;
+	margin-left: auto;
+	text-align: center;
+}
+
+.bothMapsPanel_infoPanel_right {
+	background-color: white;
+	padding: 2px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: lightgray;
+}
+
+.bothMapsPanel_infoPanel {
+	background-color: lightgray;
+	padding: 1px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: white;
+	opacity: 0.9;
+}
+
+.bothMapsPanel_routePanel {
+	z-index: 1;
+	background-color: lightgray;
+	padding: 1px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: white;
+	opacity: 0.9;
+}
+
+.bothMapsPanel_routeInfoPanel {
+	z-index: 1;
+	background-color: white;
+	padding: 2px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: lightgray;
+	background-color: white;
+}
+
+.kongregateHead {
+	color: #808080;
+	font: 20px MisoRegular;
+	text-shadow: #fff 0px 1px 0, #000 0 -1px 0;
+	margin: 0px;
+}
+
+.kongregateWholeQuestion {
+	color: #808080;
+	font: 20px MisoRegular;
+	text-shadow: #fff 0px 1px 0, #000 0 -1px 0;
+	margin-left: 13px;
+	margin-right: 13px;
+}
+
+.kongregateQuestion {
+	margin: 5px;
+	background-color: white;
+	border-radius: 0.6em 0.6em 0.6em 0.6em;
+	-moz-box-shadow: 1px 3px 2px 0px black;
+	-webkit-box-shadow: 1px 3px 2px 0px black;
+	box-shadow: 1px 3px 2px 0px black;
+}
+
+.kongregateSubject {
+	margin: 20px;
+	font: 20px MisoRegular;
+	color: #800517;
+	text-shadow: 0px 2px 3px #555;
+	font-style: italic;
+}
+
+.kongregateObject {
+	margin: 20px;
+	font: 20px MisoRegular;
+	color: #7D1B7E;
+	text-shadow: 0px 2px 3px #555;
+	font-style: italic;
+}
+
+.kongregateMap {
+	margin: 10px;
+	-moz-box-shadow: 1px 3px 2px 0px grey;
+	-webkit-box-shadow: 1px 3px 2px 0px grey;
+	box-shadow: 1px 3px 2px 0px grey;
+}
+
+.kongregatePredicate {
+	margin: 20px;
+	color: #222;
+	text-shadow: 0px 2px 3px #555;
+	font: 20px MisoRegular;
+}
+
+.kongregateImage {
+	margin: 8px 12px;
+	padding: 0px;
+	height: 130px;
+	-moz-box-shadow: 1px 3px 2px 0px grey;
+	-webkit-box-shadow: 1px 3px 2px 0px grey;
+	box-shadow: 1px 3px 2px 0px grey;
+}
+
+.detailsPanel {
+	z-index: 20;
+	padding: 15px;
+	background-color: white;
+	border: 1px solid black;
+	background-color: white;
+	border-radius: 1em 1em 1em 1em;
+	width: 450px;
+	-moz-box-shadow: 1px 3px 2px 0px black;
+	-webkit-box-shadow: 1px 3px 2px 0px black;
+	box-shadow: 1px 3px 2px 0px black;
+}
+
+.glassPanel {
+	z-index: 5;
+}
+
+table.mapsTable {
+	margin: 0 auto 0;
+	text-align: center;
+}
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+	width: 400px;
+}
+
+.dialogVPanel {
+	margin: 5px;
+}
+
+.serverResponseLabelError {
+	color: red;
+}
+
+.predicateHTML {
+	margin: 3px; //
+	font-size: 150%;
+	color: #700000;
+}
+
+.predicatePanel {
+	border: 1px solid #575656;
+	margin: 3px;
+	background-color: #FFFFFF;
+	-moz-box-shadow: 1px 3px 2px 0px black;
+	-webkit-box-shadow: 1px 3px 2px 0px black;
+	box-shadow: 1px 3px 2px 0px black;
+}
+
+.middlePanel {
+	margin: 10% auto;
+	padding: 0px 5px;
+}
+
+.RdbtnPanel {
+	margin: 15px auto;
+	white-space: nowrap;
+}
+
+.UriPanel {
+	background-color: #c0c0c0;
+	width: 555px;
+	padding: 3px 0px;
+	font-style: italic;
+	overflow: auto; <!--
+	margin: 1px;
+	-->
+}
+
+.LabelPanel {
+	width: 555px;
+	overflow: auto;
+	padding: 3px 0px; <!--
+	margin: 1px;
+	-->
+}
+
+.TypePanel {
+	background-color: #f5f5f5;
+	width: 555px;
+	overflow: auto;
+	padding: 3px 0px; <!--
+	margin: 1px;
+	-->
+}
+
+.SpecificPanel {
+	background-color: #c0c0c0;
+	width: 555px; <!--
+	margin: 1px;
+	-->
+}
+
+.specificText {
+	
+}
+
+.specificValuePanel {
+	background-color: white;
+	padding: 2px 3px;
+	overflow: auto;
+	height: 90px;
+	width: 555px;
+}
+
+.PropertyText {
+	color: #CC0000 <!--     margin :     2px;
+	-->
+}
+
+.PropertyTextUriHtml {
+	font-style: italic;
+	font-weight: bold;
+}
+
+.PropertyValue {
+	padding: 3px; <!--
+	margin: 2px;
+	-->
+}
+
+.ImagePanel {
+	text-align: center;
+	margin: 0px auto;
+}
+
+/**Landing Panel **/
+.landingPanel {
+	width: 780px;
+}
+
+.landingPanel_body {
+	padding: 8px;
+}
+
+.landingPanel_important {
+	border: 1px solid #5c525c;
+	font-weight: bold;
+	margin: 13px 5px;
+	padding: 5px;
+	text-align: center;
+	background-color: #39538E;
+	
+	-moz-box-shadow: 1px 3px 2px 0px lightgrey;
+	-webkit-box-shadow: 1px 3px 2px 0px lightgrey;
+	box-shadow: 1px 3px 2px 0px lightgrey;
+}
+
+.landingPanel_head {
+	font-size: 1.7em;
+	background-color: #39538E;
+	font-weight: bolder;
+	text-align: center;
+	color: white;
+	margin-bottom: 10px;
+	padding: 8px;
+	-webkit-box-shadow: 0 8px 6px -10px black;
+	-moz-box-shadow: 0 8px 6px -10px black;
+	box-shadow: 0 8px 6px -10px black;
+}
+
+
+.landingPanel_info {
+	border: 1px solid lightgrey;
+    letter-spacing:0.1em;
+	padding: 5px;
+	-moz-box-shadow: 1px 3px 2px 0px lightgrey;
+	-webkit-box-shadow: 1px 3px 2px 0px lightgrey;
+	box-shadow: 1px 3px 2px 0px lightgrey;
+	
+}
+
+
+.landingPanel_peaImage {
+	border: 1px solid #5c525c;
+	margin-right: 15px;
+	height: 200px;
+	-moz-box-shadow: 1px 3px 2px 0px lightgrey;
+	-webkit-box-shadow: 1px 3px 2px 0px lightgrey;
+	box-shadow: 1px 3px 2px 0px lightgrey;
+}
+
+.landingPanel_browser {
+	color: gray;
+	font-stlye: italic;
+}
+
+.landingPanel_fontSize {
+	font-size: large;
+}
+
+.landingPanel_fontSizeSmall {
+	font-size: medium;
+}
+
+.landingPanel_controlGame {
+	margin-left: 30px;
+	padding-left: 30px;
+	border-left-style: solid;
+	border-left-size: 1px;
+	border-left-color: black;
+}
+
+.landingPanel_credits {
+	font-weight: bold;
+}
+
+.landingPanel_credits:hover {
+	bakcground-color: grey;
+}
+
+.landingPanel_creditsDialog {
+	border: 1px solid black;
+	width: 610px;
+	z-index: 40;
+	background-color: white;
+	font-size: 1.2em; 
+	-moz-box-shadow : 1px 3px 2px 0px lightgrey;
+	-webkit-box-shadow: 1px 3px 2px 0px lightgrey;
+	box-shadow: 1px 3px 2px 0px lightgrey;
+	-moz-box-shadow: 1px 3px 2px 0px lightgrey;
+}
+
+.landingPanel_creditsDialogHead {
+	padding: 7px;
+	background-color: #39538E;
+	color: white;
+	border-bottom: 1px solid black;
+	height: 100%;
+	font-size: 1.5em;
+	font-style: bold;
+}
+
+a.info {
+	position: relative; /*this is the key*/
+	z-index: 24;
+	color: gray;
+	text-decoration: none;
+}
+
+a.info:visited {
+	position: relative; /*this is the key*/
+	color: gray;
+	text-decoration: none;
+}
+
+a.info:hover {
+	z-index: 25;
+	background-color: #ccc;
+	color: #000;
+}
+
+a.info span {
+	display: none
+}
+
+a.info:hover span { /*the span will display just on :hover state*/
+	display: block;
+	position: absolute;
+	top: 3em;
+	left: 2em;
+	width: 26em;
+	border: 3px solid #0cf;
+	background-color: #cff;
+	color: #000;
+	padding: 3px;
+	text-align: center;
+	z-index: 25
+}
+
+a.infoLanding {
+	position: relative; /*this is the key*/
+	z-index: 24;
+	color: white;
+	text-decoration: none;
+}
+
+a.infoLanding:visited {
+	position: relative; /*this is the key*/
+	color: white;
+	text-decoration: none;
+}
+
+a.infoLanding:hover {
+	z-index: 25;
+	background-color: #ccc;
+	color: #000;
+}
+
+a.infoLanding span {
+	display: none
+}
+
+a.infoLanding:hover span {
+	/*the span will display just on :hover state*/
+	display: block;
+	position: absolute;
+	bottom: 30px;
+	left: 2em;
+	width: 39em;
+	border: 3px solid #0cf;
+	background-color: #cff;
+	color: #000;
+	padding: 9px;
+	text-align: center;
+	z-index: 25
+}
+
+img.imageLanding {
+	float: left;
+	border: 1px solid black;
+	margin-right: 2px;
+}
+
+a.infoBlack {
+	position: relative; /*this is the key*/
+	z-index: 24;
+	color: black;
+	text-decoration: none;
+	letter-spacing: normal;
+}
+
+a.infoBlack:visited {
+	position: relative; /*this is the key*/
+	color: black;
+	text-decoration: none;
+}
+
+a.infoBlack:hover {
+	z-index: 25;
+	background-color: #ccc;
+	color: #000;
+}
+
+a.infoBlack span {
+	display: none
+}
+
+a.infoBlack:hover span { /*the span will display just on :hover state*/
+	display: block;
+	position: absolute;
+	top: 3em;
+	left: -1.5em;
+	width: 26em;
+	border: 3px solid #0cf;
+	background-color: #cff;
+	color: #000;
+	padding: 3px;
+	text-align: center;
+	z-index: 25
+}
+
+.startPanel_linksetPanel{
+	-moz-box-shadow: 1px 2px 5px 2px #ccc;
+	-webkit-box-shadow: 1px 2px 5px 2px #ccc;
+	box-shadow: 1px 2px 5px 2px #ccc;
+}
+
+.startPanel_hLoginPanel{
+	-moz-box-shadow: 1px 2px 5px 2px #ccc;
+	-webkit-box-shadow: 1px 2px 5px 2px #ccc;
+	box-shadow: 1px 2px 5px 2px #ccc;
+}
+
+.startPanel_loginPanel-disabled {
+	opacity: 0.4;
+}
+
+.startPanel_nameInput {
+	margin: 5px 3px 3px;
+	padding: 1px;
+}
+
+.startPanel_nameInput-disabled {
+	margin: 5px 3px 3px;
+	padding: 1px;
+	border: 1px dashed gray;
+	opacity: 0.4;
+}
+
+.startPanel_loginImage {
+	height: 70px;
+}
+
+.image-ToggleButton {
+	margin: 3px;
+	padding: 1px;
+	background-color: #fff;
+	border: 1px dashed #666;
+	cursor: hand;
+	cursor: pointer;
+	opacity: 0.4;
+}
+
+.image-ToggleButton-up-hovering {
+	border-top: 1px solid #fff;
+	border-left: 1px solid #fff;
+	border-right: 1px solid #777;
+	border-bottom: 1px solid #777;
+}
+
+.image-ToggleButton-down,.image-ToggleButton-down-hovering {
+	border-top: 1px solid #333;
+	border-left: 1px solid #333;
+	border-right: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	opacity: 1;
+}
+
+/** AdminPanel **/
+.AdminPanel {
+	
+}
+
+.adminPanel_header {
+	width: 100%;
+	background-color: #39538E;
+	margin-bottom: 15px;
+}
+
+.adminPanel_headerText {
+	margin-left: 10px;
+	font-weight: bolder;
+	font-size: medium;
+	color: white;
+}
+
+.adminPanel_quitBtn {
+	margin-right: 0;
+	margin-left: auto;
+	width: 100px;
+}
+
+.adminPanel_checkBoxPanel {
+	border-width: 2px;
+	border-style: dashed solid;
+	border-color: #D3D3D3;
+	padding: 8px;
+	padding-right: 14px;
+}
+
+.adminPanel_upload {
+	
+}
+
+.adminPanel_margin {
+	border-width: 2px;
+	border-style: dashed solid;
+	border-color: #D3D3D3;
+	margin-bottom: 15px;
+	padding: 8px;
+	margin-top: 15px;
+	margin-left: 0;
+	margin-right: 0;
+	margin-bottom: 8px ];
+}
+
+.AdminPanel_Label {
+	color: black;
+}
+
+.AdminPanel_Box {
+	width: 400px;
+}
+
+.AdminPanel_Box-disable {
+	background-color: lightgray
+}
+
+.AdminPanel_Spacing {
+	padding: 10px 0px;
+}
+
+.adminPanel_addBtn {
+	padding: 15px 10px;
+}
+
+.Menu_Header {
+	padding: 5px 0px;
+	font-weight: bold;
+}
+
+.Menu_AdminPanel {
+	padding: 10px 5px 0px 0px;
+}
+
+.TaskPanel_Result {
+	color: green;
+	font-weight: bold;
+	padding: 5px;
+}
+
+.taskPanel_header {
+	margin-left: 10px;
+	font-weight: bolder;
+	font-size: medium;
+	color: white;
+}
+
+.taskPanel_table {
+	width: 500px;
+	height: auto;
+	margin-bottom: 15px;
+	overflow: auto;
+}
+
+.taskTableColumn_head {
+	font-weight: bold;
+	padding: 3px 10px;
+	background-color: #A0A0A0;
+	border-bottom-style: dashed;
+	border-bottom-width: 1px;
+	border-bottom-color: black;
+	text-aling: center;
+}
+
+.taskTableColumn_text {
+	background-color: white;
+	margin: 5px;
+	padding: 3px;
+	text-aling: center;
+}
+
+.taskTableColumn {
+	background-color: #F5F5F5;
+	text-aling: center;
+	padding: 3px 3px;
+	margin: 5px 10px;
+}
+
+.tutorialPanel {
+	
+}
+
+.tutorialPanel_image {
+	width: 800px;
+	height: 290px;
+	margin: 0px 5px 5px;
+
+	border-bottom-width: 1px;
+	border-bottom-style: dashed;
+	border-bottom-color: #5c525c;
+	-moz-box-shadow: 1px 2px 5px 2px #ccc;
+	-webkit-box-shadow: 1px 2px 5px 2px #ccc;
+	box-shadow: 1px 2px 5px 2px #ccc;
+}
+
+.tutorialPanel_headPanel {
+	background-color: #39538E;
+	padding: 8px;
+	width: 100%;
+	border-bottom: 1px dashed black;
+}
+
+.tutorialPanel_headText {
+	font-size: 20px;
+	font-weight: bolder;
+	color: white;
+}
+
+.tutorialPanel_topic {
+	font-size: medium;
+	font-weight: bold;
+}
+
+.tutorialPanel_text {
+	font-size: medium;
+}
+
+.tutorialPanel_buttonPanel {
+	margin: 8px;
+}
+
+.win_head {
+	background-color: #996600;
+	font-weight: bolder;
+	font-size: medium;
+	text-align: center;
+	color: white;
+	margin-bottom: 5px;
+	padding: 5px;
+}
+
+.win_text {
+	margin: 5px;
+	padding-bottom: 7px;
+	text-align: center;
+}
+
+.lose_head {
+	background-color: #8B2323;
+	font-weight: bolder;
+	font-size: medium;
+	text-align: center;
+	color: white;
+	margin-bottom: 5px;
+	padding: 5px;
+}
+
+.lose_text {
+	margin: 5px;
+	padding-bottom: 7px;
+	text-align: center;
+}
+
+.application_statisticsPanel {
+	
+}
+
+.statisticsPanel {
+	text-align: center;
+	z-index: 5;
+	background-color: white;
+	border: 1px solid black;
+}
+
+.noBorder {
+	text-align: center;
+	z-index: 5;
+	background-color: white;
+	border: 1px solid #39538E;
+}
+
+.statisticsPanel_stats {
+	width: 350px;
+	margin: 5px 15px;
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid dashed;
+	border-color: black;
+	background-color: #F8F8F8;
+}
+
+.statisticsPanel_value {
+	text-align: center;
+	white-space: nowrap;
+}
+
+.statisticsPanel_desc {
+	color: #480000;
+	font-weight: bold;
+	margin: 3px;
+	text-align: center;
+}
+
+.highscorePanel {
+	padding: 3px;
+	z-index: 10;
+	background-color: white;
+	background-image: url('PeaInvasion/images/highscore.png');
+	background-position: -50px -50px;
+	-moz-box-shadow: 1px 2px 5px 2px #ccc;
+	-webkit-box-shadow: 1px 2px 5px 2px #ccc;
+	box-shadow: 1px 2px 5px 2px #ccc;
+	-moz-border-radius: 1em 1em 1em 1em;
+	border-radius: 1em 1em 1em 1em;
+}
+
+.highscorePanel_scroll {
+	margin: 5px;
+	color: white;
+}
+
+.highscorePanel_head {
+	margin: 0px;
+	text-align: center;
+	padding-top: 15px;
+	padding-bottom: 10px;
+	border-bottom: 1px dashed grey;
+	color: #fff;
+	text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px
+		#ff2d95, 0 0 30px #ff2d95, 0 0 40px #ff2d95, 0 0 50px #ff2d95, 0 0
+		75px #ff2d95;
+	letter-spacing: 5px;
+	font: 80px 'MisoRegular';
+	font-size: 1.7em;
+}
+
+.font_italic {
+	font-style: italic;
+}
+
+.color_black {
+	color: black;
+}
+/** Set ids using widget.getElement().setId("idOfElement") 
+#closeButton {
+  margin: 15px 6px 6px;
 }
 
 .sendButton {
   display: block;
   font-size: 16pt;
+}*/
+.myButton {
+	-moz-box-shadow: inset 0px 1px 0px -50px #ffffff;
+	-webkit-box-shadow: inset 0px 1px 0px -50px #ffffff;
+	box-shadow: inset 0px 1px 0px -50px #ffffff;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ededed
+		), color-stop(1, #dfdfdf) );
+	background: -moz-linear-gradient(center top, #ededed 5%, #dfdfdf 100%);
+	filter: progid :   DXImageTransform.Microsoft.gradient (   startColorstr
+		= 
+		 '#ededed', endColorstr =   '#dfdfdf' );
+	background-color: #ededed;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	display: inline-block;
+	color: #5c525c;
+	font-family: Comic Sans MS;
+	font-size: 14px;
+	font-weight: normal;
+	padding: 5px 15px;
+	text-decoration: none;
+	text-shadow: 1px 1px 5px #ffffff;
+	margin: 5px;
 }
 
-/** Most GWT widgets already have a style name defined */
-.gwt-DialogBox {
-  width: 400px;
+.myButton:hover {
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #dfdfdf
+		), color-stop(1, #ededed) );
+	background: -moz-linear-gradient(center top, #dfdfdf 5%, #ededed 100%);
+	filter: progid :   DXImageTransform.Microsoft.gradient (   startColorstr
+		= 
+		 '#dfdfdf', endColorstr =   '#ededed' );
+	background-color: #dfdfdf;
 }
 
-.dialogVPanel {
-  margin: 5px;
+.myButton:active {
+	position: relative;
+	top: 1px;
 }
 
-.serverResponseLabelError {
-  color: red;
+.myButton:disabled {
+	background-color: white
 }
 
-/** Set ids using widget.getElement().setId("idOfElement") */
-#closeButton {
-  margin: 15px 6px 6px;
+.gameMessage {
+	z-index: 1;
+	display: inline-block;
+	font-size: 14px;
+	padding: 3px 22px;
+	text-decoration: none;
+	color: white;
+	background-color: #39538E;
+	border: 1px dashed black;
+	-moz-box-shadow: 1px 3px 2px 0px lightgrey;
+	-webkit-box-shadow: 1px 3px 2px 0px lightgrey;
+	box-shadow: 1px 3px 2px 0px lightgrey;
+}
+
+.gameMessage:active {
+	position: relative;
+	top: 1px;
+}
+
+.gameMessageDisagreement {
+	z-index: 1;
+	display: inline-block;
+	font-size: 14px;
+	padding: 3px 22px;
+	text-decoration: none;
+	color: white;
+	background-color: #800000;
+	border: 1px dashed black;
+}
+
+.gameMessageDisagreement:active {
+	position: relative;
+	top: 1px;
+}
+
+.gameMessagePenalty {
+	z-index: 1;
+	display: inline-block;
+	font-size: 14px;
+	font-style: bolder;
+	padding: 3px 22px;
+	text-decoration: none;
+	color: black;
+	background-color: #E80000;
+	border: 1px dashed black;
+}
+
+.gameMessagePenalty:active {
+	position: relative;
+	top: 1px;
+}
+
+.gameMessageNotSure {
+	z-index: 1;
+	display: inline-block;
+	font-size: 14px;
+	font-style: bolder;
+	padding: 3px 22px;
+	text-decoration: none;
+	color: white;
+	background-color: #909090;
+	border: 1px dashed black;
+}
+
+.gameMessageNotSure:active {
+	position: relative;
+	top: 1px;
+}
+
+.bottom_margin {
+	margin-bottom: 8px;
+}
+
+.gwt-TabPanelBottom {
+  border: none;
 }

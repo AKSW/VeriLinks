@@ -144,7 +144,7 @@ public class BlockSpring extends Entity implements PhysicsEntity {
 
   @Override
   public String getImagePath() {
-    return "Application/images/Block-Spring.png";
+    return "PeaInvasion/images/Block-Spring.png";
   }
 
   public Body getBody() {

@@ -34,12 +34,12 @@ public class EnemyShooter extends Enemy{
 
   @Override
   public String getImagePath() {
-    return "Application/images/pea/enemyShooter2.png";
+    return "PeaInvasion/images/pea/enemyShooter2.png";
     //return "images/pea.png";
   }
   
   public String getImagePathHit() {
-    return "Application/images/pea/enemyShooter_hit2.png";
+    return "PeaInvasion/images/pea/enemyShooter_hit2.png";
     //return "images/pea.png";
   }
   

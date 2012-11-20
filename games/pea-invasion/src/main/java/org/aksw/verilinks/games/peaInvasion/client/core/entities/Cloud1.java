@@ -59,7 +59,7 @@ public class Cloud1 extends Entity {
 
   @Override
   String getImagePath() {
-    return "Application/images/Cloud1.png";
+    return "PeaInvasion/images/Cloud1.png";
   }
 
   @Override

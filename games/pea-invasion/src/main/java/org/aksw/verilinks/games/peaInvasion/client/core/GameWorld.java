@@ -696,7 +696,7 @@ public class GameWorld implements ContactListener {
 
 	public void setBackground() {
     // load and show our background image
-    Image bgImage = assetManager().getImage("Application/images/bg_dark.png");
+    Image bgImage = assetManager().getImage("PeaInvasion/images/bg_dark.png");
     ImageLayer bgLayer = graphics().createImageLayer(bgImage);
     graphics().rootLayer().add(bgLayer);
 

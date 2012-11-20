@@ -12,7 +12,7 @@ public class JsoTemplateInstance extends JavaScriptObject {
 		return this.type;
 	}-*/;
 
-	public final native JsArray<JavaScriptObject> getProperties() /*-{
+	public final native JsArray<JsoTemplateProperty> getProperties() /*-{
 		return this.properties;
 	}-*/;
 }

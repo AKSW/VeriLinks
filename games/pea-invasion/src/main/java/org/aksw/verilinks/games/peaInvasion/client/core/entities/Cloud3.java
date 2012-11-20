@@ -19,6 +19,6 @@ public class Cloud3 extends Cloud1 {
 
   @Override
   String getImagePath() {
-    return "Application/images/Cloud3.png";
+    return "PeaInvasion/images/Cloud3.png";
   }
 }

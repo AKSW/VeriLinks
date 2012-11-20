@@ -100,11 +100,11 @@ public class GameComponent implements Game, Pointer.Listener, Keyboard.Listener 
 
   public void loadLevel(final int money, final int score, final int lvl ) {
 //  	worldLayer.clear();
-  	 Image bgImage = assetManager().getImage("Application/images/bg.png");
+  	 Image bgImage = assetManager().getImage("PeaInvasion/images/bg.png");
   	// Change background
     if( lvl==3 || lvl ==4){
     	// load and show our background image
-      bgImage = assetManager().getImage("Application/images/bg_dark.png");
+      bgImage = assetManager().getImage("PeaInvasion/images/bg_dark.png");
     }
     
     ImageLayer bgLayer = graphics().createImageLayer(bgImage);
