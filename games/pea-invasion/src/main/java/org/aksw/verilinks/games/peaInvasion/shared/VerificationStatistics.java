@@ -3,6 +3,7 @@ package org.aksw.verilinks.games.peaInvasion.shared;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.dev.json.JsonObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import org.aksw.verilinks.games.peaInvasion.client.PeaInvasion;
@@ -109,8 +110,24 @@ public class VerificationStatistics implements IsSerializable{
 		return this.countUnsure;
 	}
 
-	public String getJson() {
-		// TODO Auto-generated method stub
+	public String getVerifiedLinks() {
+		ArrayList<Integer> unique = new ArrayList<Integer>();
+		String verified = "";
+		for(int i=0;i<this.list.size();i++){
+			if(!unique.contains(list.get(i).getId()))
+				unique.add(list.get(i).getId());
+		}
+		for(int i=0;i<unique.size();i++){
+			verified+=unique.get(i);
+			if(i!=unique.size()-1)
+				verified+="+";
+		}
+		return verified;
+	}
+	
+	public String getJson(){
+		JsonObject data = new JsonObject();
+		
 		return null;
 	}
 }

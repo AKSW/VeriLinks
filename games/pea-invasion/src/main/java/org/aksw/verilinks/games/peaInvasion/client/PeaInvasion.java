@@ -167,7 +167,7 @@ public class PeaInvasion extends HtmlGame {
 
 	/** Saves last pushed key */
 	private int numKeyCache;
-
+	
 	// Highscore
 	private PopupPanel popup;
 	private PopupPanel glass;
@@ -196,6 +196,8 @@ public class PeaInvasion extends HtmlGame {
 	private Template objectTemplate;
 
 	private TemplateLinkset template;
+
+	private int FIRST_QUERY_REQUEST = -100;
 
 	/**
 	 * This is the entry point method.
@@ -1764,7 +1766,7 @@ public class PeaInvasion extends HtmlGame {
 		verificationStats.addVerification(verification);
 
 		// send veri
-		getLink();
+		getLink(selection);
 		echo("CLIENT: thisLink = " + thisLink);
 		echo("CLIENT: nextLink = " + nextLink);
 
@@ -1874,7 +1876,7 @@ public class PeaInvasion extends HtmlGame {
 	 */
 	public void firstQueryRequest() {
 		echo("Client: First Query Request");
-		getLink();
+		getLink(FIRST_QUERY_REQUEST );
 		this.disableInput = false;
 
 	}
@@ -2526,10 +2528,10 @@ public class PeaInvasion extends HtmlGame {
 		return this.user;
 	}
 
-	private void getLink(){
+	private void getLink(int selection){
 		// Receive new links, update Table
-		
-		String url = generateURL();
+		echo("Get Link Request");
+		String url = generateURL(selection);
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
 		try {
@@ -2543,17 +2545,8 @@ public class PeaInvasion extends HtmlGame {
 					echo("GET Link Success: " + response.getText());
 					JSONValue jsonValue = JSONParser.parseStrict(response
 							.getText());
-					System.out.println("jsonValue: " + jsonValue.toString());
 					JSONObject jsonObject = jsonValue.isObject(); // assert that											// an object
-					if (jsonObject == null) {
-						System.out.println("JSON payload did not describe an object");
-						throw new RuntimeException(
-								"JSON payload did not describe an object");
-					} else
-						System.out.println("is object");
-					// Cast
 					JsoLink l = jsonObject.getJavaScriptObject().cast();
-					System.out.println("casted");
 					parseLink(l);
 				}
 			});
@@ -2623,10 +2616,9 @@ public class PeaInvasion extends HtmlGame {
 //		echo("bonus: " + link.getBonus());
 		echo("Client: This link is Eval_Link?: " + thisLink);
 		echo("----------------------------------");
-		System.out.println("###Client: Callback GetLink success###");	
 	}
 	
-	private String generateURL() {
+	private String generateURL(int selection) {
 		String url = "http://localhost:8080/verilinks-server/server?service=getLink";
 		url += "&userId="+user.getId();
 		url += "&userName="+user.getName();
@@ -2634,9 +2626,10 @@ public class PeaInvasion extends HtmlGame {
 		url += "&nextLink="+nextLink;
 		if(link != null)
 			url += "&curLink="+link.getId();
-		if(this.verificationStats.getJson()!=null)
-			url += "&verification="+this.verificationStats.getJson();
-		
+		if(this.verificationStats.getVerifiedLinks().length()>0)
+			url += "&verifiedLinks="+this.verificationStats.getVerifiedLinks();
+		if(selection != FIRST_QUERY_REQUEST)
+			url += "&verification="+selection;
 		echo("Generate URL: "+url);
 		
 		return url;

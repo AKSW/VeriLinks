@@ -37,7 +37,7 @@ public class VerifyComponent extends HorizontalPanel {
 	private VerticalPanel subPanel;
 	private VerticalPanel obPanel;
 	private VerticalPanel predicatePanel;
-	
+
 	private VerticalPanel subjectImagePanel;
 	private VerticalPanel objectImagePanel;
 	private final String noImage = "PeaInvasion/images/noImage.png";
@@ -45,23 +45,22 @@ public class VerifyComponent extends HorizontalPanel {
 	private TemplateInstance subjectTemplate;
 	private TemplateInstance objectTemplate;
 	private TemplateLinkset template;
-	
+
 	private boolean isBothMapInstances = false;
 	private BothMapsPanel bothMapsPanel;
 
 	private KongregatePanel kongregate;
-	
+
 	/**
 	 * Constructor
 	 * 
 	 * @param model
 	 */
-	public VerifyComponent(TemplateLinkset template,
-			Configuration config) {
+	public VerifyComponent(TemplateLinkset template, Configuration config) {
 
 		super();
 
-		this.template=template;
+		this.template = template;
 		this.subjectTemplate = template.getSubject();
 		this.objectTemplate = template.getObject();
 		this.config = config;
@@ -75,43 +74,46 @@ public class VerifyComponent extends HorizontalPanel {
 
 		System.out.println("\n##VerifyComponent: Update Table##");
 
-		System.out.println("Using templates: "+temp.getSubject().getOntology()+
-				"-"+temp.getObject().getOntology() + "'");
+		System.out.println("Using templates: "
+				+ temp.getSubject().getOntology() + "-"
+				+ temp.getObject().getOntology() + "'");
 
 		Instance instanceSubject = stmt.getSubject();
 		Instance instanceObject = stmt.getObject();
 
 		// here
-//		if(config.isKongregate() || config.isSimple())
-//			updateKongregate(stmt);
-//		else if (!isBothMapInstances)
-//			updateNormal(stmt);
-//		else
-//			updateBothMaps(stmt);
+		// if(config.isKongregate() || config.isSimple())
+		// updateKongregate(stmt);
+		// else if (!isBothMapInstances)
+		// updateNormal(stmt);
+		// else
+		// updateBothMaps(stmt);
 		updateNormal(stmt);
 
 		// Predicate panel
-		DOM.getElementById("predicate").setInnerHTML(parsePredicate(stmt.getPredicate()));
+		DOM.getElementById("predicate").setInnerHTML(
+				parsePredicate(stmt.getPredicate()));
 
 		// Image panel
 		// Subject image
 		subjectImagePanel.clear();
 		String buffer = null;
 		String sParsedImage = parseImage(instanceSubject.getImage());
-		System.out.println("Image Size: " + instanceSubject.getImage().length());
+		System.out
+				.println("Image Size: " + instanceSubject.getImage().length());
 
 		// TODO length of NO_DECLARATION ?
-		if(sParsedImage == null)
-		// No image available
+		if (sParsedImage == null)
+			// No image available
 			subjectImagePanel.add(new HTML("<img class='image' src='" + noImage
 					+ "' title='no image available' />"));
 		else if (instanceSubject.getImage().length() > 10
 				&& !sParsedImage.equals(PropertyConstants.NO_DECLARATION)) // Image
-																																		// available
+																			// available
 		{
-			buffer = "<a class='small' href='#nogo'>" + "<img src='" + sParsedImage
-					+ "' title='subject image' />" + "<img class='large' src='"
-					+ sParsedImage + "'  /></a>";
+			buffer = "<a class='small' href='#nogo'>" + "<img src='"
+					+ sParsedImage + "' title='subject image' />"
+					+ "<img class='large' src='" + sParsedImage + "'  /></a>";
 			subjectImagePanel.add(new HTML(buffer));
 			System.out.println("CMON: " + buffer);
 		} else
@@ -123,15 +125,16 @@ public class VerifyComponent extends HorizontalPanel {
 		objectImagePanel.clear();
 		String oParsedImage = parseImage(instanceObject.getImage());
 		// Image available
-		if(oParsedImage == null){
-		// No image available
+		if (oParsedImage == null) {
+			// No image available
 			objectImagePanel.add(new HTML("<img class='image' src='" + noImage
 					+ "' title='no image available' />"));
-		}
-		else if (oParsedImage.length() > 10
+		} else if (oParsedImage.length() > 10
 				&& !oParsedImage.equals(PropertyConstants.NO_DECLARATION)) {
 			buffer = "<a class='small' href='#nogo' title='small object image'>"
-					+ "<img src='" + oParsedImage + "' title='object image' />"
+					+ "<img src='"
+					+ oParsedImage
+					+ "' title='object image' />"
 					+ "<img class='large' src='" + oParsedImage + "'  /></a>";
 			objectImagePanel.add(new HTML(buffer));
 		} else
@@ -144,8 +147,8 @@ public class VerifyComponent extends HorizontalPanel {
 	}
 
 	/**
-	 * Update statement in VerifyComponent for text-type instances. Or 1 text-type
-	 * and 1 map-type instance.
+	 * Update statement in VerifyComponent for text-type instances. Or 1
+	 * text-type and 1 map-type instance.
 	 * 
 	 * @param newLink
 	 */
@@ -156,14 +159,14 @@ public class VerifyComponent extends HorizontalPanel {
 		System.out.println("Set subject panel");
 		subPanel.clear();
 		subPanel.add(new HTML(removeDuplicate(instanceSubject.getLabel())));
-		subPanel.add(new HTML(instanceSubject.getUri()));
-		subPanel.add(new HTML(instanceSubject.getOptional()));
-		
-		echo("subjectTemplate type: "+subjectTemplate.getType());
+		// subPanel.add(new HTML(instanceSubject.getUri()));
+		// subPanel.add(new HTML(instanceSubject.getOptional()));
+
+		echo("subjectTemplate type: " + subjectTemplate.getType());
 		if (subjectTemplate.getType().equals("map")) {
 			subPanel.add(new HTML("MAPTYPE"));
-//			subjectPanel.setLatitude(instanceSubject.getLatitude());
-//			subjectPanel.setLongitude(instanceSubject.getLongitude());
+			// subjectPanel.setLatitude(instanceSubject.getLatitude());
+			// subjectPanel.setLongitude(instanceSubject.getLongitude());
 		}
 		System.out.println("Subject Uri: " + instanceSubject.getUri());
 		System.out.println("Set subject panel done");
@@ -171,13 +174,13 @@ public class VerifyComponent extends HorizontalPanel {
 		System.out.println("Set object panel");
 		obPanel.clear();
 		obPanel.add(new HTML(removeDuplicate(instanceObject.getLabel())));
-		obPanel.add(new HTML(instanceObject.getUri()));
-		obPanel.add(new HTML(instanceObject.getOptional()));
-		echo("objectTemplate.getType(): "+objectTemplate.getType());
+		// obPanel.add(new HTML(instanceObject.getUri()));
+		// obPanel.add(new HTML(instanceObject.getOptional()));
+		echo("objectTemplate.getType(): " + objectTemplate.getType());
 		if (objectTemplate.getType().equals("map")) {
-			obPanel.add(new HTML("map"));
-//			objectPanel.setLatitude(instanceObject.getLatitude());
-//			objectPanel.setLongitude(instanceObject.getLongitude());
+			// obPanel.add(new HTML("map"));
+			// objectPanel.setLatitude(instanceObject.getLatitude());
+			// objectPanel.setLongitude(instanceObject.getLongitude());
 		}
 		System.out.println("Object Uri: " + instanceObject.getUri());
 		System.out.println("Set object panel done");
@@ -191,22 +194,22 @@ public class VerifyComponent extends HorizontalPanel {
 	 */
 	private void updateBothMaps(rdfStatement link) {
 		echo("Update both");
-		if(config.equals(Configuration.KNOWLEDGE_EXPERT))
+		if (config.equals(Configuration.KNOWLEDGE_EXPERT))
 			this.bothMapsPanel.update(link);
-		else{
+		else {
 			rdfInstance sub = link.getSubject();
-			rdfInstance ob= link.getObject();
-			
+			rdfInstance ob = link.getObject();
+
 			sub.setType(removeNamespace(sub.getType()));
 			ob.setType(removeNamespace(ob.getType()));
-			
+
 			rdfStatement stmt = link;
 			link.setSubject(sub);
 			link.setObject(ob);
 			this.bothMapsPanel.update(link);
 		}
 	}
-	
+
 	/**
 	 * Update statement in VerifyComponent for both map-type instances
 	 * 
@@ -215,25 +218,26 @@ public class VerifyComponent extends HorizontalPanel {
 	private void updateKongregate(rdfStatement link) {
 		echo("Update Kongregate");
 		rdfInstance sub = link.getSubject();
-		rdfInstance ob= link.getObject();
-		
+		rdfInstance ob = link.getObject();
+
 		sub.setType(removeNamespace(sub.getType()));
 		ob.setType(removeNamespace(ob.getType()));
-		
+
 		rdfStatement stmt = link;
 		link.setSubject(sub);
 		link.setObject(ob);
-		
+
 		this.kongregate.update(stmt);
 	}
 
-	private String removeDuplicate(String value){
-		String delimiter = " \\| ";
-		String seperator = " | ";
+	private String removeDuplicate(String value) {
+		echo("Remove duplicate: " + value);
+		String delimiter = " \\; ";
+		String seperator = " ; ";
 		String dummy = "";
 		String parsed = "";
 		int size = value.split(delimiter).length;
-//		echo("VerifyComponent: removeNamespace size: " + size);
+		// echo("VerifyComponent: removeDuplicate size: " + size);
 
 		String[] split = new String[size];
 		split = value.split(delimiter);
@@ -242,29 +246,33 @@ public class VerifyComponent extends HorizontalPanel {
 		// 1
 		for (int i = 1; i < size; i++) {
 			dummy = findDuplicate(split[i], parsed);
-			if (!dummy.isEmpty())
-				parsed += seperator+dummy;
-			echo("parsed: "+parsed);
+			if (!dummy.isEmpty()) {
+				if (parsed.isEmpty())
+					parsed += dummy;
+				else
+					parsed += seperator + dummy;
+			}
 		}
-
+		echo("Duplicate removed: " + parsed);
 		return parsed;
 	}
+
 	private String findDuplicate(String value, String endString) {
-		echo("VerifyComponent: findNamespace value: " + value);
+		// echo("FindDuplicate value: " + value+" , end: "+endString);
 		String parsed = value;
-		if (endString.contains(parsed))
+		if (endString.contains(parsed) || parsed.contains("??"))
 			return "";
 		return parsed;
 	}
-	
+
 	private String removeNamespace(String value) {
-//		echo("VerifyComponent: removeNamespace orignal: " + value);
-		String delimiter = " \\| ";
-		String seperator = " | ";
+		echo("Remove Namespace: " + value);
+		String delimiter = " \\; ";
+		String seperator = " ; ";
 		String dummy = "";
 		String parsed = "";
 		int size = value.split(delimiter).length;
-//		echo("VerifyComponent: removeNamespace size: " + size);
+		// echo("VerifyComponent: removeNamespace size: " + size);
 
 		String[] split = new String[size];
 		split = value.split(delimiter);
@@ -274,27 +282,28 @@ public class VerifyComponent extends HorizontalPanel {
 		for (int i = 1; i < size; i++) {
 			dummy = findNamespace(split[i], parsed);
 			if (!dummy.isEmpty())
-				parsed += seperator+dummy;
-			echo("parsed: "+parsed);
-		}
+				parsed += seperator + dummy;
 
+		}
+		echo("namepsace removed: " + parsed);
 		return parsed;
 	}
 
 	private String findNamespace(String value, String endString) {
-		echo("VerifyComponent: findNamespace value: " + value);
+		echo("FindNamespace value: " + value);
 		String parsed;
-		if(value.contains(":"))
+		if (value.contains(":"))
 			parsed = value.substring(value.indexOf(":") + 1);
 		else
 			parsed = value;
-		echo("VerifyComponent: findNamespace parsed: " + parsed);
+		echo("FindNamespace parsed: " + parsed);
 		if (endString.contains(parsed))
 			return "";
 		return parsed;
 	}
 
-	// TODO server does highlight. but client should do that. hosted and web mode
+	// TODO server does highlight. but client should do that. hosted and web
+	// mode
 	// compatibility
 	/**
 	 * Highlight similarities between subject and object
@@ -352,7 +361,8 @@ public class VerifyComponent extends HorizontalPanel {
 					oLabel = highlightText(oLabel, properties[i]);
 				}
 				// subject specific
-				if (sSpecific.toLowerCase().contains(properties[i].toLowerCase())) {
+				if (sSpecific.toLowerCase().contains(
+						properties[i].toLowerCase())) {
 					sSpecific = highlightText(sSpecific, properties[i]);
 					// oSpecific = highlightText(oSpecific,properties[i]);
 					oLabel = highlightText(oLabel, properties[i]);
@@ -360,12 +370,14 @@ public class VerifyComponent extends HorizontalPanel {
 
 			}
 			// Split sLabel
-			properties = sLabel.split(PropertyConstants.SEPERATOR_PROPERTY_VALUE);
+			properties = sLabel
+					.split(PropertyConstants.SEPERATOR_PROPERTY_VALUE);
 			for (int i = 0; i < properties.length; i++) {
 				System.out.println("Split s " + i + ": " + properties[i]);
 
 				// subject specific
-				if (oSpecific.toLowerCase().contains(properties[i].toLowerCase())) {
+				if (oSpecific.toLowerCase().contains(
+						properties[i].toLowerCase())) {
 					// sSpecific = highlightText(sSpecific,properties[i]);
 					oSpecific = highlightText(oSpecific, properties[i]);
 					sLabel = highlightText(sLabel, properties[i]);
@@ -402,7 +414,6 @@ public class VerifyComponent extends HorizontalPanel {
 
 	private void echo(String string) {
 		System.out.println(string);
-
 	}
 
 	private String highlightText(String label, String replace) {
@@ -415,13 +426,15 @@ public class VerifyComponent extends HorizontalPanel {
 
 		if (replace.contains("(")) {
 			// split
-			buffer = label.replace(replace, "<FONT style='BACKGROUND-COLOR: yellow'>"
-					+ replace + "</FONT>");
+			buffer = label.replace(replace,
+					"<FONT style='BACKGROUND-COLOR: yellow'>" + replace
+							+ "</FONT>");
 		} else {
 			String pattern = "(?i)(" + replace + ")";
 			System.out.println("pattern: " + pattern);
 			buffer = label.replaceAll(pattern,
-					"<FONT style='BACKGROUND-COLOR: yellow'>" + replace + "</FONT>");
+					"<FONT style='BACKGROUND-COLOR: yellow'>" + replace
+							+ "</FONT>");
 		}
 		System.out.println("buffer highlighText: " + buffer);
 
@@ -430,7 +443,6 @@ public class VerifyComponent extends HorizontalPanel {
 
 	private String highlightText(String label) {
 		return "<FONT style='BACKGROUND-COLOR: yellow'>" + label + "</FONT>";
-
 	}
 
 	// Init checkboxes and queries
@@ -439,20 +451,24 @@ public class VerifyComponent extends HorizontalPanel {
 		echo("subjectTemplate type: " + subjectTemplate.getType());
 		echo("objectTemplate type: " + objectTemplate.getType());
 		// Subject and object Both map-type instances
-//		if (config.isKongregate() || config.isSimple()){
-//			initKongregate();
-//		}
-//		else{
-//			if (subjectTemplate.getType().equals(PropertyConstants.TEMPLATE_TYPE_MAP) == true
-//				&& objectTemplate.getType().equals(PropertyConstants.TEMPLATE_TYPE_MAP) == true) {
-//				this.isBothMapInstances = true;
-//				initBothMapInstances();
-//			} 
-//			else { // at least 1 text-type instance
-//				this.isBothMapInstances = false;
-//				initNormal();
-//			}
-//		}
+		// if (config.isKongregate() || config.isSimple()){
+		// initKongregate();
+		// }
+		// else{
+		// if
+		// (subjectTemplate.getType().equals(PropertyConstants.TEMPLATE_TYPE_MAP)
+		// == true
+		// &&
+		// objectTemplate.getType().equals(PropertyConstants.TEMPLATE_TYPE_MAP)
+		// == true) {
+		// this.isBothMapInstances = true;
+		// initBothMapInstances();
+		// }
+		// else { // at least 1 text-type instance
+		// this.isBothMapInstances = false;
+		// initNormal();
+		// }
+		// }
 		initNormal();
 		echo("##VerifyComponent: Init VerifyComponent End");
 	}
@@ -465,19 +481,20 @@ public class VerifyComponent extends HorizontalPanel {
 		this.setSpacing(2);
 
 		this.subPanel = new VerticalPanel();
-		subPanel.add(new HTML("init"));
-		
+		DOM.getElementById("subject").setInnerHTML("");
+		RootPanel.get("subject").add(subPanel);
+
 		this.obPanel = new VerticalPanel();
-		obPanel.add(new HTML("init ob"));
-		
+		DOM.getElementById("object").setInnerHTML("");
+		RootPanel.get("object").add(obPanel);
+
 		// predicate (middlePanel)
 		initMiddlePanel();
 
 		// image Panels
 		initImagePanel();
-
 	}
-	
+
 	/**
 	 * Init method for at least 1 text-type instance
 	 */
@@ -495,7 +512,6 @@ public class VerifyComponent extends HorizontalPanel {
 		initImagePanel();
 
 	}
-	
 
 	/**
 	 * Init method for 2 map-type instances
@@ -525,33 +541,36 @@ public class VerifyComponent extends HorizontalPanel {
 		// ButtonGroup
 		HorizontalPanel r1Panel = new HorizontalPanel();
 		r1Panel.setHorizontalAlignment(ALIGN_CENTER);
-		trueButton = new PushButton(new Image("PeaInvasion/images/verification/trueButton.png"));
+		trueButton = new PushButton(new Image(
+				"PeaInvasion/images/verification/trueButton.png"));
 		r1Panel.add(trueButton);
-		
-		falseButton = new PushButton(new Image("PeaInvasion/images/verification/falseButton.png"));
+
+		falseButton = new PushButton(new Image(
+				"PeaInvasion/images/verification/falseButton.png"));
 		HorizontalPanel r2Panel = new HorizontalPanel();
 		r2Panel.setHorizontalAlignment(ALIGN_CENTER);
 		r2Panel.add(falseButton);
-		
+
 		HorizontalPanel r3Panel = new HorizontalPanel();
 		r3Panel.setHorizontalAlignment(ALIGN_CENTER);
-////		r3Panel.add(rdbtnNotSure);
-//		Image i3 = new Image("Application/images/verification/unsure.png");
-////		i3.setSize("25px", "25px");
-//		Image k3 = new Image("Application/images/verification/key3.png");
-//		r3Panel.add(k3);
-//		r3Panel.add(i3);
-//		r3Panel.setSpacing(2);
-		unsureButton = new PushButton(new Image("PeaInvasion/images/verification/unsureButton.png"));
+		// // r3Panel.add(rdbtnNotSure);
+		// Image i3 = new Image("Application/images/verification/unsure.png");
+		// // i3.setSize("25px", "25px");
+		// Image k3 = new Image("Application/images/verification/key3.png");
+		// r3Panel.add(k3);
+		// r3Panel.add(i3);
+		// r3Panel.setSpacing(2);
+		unsureButton = new PushButton(new Image(
+				"PeaInvasion/images/verification/unsureButton.png"));
 		r3Panel.add(unsureButton);
-		
+
 		VerticalPanel rdbtnPanel = new VerticalPanel();
 		rdbtnPanel.setStyleName("RdbtnPanel");
 		rdbtnPanel.setVerticalAlignment(ALIGN_MIDDLE);
 		rdbtnPanel.add(r1Panel);
 		rdbtnPanel.add(r2Panel);
 		rdbtnPanel.add(r3Panel);
-		
+
 		rdbtnPanel.setSpacing(5);
 		DOM.setStyleAttribute(rdbtnPanel.getElement(), "marginBottom", "3px");
 		// verifyButton
@@ -560,13 +579,13 @@ public class VerifyComponent extends HorizontalPanel {
 
 		VerticalPanel middlePanel = new VerticalPanel();
 		middlePanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		if(config.isSimple()==false)
+		if (config.isSimple() == false)
 			middlePanel.add(predicatePanel);
 		middlePanel.add(rdbtnPanel);
-//		middlePanel.add(verifyButton);
+		// middlePanel.add(verifyButton);
 		middlePanel.setStyleName("middlePanel");
 
-		RootPanel.get("predicate").add(middlePanel);
+		RootPanel.get("verifyButtons").add(middlePanel);
 		echo("Init middle panel done");
 	}
 
@@ -574,35 +593,35 @@ public class VerifyComponent extends HorizontalPanel {
 		echo("Init image panel");
 		// subject image
 		subjectImagePanel = new VerticalPanel();
-		subjectImagePanel
-				.add(new HTML("<img class='image' src='" + noImage + "'/>"));
+		subjectImagePanel.add(new HTML("<img class='image' src='" + noImage
+				+ "'/>"));
 
 		// object image
 		objectImagePanel = new VerticalPanel();
-		objectImagePanel
-				.add(new HTML("<img class='image' src='" + noImage + "'/>"));
+		objectImagePanel.add(new HTML("<img class='image' src='" + noImage
+				+ "'/>"));
 
-		if(!config.isSimple()){
+		if (!config.isSimple()) {
 			RootPanel.get("imageSubject").add(subjectImagePanel);
 			RootPanel.get("imageObject").add(objectImagePanel);
 		}
 		echo("Init image panel done");
 	}
 
-/**
+	/**
 	 * Remove '<' and '>' of an image url
 	 * @param image
 	 * @return parsed String
 	 */
 	public String parseImage(String image) {
-		System.out.println("PARSE IMAGE: "+image);
-		if (image == null || image.length()<3)
+		System.out.println("PARSE IMAGE: " + image);
+		if (image == null || image.length() < 3)
 			return null;
 		if (image.equals(PropertyConstants.NO_DECLARATION))
 			return image;
-		String end =image;
+		String end = image;
 		if (image.contains("<"))
-		end = image.substring(1, image.length() - 1);
+			end = image.substring(1, image.length() - 1);
 		System.out.println("parsed: " + end);
 		return end;
 	}
@@ -631,8 +650,8 @@ public class VerifyComponent extends HorizontalPanel {
 		}
 
 		System.out.println("width " + image.getWidth() + " height "
-				+ image.getHeight() + " scale " + scaleRatio + " nuH " + newHeight
-				+ " nuW " + newWidth);
+				+ image.getHeight() + " scale " + scaleRatio + " nuH "
+				+ newHeight + " nuW " + newWidth);
 	}
 
 	public Button getOkButton() {
@@ -668,17 +687,16 @@ public class VerifyComponent extends HorizontalPanel {
 		return unsureButton;
 	}
 
-	public void enableButtons(){
+	public void enableButtons() {
 		this.trueButton.setEnabled(true);
 		this.falseButton.setEnabled(true);
 		this.unsureButton.setEnabled(true);
-		DOM.setStyleAttribute(trueButton.getElement(),"border","none");
-		DOM.setStyleAttribute(falseButton.getElement(),"border","none");
-		DOM.setStyleAttribute(unsureButton.getElement(),"border","none");
-    
+		DOM.setStyleAttribute(trueButton.getElement(), "border", "none");
+		DOM.setStyleAttribute(falseButton.getElement(), "border", "none");
+		DOM.setStyleAttribute(unsureButton.getElement(), "border", "none");
 	}
-	
-	public void disableButtons(){
+
+	public void disableButtons() {
 		this.trueButton.setEnabled(false);
 		this.falseButton.setEnabled(false);
 		this.unsureButton.setEnabled(false);

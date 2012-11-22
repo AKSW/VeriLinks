@@ -6,82 +6,96 @@
 <!-- differences in layout.                        -->
 
 <html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-    <!--                                                               -->
-    <!-- Consider inlining CSS to reduce the number of requested files -->
-    <!--                                                               -->
-    <link type="text/css" rel="stylesheet" href="PeaInvasion.css">
+<!--                                                               -->
+<!-- Consider inlining CSS to reduce the number of requested files -->
+<!--                                                               -->
+<link type="text/css" rel="stylesheet" href="PeaInvasion.css">
 
-    <!--                                           -->
-    <!-- Any title is fine                         -->
-    <!--                                           -->
-    <title>Web Application Starter Project</title>
+<!--                                           -->
+<!-- Any title is fine                         -->
+<!--                                           -->
+<title>VeriLinks: Interlinking Game</title>
 
-    <!--                                           -->
-    <!-- This script loads your compiled module.   -->
-    <!-- If you add any GWT meta tags, they must   -->
-    <!-- be added before this line.                -->
-    <!--                                           -->
-    <script type="text/javascript" language="javascript" src="PeaInvasion/PeaInvasion.nocache.js"></script>
-  </head>
+<!--                                           -->
+<!-- This script loads your compiled module.   -->
+<!-- If you add any GWT meta tags, they must   -->
+<!-- be added before this line.                -->
+<!--                                           -->
+<script type="text/javascript" language="javascript"
+	src="PeaInvasion/PeaInvasion.nocache.js"></script>
+</head>
 
-  <!--                                           -->
-  <!-- The body can have arbitrary html, or      -->
-  <!-- you can leave the body empty if you want  -->
-  <!-- to create a completely dynamic UI.        -->
-  <!--                                           -->
-  <body>
+<!--                                           -->
+<!-- The body can have arbitrary html, or      -->
+<!-- you can leave the body empty if you want  -->
+<!-- to create a completely dynamic UI.        -->
+<!--                                           -->
+<body>
 
-    <!-- OPTIONAL: include this if you want history support -->
-    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+	<!-- OPTIONAL: include this if you want history support -->
+	<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
+		style="position: absolute; width: 0; height: 0; border: 0"></iframe>
 
-    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
-    <noscript>
-      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-        Your web browser must have JavaScript enabled
-        in order for this application to display correctly.
-      </div>
-    </noscript>
+	<!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+	<noscript>
+		<div
+			style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+			Your web browser must have JavaScript enabled in order for this
+			application to display correctly.</div>
+	</noscript>
 
-    <h1>Veri-Links</h1>
-    
-    <table class="upperContent">
-    <tr>
-    	<td class="imageTable">
-    	<div id="imageSubject">
-    		
-   		</div>
-   		</td>
-		<td>
-			<div id='playn-root'>
-				<div id="loading">
-					<img class="load" src="PeaInvasion/images/loading.png" />
-				</div>
-			</div>
-		</td>
-		<td class="imageTable">
-		<div id="imageObject">
-    		
-   		</div>
-   		</td>
-	</tr>
+	<h1>Veri-Links</h1>
+
+	<table class="upperContent">
+		<tr>
+			<td class="imageTable">
+				<div id="imageSubject"></div></td>
+			<td>
+				<div id='playn-root'>
+					<div id="loading">
+						<img class="load" src="PeaInvasion/images/loading.png" />
+					</div>
+				</div></td>
+			<td class="imageTable">
+				<div id="imageObject"></div></td>
+		</tr>
 	</table>
-	<table class ='lowerContent'>
-	<tr>
-		<td valign=top>
-			<div id='subject'></div>
-		</td>
-		<td valign=top>
-			<div id='predicate'></div>
-		</td>
-		<td valign=top>
-			<div id='object' ></div>
-		</td>
-	</tr>
+	<table class='lowerContent'>
+		<tr>
+			<td valign='top'>
+				<div id='verifyCnt'>
+					<div class='kongregateWholeQuestion'>
+						<div class='kongregateHead'>Quiz:</div>
+						<div class='kongregateQuestion'>
+							<div id='subject'>Subject</div>
+							<div id='predicate'>Predicate</div>
+							<div id='object'>Object</div>
+						</div>
+					</div>
+					<div id='verifyButtons'></div>
+				</div></td>
+		</tr>
+
+		<!-- <tr>
+			<td valign=top>
+				<div id='subject'></div></td>
+			<td valign=top>
+				<div id='predicate'></div></td>
+			<td valign=top>
+				<div id='object'></div></td>
+		</tr>
+		<div class='kongregateWholeQuestion'>
+			<div class='kongregateQuestion'>
+				<div class='kongregateImage'>blabla</div>
+				<div class='kongregateMap'>asdasd</div>
+				blabla
+			</div>
+		</div> -->
 	</table>
 	<div id='bottomButtons'></div>
-    <div id='bottomContent'>*Press F11 for fullscreen mode! :) </div>
-  </body>
+	<div id='bottomContent'>*Press F11 for fullscreen mode! :)</div>
+</body>
 </html>
