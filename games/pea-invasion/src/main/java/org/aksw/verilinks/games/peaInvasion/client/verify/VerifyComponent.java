@@ -1,5 +1,7 @@
 package org.aksw.verilinks.games.peaInvasion.client.verify;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -583,8 +585,7 @@ public class VerifyComponent extends HorizontalPanel {
 			middlePanel.add(predicatePanel);
 		middlePanel.add(rdbtnPanel);
 		// middlePanel.add(verifyButton);
-		middlePanel.setStyleName("middlePanel");
-
+		middlePanel.setStyleName("middlePanel");		
 		RootPanel.get("verifyButtons").add(middlePanel);
 		echo("Init middle panel done");
 	}

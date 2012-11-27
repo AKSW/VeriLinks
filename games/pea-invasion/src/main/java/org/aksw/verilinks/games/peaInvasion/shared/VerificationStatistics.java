@@ -3,13 +3,17 @@ package org.aksw.verilinks.games.peaInvasion.shared;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.dev.json.JsonObject;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONNumber;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import org.aksw.verilinks.games.peaInvasion.client.PeaInvasion;
 
 public class VerificationStatistics implements IsSerializable{
 
+	private User user;
 	private ArrayList<Verification> list;
 	private ArrayList<Verification> completeList;
 	private int countAgreed;
@@ -32,6 +36,7 @@ public class VerificationStatistics implements IsSerializable{
 		countPenaltyComplete = 0;
 		countUnsure=0;
 		countUnsureComplete=0;
+		this.user = new User();
 	}
 	
 	/** Add Verification to lists*/
@@ -43,23 +48,28 @@ public class VerificationStatistics implements IsSerializable{
 	/** Add Verification Evaluation to latest added verification*/
 	public void addEvaluation(int bonus, boolean notSure){
 		System.out.println("##VerificationStats: Add Eval. Bonus = "+bonus+" , notSure = "+notSure);
-		if (bonus==GameConstants.BONUS_MEDIUM || bonus==GameConstants.BONUS_HUGE){
+		if (bonus==GameConstants.BONUS_AGREE || bonus==GameConstants.BONUS_POSITIVE){
 			countAgreed++;
 			countAgreedComplete++;
+			System.out.println("##VerificationStats: agree");
+			
 		}else if ((bonus==GameConstants.BONUS_NONE) && (notSure==false)){
 			countDisagreed++;
 			countDisagreedComplete++;
+			System.out.println("##VerificationStats: disagree");
 		}
-		else if (bonus==GameConstants.BONUS_PENALTY){
+		else if (bonus==GameConstants.BONUS_NEGATIVE){
 			countPenalty++;
 			countPenaltyComplete++;
+			System.out.println("##VerificationStats: penalty");
 		}
 		else if ((bonus==GameConstants.BONUS_NONE) && (notSure==true)){
 			countUnsure++;
 			countUnsureComplete++;
+			System.out.println("##VerificationStats: unsure");
 		}
-		for (int i=0;i<list.size();i++)
-			System.out.println(list.get(i).getId()+" , "+list.get(i).getSelection());
+//		for (int i=0;i<list.size();i++)
+//			System.out.println(list.get(i).getId()+" , "+list.get(i).getSelection());
 	}
 	
 	public void reset(){
@@ -126,8 +136,29 @@ public class VerificationStatistics implements IsSerializable{
 	}
 	
 	public String getJson(){
-		JsonObject data = new JsonObject();
 		
-		return null;
+		JSONObject jUser = new JSONObject();
+		jUser.put("id", new JSONString(user.getId()));
+		jUser.put("name",  new JSONString(user.getName()));
+		
+		JSONArray jVeriArr = new JSONArray();
+		JSONObject jV = null;
+		
+		for(int i =0;i<list.size();i++){
+			jV = new JSONObject();
+			jV.put("id", new JSONNumber(list.get(i).getId()));
+			jV.put("veri", new JSONNumber(list.get(i).getSelection()));
+			jVeriArr.set(i,jV);
+		}
+		
+		JSONObject jData = new JSONObject();
+		jData.put("user", jUser);
+		jData.put("verification", jVeriArr);
+		
+		return jData.toString();
+	}
+
+	public void setUser(User u) {
+		this.user=u;
 	}
 }

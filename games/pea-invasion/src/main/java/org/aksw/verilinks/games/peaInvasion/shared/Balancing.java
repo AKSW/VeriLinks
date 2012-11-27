@@ -134,7 +134,7 @@ public class Balancing {
 	}
 
 	public static int getBonus(int bonus, double difficulty) {
-		if (bonus == GameConstants.BONUS_PENALTY)
+		if (bonus == GameConstants.BONUS_NEGATIVE)
 			return bonus;
 		double diff = getLinkDifficulty(difficulty);			
 		return (int) (bonus*diff);

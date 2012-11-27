@@ -46,6 +46,7 @@ import org.aksw.verilinks.server.tools.XMLTool;
 import org.openjena.atlas.json.JSON;
 import org.openjena.atlas.json.JsonArray;
 import org.openjena.atlas.json.JsonException;
+import org.openjena.atlas.json.JsonNumber;
 import org.openjena.atlas.json.JsonObject;
 import org.openjena.atlas.json.JsonValue;
 import org.xml.sax.SAXException;
@@ -84,13 +85,9 @@ public class Server extends HttpServlet {
 	private String POST_SCORE = "postScore";
 	private String POST_LEVEL_STATS = "postLevelStats";
 
-	
 	private static final int VALID = 1;
-	private static final int NOT_VALID = 0;
+	private static final int INVALID = 0;
 	private static final int UNSURE = -1;
-	private static final int SURE_POSITIVE = 1;
-	private static final int SURE_NEGATIVE = -2;
-
 	
 	/** Resource path */
 	private String resourcePath = null;
@@ -100,15 +97,17 @@ public class Server extends HttpServlet {
 	private final String prefixFile = "prefix.csv";
 
 	private static final double EVAL_POSITIVE = 1;
-	private static final double EVAL_NONE = 0;
+	private static final double EVAL_UNSURE = 0;
 	private static final double EVAL_NEGATIVE = -1;
 	private static final double EVAL_FIRST = -2;
-
+	private static final double EVAL_ERROR = -1111;
 
 	private boolean taskSuccess;
 
 	/** Prefix Map **/
 	private HashMap<String, String> prefixMap;
+
+	
 
 	@Override
 	public void init() throws ServletException {
@@ -328,7 +327,7 @@ public class Server extends HttpServlet {
 		try {
 			DBTool db = new DBTool(resourcePath + dbIniFile);
 			con = db.getConnection();
-			String query = "INSERT IGNORE INTO highscore VAUES ('" + id
+			String query = "INSERT IGNORE INTO highscores (ID, Name, Score) VALUES  ('" + id
 					+ "' , '" + userName + "' ," + score + ")";
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate(query);
@@ -366,32 +365,36 @@ public class Server extends HttpServlet {
 		echo("CommitVerification: " + req);
 		if (req.getParameterMap().size() != 2) {
 			echo("param: " + req.getParameterMap().size());
-			return "Error: Invalid request parameters!";
+//			return "Error: Invalid request parameters!";
 		}
 		
 		// ParseJson
+		echo("get param names:");
 		ArrayList<Verification> verifications =null;
 		User user = new User();
 		List<String> requestParameterNames = Collections
 				.list((Enumeration<String>) req.getParameterNames());
+		echo("Size: "+requestParameterNames.size());
 		for (String parameterName : requestParameterNames) {
 			echo("param Name: " + parameterName);
 			if (!parameterName.equals("service")){
+				echo("not equals service!");
 				// veri
 				verifications = parseJson(parameterName);
+				echo("parsse done");
 				// user
 				JsonObject j = JSON.parse(parameterName);
+				echo("j!");
 				JsonObject jUser = j.get("user").getAsObject();
-				
+				echo("Jsuer: "+jUser.toString());
 				String userId = jUser.get("id").toString();
 				String userName = jUser.get("name").toString();
 				user.setId(userId);
 				user.setName(userName);
 				user.setCredible(true);
+				echo("set user done");
 			}
 		}
-		
-	
 		
 		// Connect to db
 		DBTool db = new DBTool(resourcePath + dbIniFile);
@@ -400,8 +403,16 @@ public class Server extends HttpServlet {
 		// add into db
 		updateDB(con, verifications, 0, 0, 0, 0, user, user.isCredible());
 
-//		// Get user strength
-//		String userStrength = getUserStrength(con,user);
+		// Get user strength
+		double userStrength = 0;
+		try {
+			userStrength = getUserStrength(user.getName(),user.getId(),con);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			echo("Get User strength error! "+e1.getMessage());
+			return "ERROR: Get user strength!";
+		}
 
 		// Close db connection
 		try {
@@ -410,9 +421,13 @@ public class Server extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		echo("Commitverification done: ");
-		return "done";
+		
+		JsonObject str = new JsonObject();
+		str.put("userstrength", Balancing.getStringUserStrength(userStrength));
+		
+		echo("Commitverification done: User strength: "+userStrength);
+		
+		return str.toString();
 	}
 
 	private ArrayList<Verification> parseJson(String data) {
@@ -441,7 +456,7 @@ public class Server extends HttpServlet {
 				arr.add(v);
 			}
 		} catch (Exception e) {
-			echo("error:" + e.getMessage());
+			echo("error parsing json:" + e.getMessage());
 		}
 		return arr;
 	}
@@ -639,9 +654,10 @@ public class Server extends HttpServlet {
 		Connection con = db.getConnection();
 
 		// Evaluate verification
-		double eval = 0;
+		double eval = 1111; // no verification
 		if(verification != null)
 			eval = evaluateVerification(curLink, verification, con);
+		
 		// Get difficulty
 		double diff = 0;
 		if(curLink!=null)
@@ -704,7 +720,10 @@ public class Server extends HttpServlet {
 			linkJson.put("subject", subject);
 			linkJson.put("object", object);
 			linkJson.put("predicate", link.getPredicate());
-			linkJson.put("prevLinkEval", Double.toString(eval));
+			if(verification != null){
+				JsonValue e = JsonNumber.value(eval);
+				linkJson.put("prevLinkEval", e);
+			}
 			linkJson.put("difficulty", Double.toString(diff));
 			
 		} catch (JsonException e) {
@@ -1067,10 +1086,10 @@ public class Server extends HttpServlet {
 		int verification = Integer.parseInt(verify);
 		if (verification == VALID)
 			sqlQuery = "SELECT * from evaluate_positive WHERE ID=" + curLink;
-		else if (verification == NOT_VALID)
+		else if (verification == INVALID)
 			sqlQuery = "SELECT * from evaluate_negative WHERE ID=" + curLink;
 		else if (verification == UNSURE)
-			return EVAL_NONE;
+			return EVAL_UNSURE;
 		echo("Eval query: " + sqlQuery);
 		try {
 			dbStmt = con.createStatement();
@@ -1087,7 +1106,7 @@ public class Server extends HttpServlet {
 															// links
 					echo("-> manual verified links with Confidence = {1,-2}");
 					if ((confidence == 1 && verification == VALID)
-							|| (confidence == -2 && verification == NOT_VALID))
+							|| (confidence == -2 && verification == INVALID))
 						eval = EVAL_POSITIVE;
 					else
 						eval = EVAL_NEGATIVE; // Penalty
@@ -1108,7 +1127,7 @@ public class Server extends HttpServlet {
 			} else {
 				echo("Server MYSQL Error: Couldn't retrieve threshold for ID = "
 						+ curLink);
-				return -1;
+				return EVAL_ERROR;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

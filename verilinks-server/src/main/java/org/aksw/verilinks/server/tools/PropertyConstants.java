@@ -90,8 +90,9 @@ public class PropertyConstants {
   public final static String DB_TABLE_INSTANCES_PROPERTY_TYPE = "Type";
   public final static String DB_TABLE_INSTANCES_PROPERTY_LONG = "Longitude";
   public final static String DB_TABLE_INSTANCES_PROPERTY_LAT = "Latitude";
-  
-  public final static String DB_TABLE_HIGHSCORES_PLAYER = "Player";
+
+  public final static String DB_TABLE_HIGHSCORES_PLAYER_NAME = "Name";
+  public final static String DB_TABLE_HIGHSCORES_PLAYER_ID = "ID";
   public final static String DB_TABLE_HIGHSCORES_SCORE = "Score";
   
   public final static String DB_TABLE_USER_ID = "UserID";

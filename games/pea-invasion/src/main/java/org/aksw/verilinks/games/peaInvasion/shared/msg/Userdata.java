@@ -5,7 +5,7 @@ public class Userdata {
 	private String name=null;
 	private String id=null;
 	private int highscore=0;
-	private String strength=null;
+	private String strength="unknown";
 	private int numVeri=0;
 	private int numAgree=0;
 	private int numDisagree=0;
@@ -55,7 +55,7 @@ public class Userdata {
 	}
 
 	public String getStrength() {
-		return strength;
+		return this.strength;
 	}
 
 	public void setStrength(String strength) {

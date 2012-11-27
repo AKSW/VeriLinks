@@ -239,8 +239,11 @@ public class DBTool{
                                		PropertyConstants.DB_TABLE_INSTANCES_PROPERTY_NAME+") );";
     
     String createHighscoreTable= "CREATE TABLE "+PropertyConstants.DB_TABLE_NAME_HIGHSCORES + " ( " +
-                               PropertyConstants.DB_TABLE_HIGHSCORES_PLAYER + " VARCHAR(15), " +
-                               PropertyConstants.DB_TABLE_HIGHSCORES_SCORE + " INT );";
+    						   PropertyConstants.DB_TABLE_HIGHSCORES_PLAYER_ID + " VARCHAR(50), " +
+                               PropertyConstants.DB_TABLE_HIGHSCORES_PLAYER_NAME + " VARCHAR(40), " +
+                               PropertyConstants.DB_TABLE_HIGHSCORES_SCORE + " INT, " +
+                               "PRIMARY KEY ("+ PropertyConstants.DB_TABLE_HIGHSCORES_PLAYER_ID+", "+
+                               PropertyConstants.DB_TABLE_HIGHSCORES_PLAYER_NAME+"));";
     
     String createUserTable= "CREATE TABLE "+PropertyConstants.DB_TABLE_NAME_USER + " ( " +
                                PropertyConstants.DB_TABLE_USER_ID + " VARCHAR(50), " +

@@ -8,10 +8,10 @@
 		<link href="css/main.css" rel="stylesheet" />
 
 		<!-- verify components -->
-		<link rel="stylesheet" href="css/verify.css">
+		<link rel="stylesheet" href="css/verilinks.css">
 		<script type="text/javascript" src="js/lib/jquery-1.8.2.min.js"></script>
 		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
-		<script type="text/javascript" src="js/verify.js"></script>
+		<script type="text/javascript" src="js/verilinks.js"></script>
 
 		<!-- main logic -->
 		<script data-main="js/main" src="js/require.js"></script>
@@ -21,25 +21,26 @@
 		<div id="gameContainer"></div>
 
 		<!-- -->
-		<a href="#" onclick="emulate()" style="position:absolute; right:10px; color:white;">Start round</a>
+<!-- 		<a href="#" onclick="emulate()" style="position:absolute; right:10px; color:white;">Start round</a> -->
+<!-- 		<a href="#" onclick="drawMsg('boo')" style="position:absolute; right:10px; color:white;">Draw</a> -->
 		<!-- verify -->
-		<div id="verifyContent">
+		<div id="verilinksContainer">
 			<table id ='link'>
 				<tr>
 					<td valign=top><div id='subject'></div></td>
 					<td valign=top><div id='predicate'></div>
 					<div id='buttons'>
 						<p class='vertical-align'>
-							<a href="#" title='True' onclick="VERILINKS.verify(VERILINKS.TRUE())"><img src="img/verify/trueButton.png"></a>
+							<a href="#" title='True' onclick="VERILINKS.verify(VERILINKS.TRUE())"><img class="lock" src="img/verify/trueButton.png"></a>
 						</p>
 						<p class='vertical-align'>
-							<a href="#" title='False'onclick="VERILINKS.verify(VERILINKS.TRUE())"><img src="img/verify/falseButton.png"></a>
+							<a href="#" title='False'onclick="VERILINKS.verify(VERILINKS.FALSE())"><img class="lock" src="img/verify/falseButton.png"></a>
 						</p>
 						<p class='vertical-align'>
-							<a href="#" title='Unsure' onclick="VERILINKS.verify(VERILINKS.TRUE())"><img src="img/verify/unsureButton.png"></a>
+							<a href="#" title='Unsure' onclick="VERILINKS.verify(VERILINKS.UNSURE())"><img class="lock" src="img/verify/unsureButton.png"></a>
 						</p>
 						<p class='vertical-align'>
-							<button id='commit' onclick="VERILINKS.commit()">Commit</button>
+							<button id='start' onclick="emulate()">Start</button>
 						</p>
 					</div></td>
 					<td valign=top><div id='object'></div></td>

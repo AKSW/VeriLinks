@@ -1,10 +1,17 @@
 VERILINKS = (function() {
-	
+
 	// constants
-	var TRUE = 1;
-	var FALSE = 0;
-	var UNSURE = -1;
-	
+	const TRUE = 1;
+	const FALSE = 0;
+	const UNSURE = -1;
+	const EVAL_POSITIVE = 1;
+	const EVAL_NEGATIVE = -1;
+	const EVAL_UNSURE = 0;
+	const EVAL_FIRST = -2;
+	const EVAL_ERROR = -1111;
+	const EVAL_THRESHOLD = 0.3;
+	const SERVER_URL = "http://localhost:8080/verilinks-server/server";
+
 	var link = null;
 	// template for displaying
 	var template = null;
@@ -13,26 +20,33 @@ VERILINKS = (function() {
 	var user = null;
 	var linkset = null;
 	// evaluation of user's verification
-	var prevLinkEval = -2;
-	
+	var prevLinkEval = 1111;
+
+	var locked = true;
+
+	var timeout;
+
 	$(document).ready(function() {
 		init();
 	});
 
 	function init() {
 		login();
-
 		templateRequest();
-
-		// Get Link
-		var req = "http://127.0.0.1:8888/VeriLinks/rest?service=getLink" + "&userName=foo&userId=username-login: only name available" + "&curLink=2" + "&nextLink=false" + "&verification=1" + "&linkset=dbpedia-linkedgeodata";
-		linkRequest(generateURL(), draw);
+		linkRequest(generateURL(), function() {
+			drawInstance("subject");
+			$("#predicate").html(link.predicate);
+			drawInstance("object");
+			VERILINKS.lock();
+		});
 	}
 
+	// ajax call to get new link
+	// draw link as callback
 	function linkRequest(req, callback) {
 		if (req == null) {
 			alert("Can't request link!");
-			return;
+			return null;
 		}
 		// alert(req);
 		$.ajax({
@@ -41,16 +55,16 @@ VERILINKS = (function() {
 				handleLink(data);
 				if (callback != undefined && typeof callback == 'function')
 					callback();
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				alert("Error getting Link: " + textStatus.toString);
+				return null;
 			}
 		});
 	}
 
 	function handleLink(data) {
-		// $('#verifyContent').html(data);
-		// alert(data);
 		link = new Link(data);
-		prevLinkEval = link.prevLinkEval;
-		// $('#verifyContent').html(data);
 	}
 
 	/** Objects **/
@@ -60,6 +74,8 @@ VERILINKS = (function() {
 		this.predicate = link.predicate;
 		this.subject = new Instance(link.subject, "subject");
 		this.object = new Instance(link.object, "object");
+
+		prevLinkEval = link.prevLinkEval;
 	}
 
 	function Instance(instance, div) {
@@ -145,11 +161,16 @@ VERILINKS = (function() {
 		return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 	}
 
+	// draw link
 	function draw() {
 		// clear();
 		drawInstance("subject");
 		$("#predicate").html(link.predicate);
 		drawInstance("object");
+
+		window.drawMsg(VERILINKS.getEval());
+		VERILINKS.lock();
+		timer();
 	}
 
 	function clear() {
@@ -165,7 +186,7 @@ VERILINKS = (function() {
 			tmp = template.subject;
 		else
 			tmp = template.object;
-		
+
 		// draw Props
 		var search;
 		var inst;
@@ -191,7 +212,6 @@ VERILINKS = (function() {
 			var lat = inst.getProperty("<http://www.w3.org/2003/01/geo/wgs84_pos#lat>");
 			loadMap(long, lat, div);
 		}
-
 	}
 
 	function drawImg(val, div) {
@@ -223,7 +243,7 @@ VERILINKS = (function() {
 
 	function templateRequest() {
 		$.ajax({
-			url : "http://127.0.0.1:8888/VeriLinks/rest?service=getTemplate",
+			url : SERVER_URL + "?service=getTemplate",
 			success : function(data) {
 				// alert(data);
 				templates = jQuery.parseJSON(data);
@@ -245,7 +265,7 @@ VERILINKS = (function() {
 
 	/** Check request params and generate Request URL */
 	function generateURL(verification) {
-		var url = "http://127.0.0.1:8888/VeriLinks/rest?service=getLink"
+		var url = SERVER_URL + "?service=getLink"
 		if (user == null) {
 			alert("user missing");
 			return null;
@@ -270,7 +290,7 @@ VERILINKS = (function() {
 		if (getVerifiedLinks() != null)
 			url += "&verifiedLinks=" + getVerifiedLinks();
 		url += "&nextLink=" + getNextLink();
-		if(verification != null)
+		if (verification != null)
 			url += "&verification=" + verification;
 		// alert(url);
 		return url;
@@ -279,10 +299,9 @@ VERILINKS = (function() {
 	function getNextLink() {
 		var min = 4;
 		var max = 6;
-		var rnd = Math.floor((Math.random()*max)+min); 
+		var rnd = Math.floor((Math.random() * max) + min);
 		if (verifiedLinks.length % rnd == rnd - 1) {
 			nextLink = true;
-			alert("test user "+rnd);
 		} else {
 			nextLink = false;
 		}
@@ -316,10 +335,31 @@ VERILINKS = (function() {
 	// this.verification = new Array();
 	// }
 
-	return {
-		// Verify link afterwards get new link
-		verify : function(verification) {
+	function timer() {
+		timeout = setTimeout('VERILINKS.unlock()', 1300);
+	}
 
+	return {
+		// Get evaluation of previous link-verification
+		getEval : function() {
+			var eval = "Game Message";
+			if (prevLinkEval == EVAL_FIRST)
+				eval = "first";
+			else if (prevLinkEval == EVAL_NEGATIVE)
+				eval = "penalty";
+			else if (prevLinkEval == EVAL_UNSURE)
+				eval = "unsure";
+			else if (prevLinkEval == EVAL_POSITIVE || prevLinkEval > EVAL_THRESHOLD)
+				eval = "agreement";
+			else if (prevLinkEval <= EVAL_THRESHOLD)
+				eval = "disagreement";
+			// alert(eval);
+			return eval;
+		},
+		// Verify link afterwards get new link and insert into verilinksComponent
+		verify : function(verification) {
+			if (locked)
+				return;
 			// add to verifiedLinks array
 			var duplicate = false;
 			// search for duplicates in array
@@ -335,11 +375,11 @@ VERILINKS = (function() {
 			}
 
 			linkRequest(generateURL(verification), draw);
-
 		},
 		// Commit user's verification
 		commit : function() {
-			var url = "http://127.0.0.1:8888/VeriLinks/rest?service=commitVerifications";
+			clearTimeout(timeout);
+			var url = SERVER_URL + "?service=commitVerifications";
 			var obj = new Commit();
 			var json = JSON.stringify(obj);
 			alert("data: " + json);
@@ -349,17 +389,32 @@ VERILINKS = (function() {
 				data : json,
 				success : function(data) {
 					alert("Post: " + data);
+					verifiedLinks.length = 0;
 				},
 				dataType : 'application/json'
 			});
 		},
-		TRUE : function(){
+		lock : function() {
+			locked = true;
+			$(".lock").css({
+				opacity : 0.3
+			});
+			// $("#start").removeAttr('disabled');
+		},
+		unlock : function() {
+			locked = false;
+			$(".lock").css({
+				opacity : 1
+			});
+			// $("#start").attr('disabled','disabled');
+		},
+		TRUE : function() {
 			return TRUE;
 		},
-		FALSE : function(){
+		FALSE : function() {
 			return FALSE;
 		},
-		UNSURE : function(){
+		UNSURE : function() {
 			return UNSURE;
 		}
 	};

@@ -7,5 +7,10 @@ require([
 
     window.emulate = function(){
         game.startRound();
+        VERILINKS.unlock();
     };
+    
+    window.drawMsg = function(msg){
+	game.drawMsg(msg);};
+	
 });

@@ -19,7 +19,7 @@ public class JsoLink extends JavaScriptObject{
 		return this.difficulty;
 	}-*/;
 	
-	public final native String getEval() /*-{
+	public final native double getEval() /*-{
 	return this.prevLinkEval;
 }-*/;
 

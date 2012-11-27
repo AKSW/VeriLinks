@@ -46,6 +46,7 @@ import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoTemplateArray;
 import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoTemplateInstance;
 import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoTemplateProperty;
 import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoUserdata;
+import org.aksw.verilinks.games.peaInvasion.shared.jso.JsoUserstrength;
 import org.aksw.verilinks.games.peaInvasion.shared.msg.Instance;
 import org.aksw.verilinks.games.peaInvasion.shared.msg.Link;
 import org.aksw.verilinks.games.peaInvasion.shared.msg.Property;
@@ -113,6 +114,11 @@ public class PeaInvasion extends HtmlGame {
 	private static final double ERROR_LIMIT = 0.125;
 	// private static final double ERROR_LIMIT = 0.0;
 
+	/**
+	 * Limit for right answers eval < Threshold -> wrong answer
+	 */
+	private static final double EVAL_THRESHOLD = 0.3;
+
 	/** Username for highscore */
 	private User user;
 	String userName;
@@ -167,7 +173,7 @@ public class PeaInvasion extends HtmlGame {
 
 	/** Saves last pushed key */
 	private int numKeyCache;
-	
+
 	// Highscore
 	private PopupPanel popup;
 	private PopupPanel glass;
@@ -244,8 +250,6 @@ public class PeaInvasion extends HtmlGame {
 		this.objectTemplate = new Template();
 		loadMapApi();
 		initLanding();
-
-
 
 	}
 
@@ -417,7 +421,7 @@ public class PeaInvasion extends HtmlGame {
 							.cast();
 					System.out.println("casted");
 					linksetList = parseLinksets(hS.getLinkset());
-					
+
 					// System.out.println("#######OBJECT: ");
 					// JsoLink h = jsonObject.getJavaScriptObject().cast();
 					// System.out.println("casted");
@@ -525,25 +529,25 @@ public class PeaInvasion extends HtmlGame {
 		if (userdata.getId() == null)
 			return null;
 		echo("Client: Parse Userdata. " + userdata.getId());
-		
+
 		Userdata data = new Userdata();
 		data.setId(userdata.getId());
 		data.setName(userdata.getName());
 		data.setHighscore(userdata.getHighscore());
 		data.setStrength(userdata.getStrength());
-		
+
 		return data;
 	}
-	
+
 	public void parseTemplate(JsoTemplateArray tmp) {
 		echo("Parse Template size = " + tmp.getTemplates().length());
 
 		JsoTemplate jTmp = null;
-		echo("linkset: "+linkset.getName());
+		echo("linkset: " + linkset.getName());
 		for (int i = 0; i < tmp.getTemplates().length(); i++) {
 			jTmp = tmp.getTemplates().get(i);
-			echo(i+". "+jTmp.getId());
-			if(this.linkset.getName().equals(jTmp.getId())){
+			echo(i + ". " + jTmp.getId());
+			if (this.linkset.getName().equals(jTmp.getId())) {
 				echo("found linkset in tmp");
 				break;
 			}
@@ -552,13 +556,13 @@ public class PeaInvasion extends HtmlGame {
 		// here
 		JsoTemplateProperty prop = null;
 		JsoTemplateInstance jSub = jTmp.getSubject();
-		echo("jSub: "+jSub.getType());
-		
+		echo("jSub: " + jSub.getType());
+
 		List<TemplateProperty> propSubList = new ArrayList<TemplateProperty>();
 		TemplateProperty propSub = null;
-		for(int j=0;j<jSub.getProperties().length();j++){
+		for (int j = 0; j < jSub.getProperties().length(); j++) {
 			prop = jSub.getProperties().get(j);
-			echo(j+". "+prop.getProperty());
+			echo(j + ". " + prop.getProperty());
 			propSub = new TemplateProperty();
 			propSub.setProperty(prop.toString());
 			propSubList.add(propSub);
@@ -568,16 +572,16 @@ public class PeaInvasion extends HtmlGame {
 		sub.setType(jSub.getType());
 		sub.setProperties(propSubList);
 		echo("subject instance tempatle done");
-		
+
 		// ob
 		JsoTemplateInstance jOb = jTmp.getObject();
-		echo("jOb: "+jOb.getType());
-		
+		echo("jOb: " + jOb.getType());
+
 		List<TemplateProperty> propObList = new ArrayList<TemplateProperty>();
 		TemplateProperty propOb = null;
-		for(int j=0;j<jOb.getProperties().length();j++){
+		for (int j = 0; j < jOb.getProperties().length(); j++) {
 			prop = jOb.getProperties().get(j);
-			echo(j+". "+prop.getProperty());
+			echo(j + ". " + prop.getProperty());
 			propOb = new TemplateProperty();
 			propOb.setProperty(prop.toString());
 			propObList.add(propOb);
@@ -587,7 +591,7 @@ public class PeaInvasion extends HtmlGame {
 		ob.setType(jOb.getType());
 		ob.setProperties(propObList);
 		echo("object instance tempatle done");
-		
+
 		this.template = new TemplateLinkset();
 		template.setLinkset(linkset.getId());
 		template.setSubject(sub);
@@ -598,10 +602,9 @@ public class PeaInvasion extends HtmlGame {
 		initCallback();
 		initHandler();
 		sendUser();
-		
-		
+
 	}
-	
+
 	private void kongregateLogin() {
 
 		echo("Client: Kongregate Request");
@@ -921,7 +924,7 @@ public class PeaInvasion extends HtmlGame {
 
 		echo("zwei");
 		RootPanel.get().add(msgButton, 0, 399);
-		
+
 		// Bottom Buttons
 		// Show tutorial
 		Button showTut = new Button("Tutorial");
@@ -935,7 +938,6 @@ public class PeaInvasion extends HtmlGame {
 
 		Button showOverview = new Button("Quick Overview");
 		showOverview.addStyleName("myButton");
-
 
 		echo("drei");
 		initOverview(showOverview);
@@ -955,8 +957,6 @@ public class PeaInvasion extends HtmlGame {
 	 */
 	private void initCallback() {
 		echo("Client: Init Callback");
-		
-
 
 		echo("Client: Init Callback Done");
 	}
@@ -1020,6 +1020,17 @@ public class PeaInvasion extends HtmlGame {
 		// assets.setPathPrefix("saim/");
 		PlayN.run(game);
 		echo("Client: Init Game Done");
+
+		Button testB = new Button("test");
+		testB.addClickHandler(new ClickHandler() {
+
+			public void onClick(ClickEvent arg0) {
+				commitVerifications();
+
+			}
+		});
+		RootPanel.get("bottomButtons").add(testB);
+
 	}
 
 	private void initLeavePage() {
@@ -1695,34 +1706,42 @@ public class PeaInvasion extends HtmlGame {
 	 * @param bonus
 	 *            money to add
 	 */
-	public void processBonus(Bonus eval) {
-		int bonus = eval.getBonus();
-		int finalBonus = Balancing.getBonus(bonus, eval.getDifficulty());
-		echo("bonus: " + bonus + " , diff: " + eval.getDifficulty()
-				+ " , finalBonus: " + finalBonus);
+	public void processEval(double eval, double difficulty) {
+		echo("Process Eval = " + eval + ", Diff = " + difficulty);
 
-		echo("##Client: Process bonus= " + bonus + " ##");
+		int bonus = 0;
+		
 		String msg = null;
-		if (bonus == GameConstants.BONUS_NONE && !notSure) { // disagreement
+		if (notSure) {// -1
+			bonus = GameConstants.BONUS_UNSURE;
+			setNotSure(GameConstants.BONUS_UNSURE);
+		} else if (eval == GameConstants.EVAL_NEGATIVE) {// sure negative
+			bonus = GameConstants.BONUS_NEGATIVE;
+			setPenalty();
+		} else if (eval == GameConstants.EVAL_POSITIVE) {// sure positive
+			bonus = GameConstants.BONUS_POSITIVE;
+			setAgreement(GameConstants.BONUS_POSITIVE);
+		} else if (eval == GameConstants.EVAL_FIRST) {// sure positive
+			bonus = GameConstants.BONUS_FIRST;
+			setFirstVerification(GameConstants.BONUS_FIRST);
+		} else if (eval > GameConstants.EVAL_THRESHOLD) {// agree
+			bonus = GameConstants.BONUS_AGREE;
+			setAgreement(GameConstants.BONUS_AGREE);
+		} else if (eval <= GameConstants.EVAL_THRESHOLD) {
+			bonus = GameConstants.BONUS_DISAGREE;
 			setDisagreement();
 		}
-		if (notSure) {// -1
-			setNotSure(bonus);
-		} else if (bonus == GameConstants.BONUS_PENALTY) {// False
-			setPenalty();
-		} else if (bonus == GameConstants.BONUS_HUGE
-				|| bonus == GameConstants.BONUS_MEDIUM) {// Bonus
-			setAgreement(finalBonus);
-		} else if (bonus == GameConstants.BONUS_FIRST) {
-			setFirstVerification(bonus);
-		}
-
+		echo("bonus: "+bonus);
 		// documentation of verification
 		verificationStats.addEvaluation(bonus, notSure);
-
+		
+		int finalBonus = bonus;
+		// here
+//		int finalBonus = Balancing.getBonus(bonus, difficulty);
+		echo("finalBonus: "+finalBonus); 
 		addMoney(finalBonus);
 		notSure = false;
-		echo("##Client: Process bonus done ##");
+		echo("Process bonus done!");
 	}
 
 	//
@@ -1814,22 +1833,34 @@ public class PeaInvasion extends HtmlGame {
 			this.user.setCredible(false);
 			echo("Too many false verifications! Link Verifications won't be commited!");
 		}
-		
+
 		String data = this.verificationStats.getJson();
-		
-		String url = "http://localhost:8080/verilinks-server/server?service=getHighscore&game=peaInvasion";
+		echo("commit: " + data);
+
+		String url = "http://localhost:8080/verilinks-server/server?service=commitVerifications";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
 				URL.encode(url));
+		// StringBuffer postData=new StringBuffer();
+		// postData.append(URL.encode("string")).append("=").append(URL.encode(data));
+		builder.setHeader("Content-type", "application/x-www-form-urlencoded");
 		try {
 			Request request = builder.sendRequest(data, new RequestCallback() {
 				public void onError(Request request, Throwable exception) {
-					echo("ERROR rest");
+					echo("ERROR: Commit Verifications! "
+							+ exception.getMessage());
 				}
 
 				public void onResponseReceived(Request request,
 						Response response) {
-					echo(" Commit Verifications success! userStrength: " + response);
-					user.setStrength(response.toString());
+					echo(" Commit Verifications success! userStrength: "
+							+ response.toString());
+					JSONValue jsonValue = JSONParser.parseStrict(response
+							.getText());
+					System.out.println("jsonValue: " + jsonValue.toString());
+					JSONObject jsonObject = jsonValue.isObject();
+					JsoUserstrength str = jsonObject.getJavaScriptObject()
+							.cast();
+					user.setStrength(str.getUserstrength());
 				}
 			});
 		} catch (RequestException e) {
@@ -1876,12 +1907,11 @@ public class PeaInvasion extends HtmlGame {
 	 */
 	public void firstQueryRequest() {
 		echo("Client: First Query Request");
-		getLink(FIRST_QUERY_REQUEST );
+		getLink(FIRST_QUERY_REQUEST);
 		this.disableInput = false;
 
 	}
 
-	
 	public void linksetRequest() {
 		echo("Linkset Request");
 		initHighscore();
@@ -1906,7 +1936,9 @@ public class PeaInvasion extends HtmlGame {
 					JSONValue jsonValue = JSONParser.parseStrict(response
 							.getText());
 					System.out.println("jsonValue: " + jsonValue.toString());
-					JSONObject jsonObject = jsonValue.isObject(); // assert that											// an object
+					JSONObject jsonObject = jsonValue.isObject(); // assert that
+																	// // an
+																	// object
 					if (jsonObject == null) {
 						System.out
 								.println("JSON payload did not describe an object");
@@ -1927,8 +1959,7 @@ public class PeaInvasion extends HtmlGame {
 		}
 		echo("Linkset Request Done");
 	}
-	
-	
+
 	private ArrayList<Linkset> parseLinkset(JsArray<JsoLinkset> lSetArray) {
 		echo("Parse Linkset. Size = " + lSetArray.length());
 		ArrayList<Linkset> linksetList = new ArrayList<Linkset>();
@@ -1943,11 +1974,11 @@ public class PeaInvasion extends HtmlGame {
 			lSet.setObject(jSet.getObject());
 			lSet.setDescription(jSet.getDescription());
 			lSet.setDifficulty(jSet.getDifficulty());
-			
+
 			linksetList.add(lSet);
 		}
 		return linksetList;
-		
+
 	}
 
 	/**
@@ -1978,7 +2009,9 @@ public class PeaInvasion extends HtmlGame {
 					JSONValue jsonValue = JSONParser.parseStrict(response
 							.getText());
 					System.out.println("jsonValue: " + jsonValue.toString());
-					JSONObject jsonObject = jsonValue.isObject(); // assert that											// an object
+					JSONObject jsonObject = jsonValue.isObject(); // assert that
+																	// // an
+																	// object
 					if (jsonObject == null) {
 						System.out
 								.println("JSON payload did not describe an object");
@@ -1986,12 +2019,9 @@ public class PeaInvasion extends HtmlGame {
 								"JSON payload did not describe an object");
 					} else
 						System.out.println("is object");
-					// Cast
-					System.out.println("#######SUBJECT: ");
 					JsoHighscoreArray hS = jsonObject.getJavaScriptObject()
 							.cast();
-					System.out.println("casted");
-					parseHighscore(hS.getHighscore());
+					showHighscore(parseHighscore(hS.getHighscore()));
 				}
 			});
 		} catch (RequestException e) {
@@ -2010,7 +2040,11 @@ public class PeaInvasion extends HtmlGame {
 		if (config.isKongregate() == true)
 			sendScoreToKongregate(score);
 
-		String url = "http://localhost:8080/verilinks-server/server?service=postScore&userId="+user.getId()+"&userName="+user.getName()+"&game=peaInvasion"+"&score="+score;
+		String url = "http://localhost:8080/verilinks-server/server?service=postScore&userId="
+				+ user.getId()
+				+ "&userName="
+				+ user.getName()
+				+ "&game=peaInvasion" + "&score=" + score;
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
 				URL.encode(url));
 		try {
@@ -2061,7 +2095,9 @@ public class PeaInvasion extends HtmlGame {
 					JSONValue jsonValue = JSONParser.parseStrict(response
 							.getText());
 					System.out.println("jsonValue: " + jsonValue.toString());
-					JSONObject jsonObject = jsonValue.isObject(); // assert that											// an object
+					JSONObject jsonObject = jsonValue.isObject(); // assert that
+																	// // an
+																	// object
 					if (jsonObject == null) {
 						System.out
 								.println("JSON payload did not describe an object");
@@ -2069,20 +2105,18 @@ public class PeaInvasion extends HtmlGame {
 								"JSON payload did not describe an object");
 					} else
 						System.out.println("is object");
-					JsoTemplateArray hS = jsonObject.getJavaScriptObject().cast();
+					JsoTemplateArray hS = jsonObject.getJavaScriptObject()
+							.cast();
 					System.out.println("casted");
 					parseTemplate(hS);
-					
-					
+
 				}
 			});
 		} catch (RequestException e) {
 			// Couldn't connect to server
 			echo("ERROR Temaplte!");
 		}
-		
-		
-		
+
 	}
 
 	// /**
@@ -2195,7 +2229,7 @@ public class PeaInvasion extends HtmlGame {
 
 	private void setPenalty() {
 		echo("Process Link-Evaluation: Penalty");
-		String msg = "False Verification! << " + GameConstants.BONUS_PENALTY
+		String msg = "False Verification! << " + GameConstants.BONUS_NEGATIVE
 				+ " Coins >> Penalty!";
 		game.penalty();
 		msgButton.setText(msg);
@@ -2219,7 +2253,7 @@ public class PeaInvasion extends HtmlGame {
 				public void onError(Request request, Throwable exception) {
 					echo("ERROR rest");
 					Window.alert("Server not running!");
-					serverRunning=false;
+					serverRunning = false;
 				}
 
 				public void onResponseReceived(Request request,
@@ -2257,14 +2291,15 @@ public class PeaInvasion extends HtmlGame {
 	}
 
 	private void echo(String msg) {
-		System.out.println("[Client]: "+msg);
+		System.out.println("[Client]: " + msg);
 	}
 
 	public void sendUser() {
 		echo("Client: Send user to server!");
-		
+		this.verificationStats.setUser(this.user);
 
-		String url = "http://localhost:8080/verilinks-server/server?service=getUserdata&userId="+user.getId()+"&userName="+user.getName();
+		String url = "http://localhost:8080/verilinks-server/server?service=getUserdata&userId="
+				+ user.getId() + "&userName=" + user.getName();
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
 		try {
@@ -2282,7 +2317,9 @@ public class PeaInvasion extends HtmlGame {
 					JSONValue jsonValue = JSONParser.parseStrict(response
 							.getText());
 					System.out.println("jsonValue: " + jsonValue.toString());
-					JSONObject jsonObject = jsonValue.isObject(); // assert that											// an object
+					JSONObject jsonObject = jsonValue.isObject(); // assert that
+																	// // an
+																	// object
 					if (jsonObject == null) {
 						System.out
 								.println("JSON payload did not describe an object");
@@ -2295,12 +2332,13 @@ public class PeaInvasion extends HtmlGame {
 					JsoUserdata u = jsonObject.getJavaScriptObject().cast();
 					System.out.println("casted");
 					Userdata userData = parseUserdata(u);
-					if(userData != null){
-						echo("SendUser Success. Strength: " + userData.getStrength());
+					if (userData != null) {
+						echo("SendUser Success. Strength: "
+								+ userData.getStrength());
 						user.setStrength(userData.getStrength());
-					}else{
+					} else {
 						echo("new user");
-						user.setStrength("0");
+						user.setStrength("novice");
 					}
 					setDifficulty(linkset.getDifficulty());
 					startOfGame = false;
@@ -2328,10 +2366,15 @@ public class PeaInvasion extends HtmlGame {
 	 */
 	public void disconnectUser() {
 		echo("Client: Disconnect user from server!");
-		
+
 		user.calcPlayTime(System.currentTimeMillis());
-		
-		String url = "http://localhost:8080/verilinks-server/server?service=disconnect&userId="+user.getId()+"&userName="+user.getName()+"&time="+user.getPlayTime();
+
+		String url = "http://localhost:8080/verilinks-server/server?service=disconnect&userId="
+				+ user.getId()
+				+ "&userName="
+				+ user.getName()
+				+ "&time="
+				+ user.getPlayTime();
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
 		try {
@@ -2528,7 +2571,7 @@ public class PeaInvasion extends HtmlGame {
 		return this.user;
 	}
 
-	private void getLink(int selection){
+	private void getLink(final int selection) {
 		// Receive new links, update Table
 		echo("Get Link Request");
 		String url = generateURL(selection);
@@ -2545,56 +2588,59 @@ public class PeaInvasion extends HtmlGame {
 					echo("GET Link Success: " + response.getText());
 					JSONValue jsonValue = JSONParser.parseStrict(response
 							.getText());
-					JSONObject jsonObject = jsonValue.isObject(); // assert that											// an object
+					JSONObject jsonObject = jsonValue.isObject(); // assert that
+																	// // an
+																	// object
 					JsoLink l = jsonObject.getJavaScriptObject().cast();
-					parseLink(l);
+					parseLink(l,selection);
 				}
 			});
 		} catch (RequestException e) {
 			// Couldn't connect to server
 			echo("ERROR get LINK");
 		}
-		
-		
+
 	}
 
-	private void parseLink(JsoLink jLink){
+	private void parseLink(JsoLink jLink, int selection) {
 		System.out.println("Parse Link");
-		
+
+		if(selection != this.FIRST_QUERY_REQUEST)
+			processEval(jLink.getEval(),Double.parseDouble(jLink.getDifficulty()));
+
 		setDifficulty(linkset.getDifficulty());
-		
+
 		JsoInstance jSub = jLink.getSubject();
 		JsoProperty jProp = null;
 		Property prop = null;
 		ArrayList<Property> propList = new ArrayList<Property>();
-		for(int i=0;i<jSub.getProperties().length();i++){
+		for (int i = 0; i < jSub.getProperties().length(); i++) {
 			jProp = jSub.getProperties().get(i);
-			prop = new Property(jProp.getProperty(),jProp.getValue());
+			prop = new Property(jProp.getProperty(), jProp.getValue());
 			propList.add(prop);
 		}
 		Instance sub = new Instance();
 		sub.setUri(jSub.getUri());
 		sub.setProperties(propList);
-		
+
 		JsoInstance jOb = jLink.getObject();
 		jProp = null;
 		List<Property> propList2 = new ArrayList<Property>();
-		for(int j=0;j<jOb.getProperties().length();j++){
+		for (int j = 0; j < jOb.getProperties().length(); j++) {
 			jProp = jOb.getProperties().get(j);
-			prop = new Property(jProp.getProperty(),jProp.getValue());
+			prop = new Property(jProp.getProperty(), jProp.getValue());
 			propList2.add(prop);
 		}
 		Instance ob = new Instance();
 		ob.setUri(jOb.getUri());
 		ob.setProperties(propList2);
-		
-		link = new Link(jLink.getId(),sub,ob,jLink.getPredicate(),
-				0,0);
+
+		link = new Link(jLink.getId(), sub, ob, jLink.getPredicate(), 0, 0);
 		// updae linkMsg
 		linkMsg.setText("Link difficulty: "
 				+ Balancing.getStringLinkDifficulty(Double.parseDouble(jLink
 						.getDifficulty())));
-		
+
 		// Update VerifyComponent
 		updateTable(link, template);
 		DeferredCommand.addCommand(new Command() {
@@ -2608,31 +2654,32 @@ public class PeaInvasion extends HtmlGame {
 		echo("Got Statement:");
 		echo("id: " + link.getId());
 		echo("subject uri: " + link.getSubject().getUri());
-		
+
 		echo("object uri: " + link.getObject().getUri());
 
 		echo("predi: " + link.getPredicate());
 		echo("counter: " + link.getCounter());
-//		echo("bonus: " + link.getBonus());
+		// echo("bonus: " + link.getBonus());
 		echo("Client: This link is Eval_Link?: " + thisLink);
 		echo("----------------------------------");
 	}
-	
+
 	private String generateURL(int selection) {
 		String url = "http://localhost:8080/verilinks-server/server?service=getLink";
-		url += "&userId="+user.getId();
-		url += "&userName="+user.getName();
-		url += "&linkset="+linkset.getName();
-		url += "&nextLink="+nextLink;
-		if(link != null)
-			url += "&curLink="+link.getId();
-		if(this.verificationStats.getVerifiedLinks().length()>0)
-			url += "&verifiedLinks="+this.verificationStats.getVerifiedLinks();
-		if(selection != FIRST_QUERY_REQUEST)
-			url += "&verification="+selection;
-		echo("Generate URL: "+url);
-		
+		url += "&userId=" + user.getId();
+		url += "&userName=" + user.getName();
+		url += "&linkset=" + linkset.getName();
+		url += "&nextLink=" + nextLink;
+		if (link != null)
+			url += "&curLink=" + link.getId();
+		if (this.verificationStats.getVerifiedLinks().length() > 0)
+			url += "&verifiedLinks="
+					+ this.verificationStats.getVerifiedLinks();
+		if (selection != FIRST_QUERY_REQUEST)
+			url += "&verification=" + selection;
+		echo("Generate URL: " + url);
+
 		return url;
 	}
-	
+
 }
