@@ -244,7 +244,7 @@ public class Server extends HttpServlet {
 		if (!prefix.endsWith("/")) {
 			prefix += '/';
 		}
-		resourcePath = prefix + "WEB-INF/resources/";
+		resourcePath = prefix + "WEB-INF/classes/";
 		echo("####Server: Init Path : '" + resourcePath + "' Done ####\n");
 	}
 
