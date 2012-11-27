@@ -88,6 +88,14 @@
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>7.0.0.v20091005</version>
 			</plugin>
+<plugin>
+	<groupId>org.codehaus.mojo</groupId>
+	<artifactId>tomcat-maven-plugin</artifactId>
+	<configuration>
+		<url>http://127.0.0.1:8080/manager</url>
+		<server>local</server>
+	</configuration>
+</plugin>
 		</plugins>
 
 		<pluginManagement>
