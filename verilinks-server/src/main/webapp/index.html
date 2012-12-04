@@ -1,0 +1,307 @@
+<!doctype html> <!-- The DOCTYPE declaration above will set the    -->
+<!-- browser's rendering engine into               -->
+<!-- "Standards Mode". Replacing this declaration  -->
+<!-- with a "Quirks Mode" doctype may lead to some -->
+<!-- differences in layout.                        -->
+
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<!-- 	<script type="text/javascript" src="js/script.js"></script> -->
+		<script type="text/javascript">
+			var xmlHttp = null;
+			var gotLinkTask = false;
+
+			function getLinkTasks() {
+				// show
+				if (document.getElementById('processLinkTask').style.display == "none")
+					document.getElementById('processLinkTask').style.display = "block";
+				else
+					document.getElementById('processLinkTask').style.display = "none";
+				// hide addLinktask
+				document.getElementById('addLinkTask').style.display = "none";
+				// http req
+				if (gotLinkTask)
+					return;
+				var url = "http://localhost:8080/verilinks-server/server?service=getTasks";
+				xmlHttp = new XMLHttpRequest();
+				xmlHttp.onreadystatechange = processRequest;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+
+			function processRequest() {
+				if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+					if (xmlHttp.responseText == "Not found") {
+						document.getElementById("TextBoxCustomerName").value = "Not found";
+						document.getElementById("TextBoxCustomerAddress").value = "";
+					} else {
+						var task = eval("(" + xmlHttp.responseText + ")");
+						parseLinkTask(task);
+						gotLinkTask = true;
+					}
+				}
+			}
+
+			function performLinkTask() {
+				var url = "http://localhost:8080/verilinks-server/server?service=performTasks";
+				xmlHttp = new XMLHttpRequest();
+				xmlHttp.onreadystatechange = processAnswer;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+
+			function processAnswer() {
+				document.getElementById("msg").innerHTML = xmlHttp.responseText;
+				if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+					window.alert(xmlHttp.responseText);
+				}
+			}
+
+			function parseLinkTask(task) {
+				if (task.tasks.length == 0) {
+					document.getElementById("msg").innerHTML = "No task to perform!";
+					document.getElementById("performBtn").disabled = true;
+				}
+				for (var i = 0; i < task.tasks.length; i++) {
+					var table = document.getElementById("linkTaskTable");
+					var row = table.insertRow(-1);
+					var subject = row.insertCell(0);
+					var object = row.insertCell(1);
+					var predicate = row.insertCell(2);
+					var description = row.insertCell(3);
+					var difficulty = row.insertCell(4);
+					var file = row.insertCell(5);
+					subject.innerHTML = task.tasks[i].subject;
+					object.innerHTML = task.tasks[i].object;
+					predicate.innerHTML = task.tasks[i].predicate;
+					description.innerHTML = task.tasks[i].description;
+					difficulty.innerHTML = task.tasks[i].difficulty;
+					file.innerHTML = task.tasks[i].file;
+				}
+			}
+
+			function addLinkTask() {
+				// show/hide
+				// addLinkTask
+				if (document.getElementById('addLinkTask').style.display == "none")
+					document.getElementById('addLinkTask').style.display = "block";
+				else
+					document.getElementById('addLinkTask').style.display = "none";
+				// processLinktask
+				document.getElementById('processLinkTask').style.display = "none"
+			}
+
+			function validate() {
+				var elems = document.getElementsByTagName('input');
+				var len = elems.length;
+				for (var i = 0; i < len; i++) {
+					if (elems[i].value.length == 0){
+						if(elems[i].className !='noDisable' && document.getElementById('existsElement').checked){
+							continue;
+						} 
+						window.alert("Please fill in field: "+elems[i].name);
+						return false;
+					}
+				}
+				form.submit();
+			}
+
+			function cbChanged() {
+				if (document.getElementById('existsElement').checked) {
+					// disable
+					var elems = document.getElementsByTagName('input');
+					var len = elems.length;
+					for (var i = 0; i < len; i++) {
+						if (elems[i].className != 'noDisable')
+							elems[i].disabled = true;
+					}
+					var elemsSelect = document.getElementsByTagName('select');
+					for (var i = 0; i < elemsSelect.length; i++) {
+
+						if (elemsSelect[i].className != 'noDisable')
+							elemsSelect[i].disabled = true;
+					}
+				} else {
+					// enable
+					var elems = document.getElementsByTagName('input');
+					var len = elems.length;
+					for (var i = 0; i < len; i++) {
+						if (elems[i].className != 'noDisable')
+							elems[i].disabled = false;
+					}
+					var elemsSelect = document.getElementsByTagName('select');
+					for (var i = 0; i < elemsSelect.length; i++) {
+						if (elemsSelect[i].className != 'noDisable')
+							elemsSelect[i].disabled = false;
+					}
+				}
+			}
+		</script>
+		<!--                                                               -->
+		<!-- Consider inlining CSS to reduce the number of requested files -->
+		<!--                                                               -->
+		<link type="text/css" rel="stylesheet" href="style.css">
+
+		<!--                                           -->
+		<!-- Any title is fine                         -->
+		<!--                                           -->
+		<title>VeriLinks: Interlinking Games</title>
+
+	</head>
+	<body>
+		<h1>VeriLinks Project</h1>
+		<div id='descr'>
+			<div id='menue'></div>
+			<p>
+				Choose an interlinking game:
+			</p>
+			<ul class='games'>
+				<li>
+					<a href='http://pea-invasion.verilinks.aksw.org/'>Pea Invasion</a>
+				</li>
+				<li>
+					<a href='http://space-ships.verilinks.aksw.org/'>Space Ships</a>
+				</li>
+			</ul>
+			<p class='aksw'>
+				Options
+			</p>
+			<button onclick="addLinkTask()">
+				Add Link-Task
+			</button>
+			<button onclick="getLinkTasks()">
+				Process Link-Task
+			</button>
+			<form id='addLinkTask' style="display: none"
+			enctype="multipart/form-data"
+			action="http://localhost:8080/verilinks-server/upload" method="post" onsubmit='return validate();'>
+				<h2>Admin Panel</h2>
+				<table>
+					<tr>
+						<td class='fat'>1.Linkset:</td>
+						<td>
+						<input class='noDisable' name="linksetElement" type="text" />
+						</td>
+						<td class='desc'>ID of linkset</td>
+					</tr>
+					<tr>
+						<td class='fat'>2.Linkfile:</td>
+						<td>
+						<input class='noDisable' name="fileElement" type="file"
+						size="10" />
+						</td>
+						<td class='desc'>Upload rdf/xml or n-triple file</td>
+
+					</tr>
+					<tr>
+						<td class='lb'>existing template?</td>
+						<td>
+						<input class='noDisable' style="margin: 15px"
+						id='existsElement' type="checkbox" onChange='cbChanged()'>
+						</td>
+						<td class='desc'>Check if template does exist in db</td>
+					</tr>
+					<tr>
+						<td class='fat'>3.Instances</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>Subject</td>
+						<td>Object</td>
+					</tr>
+					<tr>
+						<td class='lb'>ontology:</td>
+						<td>
+						<input class='noDisable' name="nameElement" type="text" />
+						</td>
+						<td>
+						<input class='noDisable' name="nameElement2" type="text" />
+						</td>
+						<td class='desc'>Name of ontology</td>
+					</tr>
+					<tr>
+						<td class='lb'>endpoint:</td>
+						<td>
+						<input name="endpointElement" type="text" />
+						</td>
+						<td>
+						<input name="endpointElement2" type="text" />
+						</td>
+						<td class='desc'>SPARQL endpoint</td>
+					</tr>
+					<tr>
+						<td class='lb'>property:</td>
+						<td>
+						<select>
+							<option value="text">text</option>
+							<option value="image">image</option>
+							<option value="map">map</option>
+						</select></td>
+						<td>
+						<select>
+							<option value="text">text</option>
+							<option value="image">image</option>
+							<option value="map">map</option>
+						</select></td>
+						<td class='desc'>Property to display</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+						<input name="prop0Element" type="text" />
+						</td>
+						<td>
+						<input name="prop0element2" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td class='fat'>4.Predicate</td>
+						<td>
+						<input class='noDisable' name="predicateElement" type="text" />
+						</td>
+						<td class='desc'>Name of the relation</td>
+					</tr>
+					<tr>
+						<td class='fat'>5.Description</td>
+						<td>
+						<input class='noDisable' name="descriptionElement" type="text" />
+						</td>
+						<td class='desc'>Description of linkset</td>
+					</tr>
+					<tr>
+						<td class='fat'>6.Difficulty</td>
+						<td>
+						<select class='noDisable' name="difficultyElement">
+							<option value="easy">easy</option>
+							<option value="n">medium</option>
+							<option value="map">hard</option>
+						</select></td>
+						<td class='desc'>Describe difficulty of linkset</td>
+					</tr>
+				</table>
+
+				<button id='submitBtn' >
+					submit
+				</button>
+			</form>
+			<!-- Process -->
+			<div id='processLinkTask' style='display: none'>
+				<table id='linkTaskTable'>
+					<tr>
+						<th>Subject</th>
+						<th>Object</th>
+						<th>Preidcate</th>
+						<th>Description</th>
+						<th>Difficulty</th>
+						<th>File</th>
+					</tr>
+				</table>
+				<p id='msg'></p>
+				<button id='performBtn' onclick="performLinkTask()">
+					Perform Link-Task
+				</button>
+			</div>
+		</div>
+	</body>
+</html>

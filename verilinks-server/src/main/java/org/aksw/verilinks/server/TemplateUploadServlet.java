@@ -92,7 +92,7 @@ public class TemplateUploadServlet extends HttpServlet {
 	private String type_2 = "";
 
 	private String filePath;
-	private String difficulty;
+	private String difficulty="";
 	private String predicate;
 	private String description;
 	private String linkset;
@@ -108,6 +108,12 @@ public class TemplateUploadServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		System.out.println("####Upload Servlet: Receiving formular");
+		echo("Post: " + req.toString());
+		echo("ConenType: " + req.getContentType());
+		echo("Path: " + req.getContextPath());
+		echo("cntLength: "+req.getContentLength());
+		
+		
 		// process only multipart requests
 		if (ServletFileUpload.isMultipartContent(req)) {
 
@@ -131,6 +137,9 @@ public class TemplateUploadServlet extends HttpServlet {
 					// process only file upload
 					// System.out.println("FileItem name: "+fileItem.getFieldName());
 					String itemName = fileItem.getFieldName();
+					echo("itemName: "+itemName);
+					
+					
 					// first
 					if (itemName.equals(NAME))
 						name = fileItem.getString();
@@ -276,7 +285,7 @@ public class TemplateUploadServlet extends HttpServlet {
 			prefix += '/';
 		}
 		// resourcePath = prefix+"WEB-INF/classes/";
-		String resourcePath = prefix + "VeriLinks/";
+		String resourcePath = prefix + "WEB-INF/classes/";
 		System.out.println("prefix: " + prefix);
 		System.out.println("resourcePath: " + resourcePath);
 
@@ -301,6 +310,7 @@ public class TemplateUploadServlet extends HttpServlet {
 			System.out.println("Error: " + e.getMessage());
 			e.printStackTrace();
 		}
+		echo("blaaaaaaaa");
 		// Create templates
 		if (!endpoint.isEmpty()) {
 			Template temp = new Template(); // Template subject
@@ -315,6 +325,7 @@ public class TemplateUploadServlet extends HttpServlet {
 			xml.addOntology(temp);
 			System.out.println("Add 1.Template DONE");
 		}
+		echo("1");
 		if (!endpoint_2.isEmpty()) { // Template object
 			Template temp2 = new Template();
 			temp2.setName(name_2);
@@ -328,7 +339,7 @@ public class TemplateUploadServlet extends HttpServlet {
 			xml.addOntology(temp2);
 			System.out.println("Add 2.Template DONE");
 		}
-
+		echo("2");
 		// Add linkedOntologies+difficulty into db
 		if (!difficulty.isEmpty())
 			insertIntoDB();
@@ -444,19 +455,26 @@ public class TemplateUploadServlet extends HttpServlet {
 		BufferedReader inputStream = null;
 		BufferedWriter outputStream = null;
 		try {
+			echo("cehck exist");
 			// Check if task already in task-file
 			inputStream = new BufferedReader(new FileReader(getResourceDir()
 					+ "linkFiles/" + this.taskFile));
+			echo("br: .."+fileName);
 			String buffer;
 			boolean found = false;
 			while ((buffer = inputStream.readLine()) != null) {
+				echo("w");
 				if (buffer.contains(fileName)) {
+					echo("found");
 					found = true;
 					break;
 				}
+				echo("nf");
 			}
 			inputStream.close();
+			echo("ip close");
 			if (found == false) {
+				echo("not found");
 				// Write to task file
 				outputStream = new BufferedWriter(new FileWriter(
 						getResourceDir() + "linkFiles/" + this.taskFile, true));
