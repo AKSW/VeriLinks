@@ -455,24 +455,20 @@ public class TemplateUploadServlet extends HttpServlet {
 		BufferedReader inputStream = null;
 		BufferedWriter outputStream = null;
 		try {
-			echo("cehck exist");
 			// Check if task already in task-file
 			inputStream = new BufferedReader(new FileReader(getResourceDir()
 					+ "linkFiles/" + this.taskFile));
-			echo("br: .."+fileName);
+			echo("Check if task already in task-file: "+fileName);
 			String buffer;
 			boolean found = false;
 			while ((buffer = inputStream.readLine()) != null) {
-				echo("w");
 				if (buffer.contains(fileName)) {
 					echo("found");
 					found = true;
 					break;
 				}
-				echo("nf");
 			}
 			inputStream.close();
-			echo("ip close");
 			if (found == false) {
 				echo("not found");
 				// Write to task file

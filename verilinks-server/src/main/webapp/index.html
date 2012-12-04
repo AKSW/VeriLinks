@@ -11,7 +11,7 @@
 		<script type="text/javascript">
 			var xmlHttp = null;
 			var gotLinkTask = false;
-
+			var rootURL ="/verilinks-server/";
 			function getLinkTasks() {
 				// show
 				if (document.getElementById('processLinkTask').style.display == "none")
@@ -23,7 +23,7 @@
 				// http req
 				if (gotLinkTask)
 					return;
-				var url = "http://localhost:8080/verilinks-server/server?service=getTasks";
+				var url = rootURL+ "server?service=getTasks";
 				xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = processRequest;
 				xmlHttp.open("GET", url, true);
@@ -44,7 +44,7 @@
 			}
 
 			function performLinkTask() {
-				var url = "http://localhost:8080/verilinks-server/server?service=performTasks";
+				var url = rootURL+"server?service=performTasks";
 				xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = processAnswer;
 				xmlHttp.open("GET", url, true);
@@ -63,6 +63,8 @@
 					document.getElementById("msg").innerHTML = "No task to perform!";
 					document.getElementById("performBtn").disabled = true;
 				}
+				else
+					document.getElementById("performBtn").disabled = false;
 				for (var i = 0; i < task.tasks.length; i++) {
 					var table = document.getElementById("linkTaskTable");
 					var row = table.insertRow(-1);
@@ -175,7 +177,7 @@
 			</button>
 			<form id='addLinkTask' style="display: none"
 			enctype="multipart/form-data"
-			action="http://localhost:8080/verilinks-server/upload" method="post" onsubmit='return validate();'>
+			action="/verilinks-server/upload" method="post" onsubmit='return validate();'>
 				<h2>Admin Panel</h2>
 				<table>
 					<tr>
