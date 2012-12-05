@@ -23,9 +23,9 @@ public class LoginConstants {
   // This app's personal client ID assigned by the Facebook Developer App
   // (http://www.facebook.com/developers).
   // Key for deployment
-  public static final String FACEBOOK_CLIENT_ID = "278603465536665";
+  public static final String FACEBOOK_CLIENT_ID = "183676705103647";
   // Offline Test on localhost use this Facebook Key
-//  public static final String FACEBOOK_CLIENT_ID = "276474835758653";
+//  public static final String FACEBOOK_CLIENT_ID = "495198197169715";
   
   // All available scopes are listed here:
   // http://developers.facebook.com/docs/authentication/permissions/

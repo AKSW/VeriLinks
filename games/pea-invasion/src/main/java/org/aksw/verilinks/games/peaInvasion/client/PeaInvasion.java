@@ -365,7 +365,7 @@ public class PeaInvasion extends HtmlGame {
 		});
 
 		// hurr test
-		landingPanel.add(asd2);
+//		landingPanel.add(asd2);
 		// landingPanel.add(butt);
 
 	}
