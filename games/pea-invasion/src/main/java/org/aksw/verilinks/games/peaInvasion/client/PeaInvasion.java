@@ -216,7 +216,7 @@ public class PeaInvasion extends HtmlGame {
 		this.isFirstStatement = true;
 		this.disableInput = true;
 		this.startOfLevel = true;
-		this.verifyLock = false;
+		this.verifyLock = true;
 		this.checkUserCredibility = false;
 		this.user = new User();
 		this.verificationStats = new VerificationStatistics();
@@ -593,11 +593,11 @@ public class PeaInvasion extends HtmlGame {
 		echo("object instance tempatle done");
 
 		this.template = new TemplateLinkset();
-		template.setLinkset(linkset.getId());
+		template.setLinkset(linkset.getName());
 		template.setSubject(sub);
 		template.setObject(ob);
 		template.setPredicate("same as");
-
+		
 		initGUI();
 		initCallback();
 		initHandler();
@@ -878,7 +878,7 @@ public class PeaInvasion extends HtmlGame {
 	private void initGUI() {
 		echo("Init GUI");
 		this.verifyComponent = new VerifyComponent(template, config);
-
+		
 		// VerifyComponent Button handler
 		PushButton trueButton = verifyComponent.getTrueButton();
 		trueButton.addClickHandler(new ClickHandler() {
@@ -1021,15 +1021,15 @@ public class PeaInvasion extends HtmlGame {
 		PlayN.run(game);
 		echo("Client: Init Game Done");
 
-		Button testB = new Button("test");
-		testB.addClickHandler(new ClickHandler() {
-
-			public void onClick(ClickEvent arg0) {
-				commitVerifications();
-
-			}
-		});
-		RootPanel.get("bottomButtons").add(testB);
+//		Button testB = new Button("test");
+//		testB.addClickHandler(new ClickHandler() {
+//
+//			public void onClick(ClickEvent arg0) {
+//				commitVerifications();
+//
+//			}
+//		});
+//		RootPanel.get("bottomButtons").add(testB);
 
 	}
 
@@ -2682,4 +2682,7 @@ public class PeaInvasion extends HtmlGame {
 		return url;
 	}
 
+	public void setVerifyLock(boolean b){
+		this.verifyLock=b;
+	}
 }

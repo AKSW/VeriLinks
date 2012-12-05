@@ -382,7 +382,7 @@ VERILINKS = (function() {
 			var url = SERVER_URL + "?service=commitVerifications";
 			var obj = new Commit();
 			var json = JSON.stringify(obj);
-			alert("data: " + json);
+			// alert("data: " + json);
 			$.ajax({
 				type : 'POST',
 				url : url,

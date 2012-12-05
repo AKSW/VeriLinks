@@ -2,7 +2,18 @@ package org.aksw.verilinks.games.peaInvasion.client.verify;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.maps.client.MapOptions;
+import com.google.gwt.maps.client.MapTypeId;
+import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.base.LatLng;
+import com.google.gwt.maps.client.events.MapEventType;
+import com.google.gwt.maps.client.events.MapHandlerRegistration;
+import com.google.gwt.maps.client.events.click.ClickMapEvent;
+import com.google.gwt.maps.client.events.click.ClickMapHandler;
+import com.google.gwt.maps.client.overlays.Marker;
+import com.google.gwt.maps.client.overlays.MarkerOptions;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -52,6 +63,8 @@ public class VerifyComponent extends HorizontalPanel {
 	private BothMapsPanel bothMapsPanel;
 
 	private KongregatePanel kongregate;
+
+	private MapWidget mapWidget;
 
 	/**
 	 * Constructor
@@ -156,6 +169,7 @@ public class VerifyComponent extends HorizontalPanel {
 	 */
 	private void updateNormal(Link stmt) {
 		echo("Update normal");
+		
 		Instance instanceSubject = stmt.getSubject();
 		Instance instanceObject = stmt.getObject();
 		System.out.println("Set subject panel");
@@ -169,24 +183,132 @@ public class VerifyComponent extends HorizontalPanel {
 			subPanel.add(new HTML("MAPTYPE"));
 			// subjectPanel.setLatitude(instanceSubject.getLatitude());
 			// subjectPanel.setLongitude(instanceSubject.getLongitude());
+		}else if(subjectTemplate.getType().equals("img")){
+//			drawImg("subject",instanceSubject.getImage());
+			drawImg("subject",instanceSubject.getImage());
 		}
 		System.out.println("Subject Uri: " + instanceSubject.getUri());
 		System.out.println("Set subject panel done");
 
 		System.out.println("Set object panel");
 		obPanel.clear();
-		obPanel.add(new HTML(removeDuplicate(instanceObject.getLabel())));
-		// obPanel.add(new HTML(instanceObject.getUri()));
-		// obPanel.add(new HTML(instanceObject.getOptional()));
 		echo("objectTemplate.getType(): " + objectTemplate.getType());
 		if (objectTemplate.getType().equals("map")) {
-			// obPanel.add(new HTML("map"));
-			// objectPanel.setLatitude(instanceObject.getLatitude());
-			// objectPanel.setLongitude(instanceObject.getLongitude());
+			double lati = Double.parseDouble(instanceObject
+					.getValue("<http://www.w3.org/2003/01/geo/wgs84_pos#lat>"));
+			double longi = Double
+					.parseDouble(instanceObject
+							.getValue("<http://www.w3.org/2003/01/geo/wgs84_pos#long>"));
+			drawMap(obPanel,instanceObject, lati, longi);
+		} else if (objectTemplate.getType().equals("txt")) {
+			obPanel.add(new HTML(removeDuplicate(instanceObject.getLabel())));
+		}else if(objectTemplate.getType().equals("img")){
+			drawImg("object",instanceObject.getImage());
 		}
 		System.out.println("Object Uri: " + instanceObject.getUri());
 		System.out.println("Set object panel done");
+	}
 
+	private void drawImg(String divId, String imgUrl){
+		String img = "<img class='kongregateImage' src='"+imgUrl+"' title='"+divId+"'>";
+		DOM.getElementById(divId).setInnerHTML(img);
+	}
+	
+	private void drawMap(VerticalPanel panel,Instance instance, double lati, double longi) {
+		echo("draw map");
+		initializeMap(instance, lati, longi);
+		panel.add(mapWidget);
+		// Resize mapWidget
+		LatLng CENTER = LatLng.newInstance(lati, longi);
+		MapHandlerRegistration.trigger(mapWidget, MapEventType.RESIZE);
+		mapWidget.setCenter(CENTER);
+	}
+
+	private void initializeMap(Instance instance, double latitude,
+			double longitude) {
+		LatLng CENTER = LatLng.newInstance(latitude, longitude);
+
+		final MapOptions options = MapOptions.newInstance();
+		// Zoom level. Required
+		// options.setZoom(Integer.parseInt(template.getZoom())); hurr
+		options.setZoom(6);
+		// Open a map centered on Cawker City, KS USA. Required
+		options.setCenter(CENTER);
+		// Map type. Required.
+		options.setMapTypeId(MapTypeId.TERRAIN);
+
+		// Enable maps drag feature. Disabled by default.
+		options.setDraggable(true);
+		// Enable and add default navigation control. Disabled by default.
+		// options.setNavigationControl(true);
+		// Enable and add map type control. Disabled by default.
+		options.setMapTypeControl(true);
+		this.mapWidget = new MapWidget(options);
+		 mapWidget.setStyleName("kongregateMap");
+		mapWidget.setSize("450px", "270px");
+		DOM.setStyleAttribute(mapWidget.getElement(), "border",
+				"1px solid black");
+		DOM.setStyleAttribute(mapWidget.getElement(), "margin", "8px");
+		MarkerOptions markerOptions = MarkerOptions.newInstance();
+		markerOptions.setPosition(CENTER);
+		markerOptions.setTitle(parseLabel(instance.getLabel()));
+
+		final Marker marker = Marker.newInstance(markerOptions);
+		marker.setMap(mapWidget);
+
+		marker.addClickHandler(new ClickMapHandler() {
+			public void onEvent(ClickMapEvent event) {
+				// drawInfoWindow(marker, event.getMouseEvent(),mapWidget);
+			}
+		});
+
+		// Panels
+		// mapInfoPanel = new VerticalPanel();
+		// mapInfoPanel.add(new HTML(link.getObject().getUri()));
+		// if (config.getKnowledgeMode().equals(Configuration.KNOWLEDGE_EXPERT))
+		// mapInfoPanel.add(new HTML(link.getObject().getLabel()));
+		// else
+		// mapInfoPanel.add(new HTML(link.getObject().getType()));
+		// if (link.getObject().getUri().length() > 85)
+		// mapInfoPanel.setWidth("400px");
+		// mapInfoPanel.setStyleName("instancePanel_mapInfoPanel");
+		//
+		// int finalLeft;
+		// echo("@@@top" + top);
+
+		// Resize mapWidget
+		MapHandlerRegistration.trigger(mapWidget, MapEventType.RESIZE);
+		mapWidget.setCenter(CENTER);
+
+	}
+
+	private String parseLabel(String newLabel) {
+		echo("\n\n\nnewLabel: " + newLabel);
+		String end = "booya";
+		if (newLabel == null)
+			return "none";
+		if (newLabel.contains("<FONT style='BACKGROUND-COLOR: yellow'>")) {
+			echo("contains font");
+			end = newLabel.replace("<FONT style='BACKGROUND-COLOR: yellow'>",
+					"");
+			end = end.replace("</FONT>", "");
+		} else
+			end = newLabel;
+		if (end.contains(" | ")) {
+			echo("contains | ");
+			int size = end.split(" | ").length;
+			String split[] = new String[size];
+			split = end.split(" | ");
+			end = split[0];
+		}
+
+		echo("endLabel: " + end);
+		String test = "<FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'><FONT style='BACKGROUND-COLOR: yellow'>Republic of Chile</FONT></FONT></FONT></FONT></FONT></FONT></FONT></FONT></FONT></FONT>";
+		echo("\n\n\n1.: " + test);
+
+		test = test.replace("<FONT style='BACKGROUND-COLOR: yellow'>", "back");
+		echo("2: " + test + "\n\n");
+		return end;
 	}
 
 	/**
@@ -471,6 +593,10 @@ public class VerifyComponent extends HorizontalPanel {
 		// initNormal();
 		// }
 		// }
+		// if(subjectTemplate.getType().equals("map") ||
+		// objectTemplate.getType().equals("map")){
+		// initMap();
+		// }
 		initNormal();
 		echo("##VerifyComponent: Init VerifyComponent End");
 	}
@@ -481,7 +607,17 @@ public class VerifyComponent extends HorizontalPanel {
 	private void initNormal() {
 		echo("Init Normal");
 		this.setSpacing(2);
-
+		
+		String text="";
+		echo("linkset: "+this.template.getLinkset());
+		if(this.template.getLinkset().equals("dbpedia-linkedgeodata"))
+			text ="Does this flag/image belong to this country?";
+		if(this.template.getLinkset().equals("dbpedia-factbook"))
+			text ="Is this language spoken in this country?";
+		if(this.template.getLinkset().equals("dbpedia-bbcwildlife"))
+			text ="Are these the same animals?";
+		DOM.getElementById("quizHead").setInnerHTML(text);
+		
 		this.subPanel = new VerticalPanel();
 		DOM.getElementById("subject").setInnerHTML("");
 		RootPanel.get("subject").add(subPanel);
@@ -585,7 +721,7 @@ public class VerifyComponent extends HorizontalPanel {
 			middlePanel.add(predicatePanel);
 		middlePanel.add(rdbtnPanel);
 		// middlePanel.add(verifyButton);
-		middlePanel.setStyleName("middlePanel");		
+		middlePanel.setStyleName("middlePanel");
 		RootPanel.get("verifyButtons").add(middlePanel);
 		echo("Init middle panel done");
 	}
@@ -609,7 +745,7 @@ public class VerifyComponent extends HorizontalPanel {
 		echo("Init image panel done");
 	}
 
-	/**
+/**
 	 * Remove '<' and '>' of an image url
 	 * @param image
 	 * @return parsed String

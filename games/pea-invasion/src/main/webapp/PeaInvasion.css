@@ -239,7 +239,7 @@ table.lowerContent {
 	background-color: white;
 }
 
-.kongregateHead {
+#quizHead {
 	color: #808080;
 	font: 20px MisoRegular;
 	text-shadow: #fff 0px 1px 0, #000 0 -1px 0;
@@ -257,19 +257,18 @@ table.lowerContent {
 
 .kongregateQuestion {
 	overflow:hidden;
-	widhdden;
-	
 	margin: 5px;
 	background-color: white;
 	border-radius: 0.6em 0.6em 0.6em 0.6em;
 	-moz-box-shadow: 1px 3px 2px 0px black;
 	-webkit-box-shadow: 1px 3px 2px 0px black;
 	box-shadow: 1px 3px 2px 0px black;
+	vertical-align:middle;
 }
 
 #subject {
 	float:left;
-	margin: 20px;
+	margin: 13px;
 	font: 20px MisoRegular;
 	color: #800517;
 	text-shadow: 0px 2px 3px #555;
@@ -277,37 +276,37 @@ table.lowerContent {
 }
 #predicate {
 	float:left;
-	margin: 20px;
+	margin: 13px;
 	color: #222;
 	text-shadow: 0px 2px 3px #555;
 	font: 20px MisoRegular;
 }
 #object {
 	float:left;
-	margin: 20px;
+	margin: 13px;
 	font: 20px MisoRegular;
 	color: #7D1B7E;
 	text-shadow: 0px 2px 3px #555;
 	font-style: italic;
 }
 #verifyCnt{
-	overflow:hidden;
 }
 #verifyButtons{
 	float:left;	
 	vertical-align: center;
 }
 .kongregateMap {
-	margin: 10px;
+	margin: 8px;
 	-moz-box-shadow: 1px 3px 2px 0px grey;
 	-webkit-box-shadow: 1px 3px 2px 0px grey;
 	box-shadow: 1px 3px 2px 0px grey;
 }
 
 .kongregateImage {
+	border: 1px solid black;
 	margin: 8px 12px;
 	padding: 0px;
-	height: 130px;
+	height: 140px;
 	-moz-box-shadow: 1px 3px 2px 0px grey;
 	-webkit-box-shadow: 1px 3px 2px 0px grey;
 	box-shadow: 1px 3px 2px 0px grey;

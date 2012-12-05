@@ -305,6 +305,8 @@ public class GameComponent implements Game, Pointer.Listener, Keyboard.Listener 
 	    		application.setStartOfLevel(false);
 	    		// Start timer
 	    		application.setCurrentLevelStartTime();
+	    		// verifyLock
+	    		application.setVerifyLock(false);
     		}
     	}
       else {

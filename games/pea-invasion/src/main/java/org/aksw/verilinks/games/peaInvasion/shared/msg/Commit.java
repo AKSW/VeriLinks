@@ -2,7 +2,10 @@ package org.aksw.verilinks.games.peaInvasion.shared.msg;
 
 import java.util.ArrayList;
 
-import com.google.gwt.dev.json.JsonObject;
+import com.google.gwt.json.client.JSONNumber;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
+
 
 public class Commit {
 
@@ -36,20 +39,20 @@ public class Commit {
 	}
 	
 	public String getJson(){
-		JsonObject json = new JsonObject();
+		JSONObject json = new JSONObject();
 		
-		JsonObject jUser = new JsonObject();
-		jUser.put("id", user.getId());
-		jUser.put("name", user.getName());
+		JSONObject jUser = new JSONObject();
+		jUser.put("id", new JSONString(user.getId()));
+		jUser.put("name", new JSONString(user.getName()));
 		
-		JsonObject jVeriList = null;
-		JsonObject jVeri = null;
+		JSONObject jVeriList = null;
+		JSONObject jVeri = null;
 		Verification v = null;
 		for(int i = 0; i<this.verification.size();i++){
 			v =this.verification.get(i);
-			jVeri = new JsonObject();
-			jVeri.put("id", v.getId());
-			jVeri.put("veri", v.getVerification());
+			jVeri = new JSONObject();
+			jVeri.put("id", new JSONNumber(v.getId()));
+			jVeri.put("veri",  new JSONNumber(v.getVerification()));
 			jVeriList.put("verification", jVeri);
 		}
 		

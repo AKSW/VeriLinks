@@ -912,7 +912,10 @@ public class Server extends HttpServlet {
 		ResultSet rs = stmt.executeQuery(sqlInstanceQuery);
 		while (rs.next()) {
 			prop = rs.getString("Property");
-			val = parse(rs.getString("Value"));
+			if(prop.equals("<http://dbpedia.org/ontology/thumbnail>"))
+				val = parse(rs.getString("Value"),false); // prefix =false
+			else
+				val = parse(rs.getString("Value"),true);
 			subjectProp.add(new Property(prop, val));
 			echo(i + ".property of subject instance: " + prop + " >> " + val);
 			i++;
@@ -931,7 +934,10 @@ public class Server extends HttpServlet {
 		rs = stmt.executeQuery(sqlInstanceQuery);
 		while (rs.next()) {
 			prop = rs.getString("Property");
-			val = parse(rs.getString("Value"));
+			if(prop.equals("<http://dbpedia.org/ontology/thumbnail>"))
+				val = parse(rs.getString("Value"),false);
+			else
+				val = parse(rs.getString("Value"),true);
 			objectProp.add(new Property(prop, val));
 			echo(i + ".property of subject instance: " + prop + " >> " + val);
 			i++;
@@ -1701,12 +1707,16 @@ public class Server extends HttpServlet {
 
 	/**
 	 * Parse method. Remove brackets and replace prefix with abbreviation
+	 * @param prefix 
 	 */
-	private String parse(String s) {
+	private String parse(String s, boolean prefix) {
 		// Remove '<' and '>'
-		// echo("##Server: Parse "+s+"##");
+		 echo("##Server: Parse "+s+"##");
 		String removedBrackets = s.replaceAll("<", "").replaceAll(">", "");
-		// Set Prefix
+		 echo("##Server: Removed Brackets "+removedBrackets+"##");
+		if(prefix==false)
+			return removedBrackets;
+		 // Set Prefix
 		String buffer;
 		String parsed = "";
 
@@ -1731,12 +1741,12 @@ public class Server extends HttpServlet {
 																			// ??
 				else
 					parsed += split[j];
-				// echo(j+".parsed split: "+parsed);
+				 echo(j+".parsed split: "+parsed);
 			}
 		} else {
 			parsed = setPrefix(removedBrackets);
 		}
-		// echo("Parsed: "+parsed);
+		 echo("Parsed: "+parsed);
 		// echo("##Server: Parse "+s+" done##");
 		return parsed;
 

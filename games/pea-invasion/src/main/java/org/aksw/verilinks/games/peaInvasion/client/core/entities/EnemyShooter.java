@@ -117,7 +117,7 @@ public class EnemyShooter extends Enemy{
   
   private int random(int min, int max) {
 		int r = min + (int)(Math.random() * ((max - min) + 1));
-		System.out.println("Fall position: "+r);
+//		System.out.println("Fall position: "+r);
 		return r;
 	}
 }
