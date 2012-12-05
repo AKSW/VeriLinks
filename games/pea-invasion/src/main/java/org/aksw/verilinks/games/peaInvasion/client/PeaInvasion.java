@@ -2267,7 +2267,7 @@ public class PeaInvasion extends HtmlGame {
 			});
 		} catch (RequestException e) {
 			// Couldn't connect to server
-			echo("ERROR Send score!");
+			echo("ERROR Connect!");
 		}
 	}
 
