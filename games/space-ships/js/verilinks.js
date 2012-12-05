@@ -11,8 +11,8 @@ VERILINKS = (function() {
 	const EVAL_ERROR = -1111;
 	const EVAL_THRESHOLD = 0.3;
 	// const SERVER_URL = "http://localhost:8080/verilinks-server/server";
-	const SERVER_URL = "/verilinks-server/server";
-	
+	// const SERVER_URL = "/verilinks-server/server";
+	const SERVER_URL = "http://[2001:638:902:2010:0:168:35:113]:8080/verilinks-server/";
 	var link = null;
 	// template for displaying
 	var template = null;
@@ -244,7 +244,7 @@ VERILINKS = (function() {
 
 	function templateRequest() {
 		$.ajax({
-			url : SERVER_URL + "?service=getTemplate",
+			url : SERVER_URL + "server?service=getTemplate",
 			success : function(data) {
 				// alert(data);
 				templates = jQuery.parseJSON(data);
@@ -266,7 +266,7 @@ VERILINKS = (function() {
 
 	/** Check request params and generate Request URL */
 	function generateURL(verification) {
-		var url = SERVER_URL + "?service=getLink"
+		var url = SERVER_URL + "server?service=getLink"
 		if (user == null) {
 			alert("user missing");
 			return null;
@@ -380,7 +380,7 @@ VERILINKS = (function() {
 		// Commit user's verification
 		commit : function() {
 			clearTimeout(timeout);
-			var url = SERVER_URL + "?service=commitVerifications";
+			var url = SERVER_URL + "server?service=commitVerifications";
 			var obj = new Commit();
 			var json = JSON.stringify(obj);
 			// alert("data: " + json);
