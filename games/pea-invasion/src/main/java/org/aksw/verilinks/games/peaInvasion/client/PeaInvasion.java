@@ -102,6 +102,8 @@ import com.google.gwt.maps.client.LoadApi.LoadLibrary;
  */
 public class PeaInvasion extends HtmlGame {
 
+//	public static final String SERVER_URL="http://localhost:8080/verilinks-server/";
+	public static final String SERVER_URL="/verilinks-server/";
 	/** Semantic Web nerd, or newbie. */
 	private Configuration config;
 
@@ -1837,7 +1839,7 @@ public class PeaInvasion extends HtmlGame {
 		String data = this.verificationStats.getJson();
 		echo("commit: " + data);
 
-		String url = "http://localhost:8080/verilinks-server/server?service=commitVerifications";
+		String url = SERVER_URL+"server?service=commitVerifications";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
 				URL.encode(url));
 		// StringBuffer postData=new StringBuffer();
@@ -1918,7 +1920,7 @@ public class PeaInvasion extends HtmlGame {
 		if (startOfGame == false)
 			game.worldLoaded = false;
 
-		String url = "http://localhost:8080/verilinks-server/server?service=getLinksets&game=peaInvasion";
+		String url = SERVER_URL+"server?service=getLinksets&game=peaInvasion";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
 		try {
@@ -1991,7 +1993,7 @@ public class PeaInvasion extends HtmlGame {
 		if (startOfGame == false)
 			game.worldLoaded = false;
 
-		String url = "http://localhost:8080/verilinks-server/server?service=getHighscore&game=peaInvasion";
+		String url = SERVER_URL+"server?service=getHighscore&game=peaInvasion";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
 		try {
@@ -2040,7 +2042,7 @@ public class PeaInvasion extends HtmlGame {
 		if (config.isKongregate() == true)
 			sendScoreToKongregate(score);
 
-		String url = "http://localhost:8080/verilinks-server/server?service=postScore&userId="
+		String url = SERVER_URL+"server?service=postScore&userId="
 				+ user.getId()
 				+ "&userName="
 				+ user.getName()
@@ -2080,7 +2082,7 @@ public class PeaInvasion extends HtmlGame {
 		final String objectName = linkset.getObject();
 		System.out.println("Names: " + subjectName + "-" + objectName);
 
-		String url = "http://localhost:8080/verilinks-server/server?service=getTemplate";
+		String url = SERVER_URL+"server?service=getTemplate";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
 		try {
@@ -2245,7 +2247,7 @@ public class PeaInvasion extends HtmlGame {
 
 	/** Connect to server, to get linkset. Check if server is running. */
 	private void connect() {
-		String url = "http://localhost:8080/verilinks-server/server?service=checkStatus";
+		String url = SERVER_URL+"server?service=checkStatus";
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
 		try {
@@ -2298,7 +2300,7 @@ public class PeaInvasion extends HtmlGame {
 		echo("Client: Send user to server!");
 		this.verificationStats.setUser(this.user);
 
-		String url = "http://localhost:8080/verilinks-server/server?service=getUserdata&userId="
+		String url = SERVER_URL+"server?service=getUserdata&userId="
 				+ user.getId() + "&userName=" + user.getName();
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
@@ -2369,7 +2371,7 @@ public class PeaInvasion extends HtmlGame {
 
 		user.calcPlayTime(System.currentTimeMillis());
 
-		String url = "http://localhost:8080/verilinks-server/server?service=disconnect&userId="
+		String url = SERVER_URL+"server?service=disconnect&userId="
 				+ user.getId()
 				+ "&userName="
 				+ user.getName()
@@ -2665,7 +2667,7 @@ public class PeaInvasion extends HtmlGame {
 	}
 
 	private String generateURL(int selection) {
-		String url = "http://localhost:8080/verilinks-server/server?service=getLink";
+		String url = SERVER_URL+"server?service=getLink";
 		url += "&userId=" + user.getId();
 		url += "&userName=" + user.getName();
 		url += "&linkset=" + linkset.getName();
