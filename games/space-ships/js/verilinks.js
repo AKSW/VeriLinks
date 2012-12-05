@@ -10,8 +10,9 @@ VERILINKS = (function() {
 	const EVAL_FIRST = -2;
 	const EVAL_ERROR = -1111;
 	const EVAL_THRESHOLD = 0.3;
-	const SERVER_URL = "http://localhost:8080/verilinks-server/server";
-
+	// const SERVER_URL = "http://localhost:8080/verilinks-server/server";
+	const SERVER_URL = "/verilinks-server/server";
+	
 	var link = null;
 	// template for displaying
 	var template = null;
