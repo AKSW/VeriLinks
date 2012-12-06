@@ -1305,7 +1305,7 @@ public class Server extends HttpServlet {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				s = new Score(rs.getString(1), "id", rs.getInt(2));
+				s = new Score(rs.getString("Name"), rs.getString("ID"), rs.getInt("Score"));
 				sBuff = new JsonObject();
 				sBuff.put("name", s.getName());
 				if (s.getId() == null)
@@ -1321,7 +1321,7 @@ public class Server extends HttpServlet {
 			con.close();
 			// Out
 			hScoreJson.put("highscore", hScoreArray);
-			hScoreJson.put("bla", "test");
+//			hScoreJson.put("bla", "test");
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

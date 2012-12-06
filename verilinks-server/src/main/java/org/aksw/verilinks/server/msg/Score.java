@@ -7,7 +7,7 @@ public class Score {
 	
 	public Score(String name, String id , int score){
 		this.name=name;
-		this.id=null;
+		this.id=id;
 		this.score = score;
 	
 	}
