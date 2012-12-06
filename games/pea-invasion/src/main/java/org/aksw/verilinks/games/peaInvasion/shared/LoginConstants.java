@@ -8,7 +8,7 @@ public class LoginConstants {
   // This app's personal client ID assigned by the Google APIs Console
   // (http://code.google.com/apis/console).
   // Key for deployment
-  public static final String GOOGLE_CLIENT_ID = "23285137063-2i3e7dk79kueejush34uhcqcor0i20mg.apps.googleusercontent.com";
+  public static final String GOOGLE_CLIENT_ID = "23285137063-ajh8tuphttbc4r2l08j6rob1l6ggt1il.apps.googleusercontent.com";
   //Offline Test on localhost use this Facebook Key
 //  public static final String GOOGLE_CLIENT_ID = "23285137063.apps.googleusercontent.com";
   
