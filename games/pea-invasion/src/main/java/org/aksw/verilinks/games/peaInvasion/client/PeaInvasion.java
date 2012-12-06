@@ -102,8 +102,8 @@ import com.google.gwt.maps.client.LoadApi.LoadLibrary;
  */
 public class PeaInvasion extends HtmlGame {
 
-	public static final String SERVER_URL="http://localhost:8080/verilinks-server/";
-//	public static final String SERVER_URL="http://verilinks.aksw.org/";
+//	public static final String SERVER_URL="http://localhost:8080/verilinks-server/";
+	public static final String SERVER_URL="http://verilinks.aksw.org/";
 	/** Semantic Web nerd, or newbie. */
 	private Configuration config;
 
