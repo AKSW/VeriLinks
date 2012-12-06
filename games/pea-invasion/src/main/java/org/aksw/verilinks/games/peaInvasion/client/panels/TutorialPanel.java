@@ -90,7 +90,7 @@ public class TutorialPanel extends VerticalPanel {
 		picPanel.add(pic);
 		// Text
 		textHTML = new HTML();
-		String text = "Welcome to the Veri-Links Tutorial! "
+		String text = "Welcome to the Pea-Invasion Tutorial! "
 				+ "Click 'Next' to start the short tutorial or click 'Skip Tutorial' to start the game";
 		textHTML.setHTML(text);
 		textHTML.setStyleName("tutorialPanel_text");

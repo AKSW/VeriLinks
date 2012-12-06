@@ -11,7 +11,7 @@
 		<script type="text/javascript">
 			var xmlHttp = null;
 			var gotLinkTask = false;
-			var rootURL ="/verilinks-server/";
+			var rootURL ="";
 			function getLinkTasks() {
 				// show
 				if (document.getElementById('processLinkTask').style.display == "none")
@@ -23,7 +23,7 @@
 				// http req
 				if (gotLinkTask)
 					return;
-				var url = rootURL+ "server?service=getTasks";
+				var url = rootURL+ "/server?service=getTasks";
 				xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = processRequest;
 				xmlHttp.open("GET", url, true);
@@ -44,7 +44,7 @@
 			}
 
 			function performLinkTask() {
-				var url = rootURL+"server?service=performTasks";
+				var url = rootURL+"/server?service=performTasks";
 				xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = processAnswer;
 				xmlHttp.open("GET", url, true);
@@ -61,7 +61,6 @@
 			function parseLinkTask(task) {
 				if (task.tasks.length == 0) {
 					document.getElementById("msg").innerHTML = "No task to perform!";
-					document.getElementById("performBtn").disabled = true;
 				}
 				else
 					document.getElementById("performBtn").disabled = false;
@@ -300,7 +299,7 @@
 					</tr>
 				</table>
 				<p id='msg'></p>
-				<button id='performBtn' onclick="performLinkTask()">
+				<button id='performBtn'  disabled = 'true' onclick="performLinkTask()">
 					Perform Link-Task
 				</button>
 			</div>

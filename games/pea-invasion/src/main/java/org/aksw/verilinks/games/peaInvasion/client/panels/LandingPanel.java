@@ -56,12 +56,12 @@ public class LandingPanel extends VerticalPanel{
 //    DOM.setStyleAttribute(enemyImage.getElement(), "marginLeft", "10px");
     DOM.setStyleAttribute(enemyImage.getElement(), "border", "1px solid black");
     
-    HTML head =new HTML("Welcome to Veri-Links");
+    HTML head =new HTML("Welcome to Pea-Invasion");
     head.setStyleName("landingPanel_head");
     DOM.setStyleAttribute(head.getElement(), "borderBottom", "1px dashed black");
     
-    HTML info = new HTML("<b>Veri-Links</b> belongs to the <i>Games With A Purpose</i> <a href='http://en.wikipedia.org/wiki/Human-based_computation_game' target='_blank'>(GWAP)</a> genre. " +
-    		"Playing Veri-Links means turning this world in to a better place.. well.. kind of.. " +
+    HTML info = new HTML("<b>Pea-Invasion</b> belongs to the <i>Games With A Purpose</i> <a href='http://en.wikipedia.org/wiki/Human-based_computation_game' target='_blank'>(GWAP)</a> genre. " +
+    		"Playing Pea-Invasion means turning this world in to a better place.. well.. kind of.. " +
     		"<br><br>While playing this game, you'll generate useful data as a byproduct - which will be used to improve the semantic web. " +
     		"The data is collected when you answer the questions in the <a href='#' class='infoBlack'><b>quiz</b>" +
     		"<span><b><i>Note:</i><br>You will verify links of the semantic web. Compare 2 instances of 2 different ontologies and decide whether their relation is valid or not.</b></span></a>. " +
