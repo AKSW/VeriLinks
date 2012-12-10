@@ -132,16 +132,73 @@
 		_playerTwo.hpText = new Kinetic.Text(_playerTwo.hpConf);
 		_playerTwo.TextLayer.add(_playerTwo.hpText);
 
-		// fill the bg
-		var colors = ["#ffffff", "#dddddd", "#bbbbbb", "#999999"];
-		var sizes = [0.5, 0.8, 1];
+		// add particles fog
+		var fogColorsAll =[
+			["#dc6a19", "#c69d22", "#6c1d1a"], // set one
+			["#a4aefe", "#24466b", "#5e6acb"], // set two
+			["#a254ce", "#522462", "#9a4dc1"] // set three
+		];
+		var fogColors = fogColorsAll[Math.floor(Math.random() * fogColorsAll.length)];
+		var fog, x, y, radius, gradient, color;
+		for(i = 0; i < 10000; i++) {
+			x = Math.random() * _options.width;
+			y = Math.random() * _options.height;
+			radius = 10 + Math.random() * 10;
+			color = fogColors[Math.floor(Math.random() * fogColors.length)];
+
+			gradient = {
+				start: {
+					x: 0,
+					y: 0,
+					radius: 0
+				},
+				end: {
+					x: 0,
+					y: 0,
+					radius: radius
+				},
+				colorStops: [0, "#ffffff", 0.4, color, 0.5, color, 1, "#000000"]
+			};
+
+			fog = new Kinetic.Circle({
+				x: x,
+				y: y,
+				radius: radius,
+				blur: 10 + Math.random()*5,
+				fill: gradient,
+				opacity: 0.03,
+				strokeWidth: 0
+			});
+			bgLayer.add(fog);
+		}
+
+		// fill the bg with start
+		var colors = ["#cccccc", "#dddddd", "#bbbbbb", "#999999"];
+		var sizes = [0.5, 1, 2];
 		var star, i;
-		for ( i = 0; i < 500; i++) {
+		for(i = 0; i < 200; i++) {
+			color = colors[Math.floor(Math.random() * colors.length)];
+			radius = sizes[Math.floor(Math.random() * sizes.length)];
+			gradient = {
+				start: {
+					x: 0,
+					y: 0,
+					radius: 0
+				},
+				end: {
+					x: 0,
+					y: 0,
+					radius: radius
+				},
+				colorStops: [0, "#ffffff", 0.4, color, 0.5, color, 1, "#000000"]
+			};
+
 			star = new Kinetic.Circle({
 				x : Math.random() * _options.width,
 				y : Math.random() * _options.height,
-				radius : sizes[Math.floor(Math.random() * sizes.length)],
-				fill : colors[Math.floor(Math.random() * colors.length)]
+				radius : radius,
+				fill : gradient,
+				blur: 30 + Math.random()*30
 			});
 			bgLayer.add(star);
 		}
@@ -164,7 +221,7 @@
 		else
 			col = "white";
 
-		if (_msg.TextLayer == null) {
+		if (_msg.TextLayer === null) {
 			_msg.TextLayer = new Kinetic.Layer();
 			_msg.hpConf = {
 				x : _options.width / 2.5,
@@ -184,7 +241,7 @@
 			_msg.TextLayer.add(_msg.hpText);
 			_stage.draw();
 		}
-	}
+	};
 
 	Game.prototype.drawPlayers = function() {
 		var stage = _stage;
