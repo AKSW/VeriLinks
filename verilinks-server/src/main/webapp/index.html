@@ -24,7 +24,7 @@
 				// http req
 				if (gotLinkTask)
 					return;
-				var url = rootURL+ "/verilinks-server/server?service=getTasks";
+				var url = rootURL+ "/server?service=getTasks";
 				xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = processRequest;
 				xmlHttp.open("GET", url, true);
@@ -45,7 +45,7 @@
 
 			function performLinkTask() {
 				document.getElementById("performBtn").disabled = false;
-				var url = rootURL+"/verilinks-server/server?service=performTasks";
+				var url = rootURL+"/server?service=performTasks";
 				xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = processAnswer;
 				xmlHttp.open("GET", url, true);
@@ -122,7 +122,7 @@
 			}
 			
 			function getTemplate(){
-				var url = rootURL+ "/verilinks-server/server?service=getTemplate";
+				var url = rootURL+ "/server?service=getTemplate";
 				var xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = function(){
 					if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
