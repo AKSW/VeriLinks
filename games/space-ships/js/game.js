@@ -86,51 +86,37 @@
 		// layer
 		var bgLayer = new Kinetic.Layer();
 
-		// player 1 avatar
-		var avatarHolder = new Kinetic.Rect({
-			x : 0,
-			y : 0,
-			width : 100,
-			height : 100,
-			fill : '#CCCCCC',
-			stroke : '#CCCCCC',
-			strokeWidth : 1
-		});
-		bgLayer.add(avatarHolder);
-		_playerOne.TextLayer = new Kinetic.Layer();
-		_playerOne.hpConf = {
-			x : 10,
-			y : 110,
-			text : "100 / 100",
-			fontSize : 16,
-			fontFamily : "Calibri",
-			textFill : "white"
-		};
-		_playerOne.hpText = new Kinetic.Text(_playerOne.hpConf);
-		_playerOne.TextLayer.add(_playerOne.hpText);
-
-		// player 2 avatar
-		avatarHolder = new Kinetic.Rect({
-			x : _options.width - 100,
-			y : 0,
-			width : 100,
-			height : 100,
-			fill : '#CCCCCC',
-			stroke : '#CCCCCC',
-			strokeWidth : 1
-		});
-		bgLayer.add(avatarHolder);
-		_playerTwo.TextLayer = new Kinetic.Layer();
-		_playerTwo.hpConf = {
-			x : _options.width - 90,
-			y : 110,
-			text : "100 / 100",
-			fontSize : 16,
-			fontFamily : "Calibri",
-			textFill : "white"
-		};
-		_playerTwo.hpText = new Kinetic.Text(_playerTwo.hpConf);
-		_playerTwo.TextLayer.add(_playerTwo.hpText);
+		// draw planets
+		var num1 = 1 + Math.floor(Math.random()*4),
+			num2 = 4 + Math.floor(Math.random()*4),
+			num3 = 8 + Math.floor(Math.random()*4),
+			size1 = 50 + Math.floor( Math.random() * 100 ),
+			size2 = 50 + Math.floor( Math.random() * 100 ),
+			size3 = 50 + Math.floor( Math.random() * 100 );
+		loadSprite("img/planets/planet_"+num1+".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : Math.random() * 150,
+			rotation : Math.random() * Math.PI * 2,
+			width : size1,
+			height : size1,
+			opacity: 0.15
+		}, bgLayer, _stage);
+		loadSprite("img/planets/planet_"+num2+".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : 150 + Math.random() * (_options.height / 2 - 150),
+			rotation : Math.random() * Math.PI * 2,
+			width : size2,
+			height : size2,
+			opacity: 0.4
+		}, bgLayer, _stage);
+		loadSprite("img/planets/planet_"+num3+".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : (_options.height / 2) + Math.random() * (_options.height / 2 - 150),
+			rotation : Math.random() * Math.PI * 2,
+			width : size3,
+			height : size3,
+			opacity: 0.25
+		}, bgLayer, _stage);
 
 		// add particles fog
 		var fogColorsAll =[
@@ -202,6 +188,52 @@
 			});
 			bgLayer.add(star);
 		}
+
+		// player 1 avatar
+		var avatarHolder = new Kinetic.Rect({
+			x : 0,
+			y : 0,
+			width : 100,
+			height : 100,
+			fill : '#CCCCCC',
+			stroke : '#CCCCCC',
+			strokeWidth : 1
+		});
+		bgLayer.add(avatarHolder);
+		_playerOne.TextLayer = new Kinetic.Layer();
+		_playerOne.hpConf = {
+			x : 10,
+			y : 110,
+			text : "100 / 100",
+			fontSize : 16,
+			fontFamily : "Calibri",
+			textFill : "white"
+		};
+		_playerOne.hpText = new Kinetic.Text(_playerOne.hpConf);
+		_playerOne.TextLayer.add(_playerOne.hpText);
+
+		// player 2 avatar
+		avatarHolder = new Kinetic.Rect({
+			x : _options.width - 100,
+			y : 0,
+			width : 100,
+			height : 100,
+			fill : '#CCCCCC',
+			stroke : '#CCCCCC',
+			strokeWidth : 1
+		});
+		bgLayer.add(avatarHolder);
+		_playerTwo.TextLayer = new Kinetic.Layer();
+		_playerTwo.hpConf = {
+			x : _options.width - 90,
+			y : 110,
+			text : "100 / 100",
+			fontSize : 16,
+			fontFamily : "Calibri",
+			textFill : "white"
+		};
+		_playerTwo.hpText = new Kinetic.Text(_playerTwo.hpConf);
+		_playerTwo.TextLayer.add(_playerTwo.hpText);
 
 		// add the layer to the stage
 		_stage.add(bgLayer);
