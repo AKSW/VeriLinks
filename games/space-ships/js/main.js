@@ -1,7 +1,7 @@
 require([
     "kinetic.min",
     "game",
-    //"verilinks"
+    "verilinks"
 ], function(){
     // init game
     var game = new Game('gameContainer');
