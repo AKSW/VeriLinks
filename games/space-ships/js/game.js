@@ -4,13 +4,17 @@
 		msg : "Game Messages"
 	};
 
-	var _stage, _projectileLayer, _clock, _bulletRed, _bulletWhite;
+	var _stage, _projectileLayer, _clock,
+		_bulletRed, _bulletWhite,
+		_explosionSpritesheet, _explodeAnim;
 
 	var _options = {
 		"frameRate" : 60,
 		"width" : 800,
 		"height" : 600
 	};
+	// time of round in seconds
+	var _roundTime = 10;
 
 	var _playerOne = {
 		hp : 100
@@ -27,14 +31,37 @@
 
 			// add the shape to the layer
 			layer.add(sprite);
+			layer.draw();
 
 			// add the layer to the stage
-			stage.add(layer);
+			if ( typeof stage !== "undefined" )
+				stage.add(layer);
 
 			if ( typeof callback !== "undefined")
 				callback(sprite);
 		};
 		imageObj.src = url;
+	};
+
+	var preloadResources = function() {
+		// preload projectiles
+		_bulletRed = new Image();
+		_bulletRed.src = "img/plasma-red.png";
+		_bulletWhite = new Image();
+		_bulletWhite.src = "img/plasma-white.png";
+		// make explosion
+		_explosionSpritesheet = new Image();
+		_explosionSpritesheet.src = "img/explosion.png";
+		prepareExplosionSprite();
+	};
+
+	var prepareExplosionSprite = function() {
+		var i, j, explode = [];
+		for(i = 0; i < 5; i++)
+			for(j = 0; j < 5; j++)
+				explode.push({x:i*64, y:j*64, width:64, height:64});
+
+		_explodeAnim = {explode: explode};
 	};
 
 	var Game = function(containerId) {
@@ -55,7 +82,7 @@
 		});
 
 		// preload resources
-		this.preloadResources();
+		preloadResources();
 		// create bg
 		this.createBackground();
 		// draw players
@@ -74,17 +101,112 @@
 		return this;
 	};
 
-	Game.prototype.preloadResources = function() {
-		// preload projectiles
-		_bulletRed = new Image();
-		_bulletRed.src = "img/plasma-red.png";
-		_bulletWhite = new Image();
-		_bulletWhite.src = "img/plasma-white.png";
-	};
-
 	Game.prototype.createBackground = function() {
 		// layer
 		var bgLayer = new Kinetic.Layer();
+
+		// draw planets
+		var num1 = 1 + Math.floor(Math.random()*4),
+			num2 = 4 + Math.floor(Math.random()*4),
+			num3 = 8 + Math.floor(Math.random()*4),
+			size1 = 50 + Math.floor( Math.random() * 100 ),
+			size2 = 50 + Math.floor( Math.random() * 100 ),
+			size3 = 50 + Math.floor( Math.random() * 100 );
+		loadSprite("img/planets/planet_"+num1+".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : Math.random() * 150,
+			rotation : Math.random() * Math.PI * 2,
+			width : size1,
+			height : size1,
+			opacity: 0.15
+		}, bgLayer);
+		loadSprite("img/planets/planet_"+num2+".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : 150 + Math.random() * (_options.height / 2 - 150),
+			rotation : Math.random() * Math.PI * 2,
+			width : size2,
+			height : size2,
+			opacity: 0.4
+		}, bgLayer);
+		loadSprite("img/planets/planet_"+num3+".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : (_options.height / 2) + Math.random() * (_options.height / 2 - 150),
+			rotation : Math.random() * Math.PI * 2,
+			width : size3,
+			height : size3,
+			opacity: 0.25
+		}, bgLayer);
+
+		// add particles fog
+		var fogColorsAll =[
+			["#dc6a19", "#c69d22", "#6c1d1a"], // set one
+			["#a4aefe", "#24466b", "#5e6acb"], // set two
+			["#a254ce", "#522462", "#9a4dc1"] // set three
+		];
+		var fogColors = fogColorsAll[Math.floor(Math.random() * fogColorsAll.length)];
+		var fog, x, y, radius, gradient, color;
+		for(i = 0; i < 10000; i++) {
+			x = Math.random() * _options.width;
+			y = Math.random() * _options.height;
+			radius = 10 + Math.random() * 10;
+			color = fogColors[Math.floor(Math.random() * fogColors.length)];
+
+			gradient = {
+				start: {
+					x: 0,
+					y: 0,
+					radius: 0
+				},
+				end: {
+					x: 0,
+					y: 0,
+					radius: radius
+				},
+				colorStops: [0, "#ffffff", 0.4, color, 0.5, color, 1, "#000000"]
+			};
+
+			fog = new Kinetic.Circle({
+				x: x,
+				y: y,
+				radius: radius,
+				blur: 10 + Math.random()*5,
+				fill: gradient,
+				opacity: 0.03,
+				strokeWidth: 0
+			});
+			bgLayer.add(fog);
+		}
+
+		// fill the bg with start
+		var colors = ["#cccccc", "#dddddd", "#bbbbbb", "#999999"];
+		var sizes = [0.5, 1, 2];
+		var star, i;
+		for(i = 0; i < 200; i++) {
+			color = colors[Math.floor(Math.random() * colors.length)];
+			radius = sizes[Math.floor(Math.random() * sizes.length)];
+			gradient = {
+				start: {
+					x: 0,
+					y: 0,
+					radius: 0
+				},
+				end: {
+					x: 0,
+					y: 0,
+					radius: radius
+				},
+				colorStops: [0, "#ffffff", 0.4, color, 0.5, color, 1, "#000000"]
+			};
+
+			star = new Kinetic.Circle({
+				x : Math.random() * _options.width,
+				y : Math.random() * _options.height,
+				radius : radius,
+				fill : gradient,
+				blur: 30 + Math.random()*30
+			});
+			bgLayer.add(star);
+		}
 
 		// player 1 avatar
 		var avatarHolder = new Kinetic.Rect({
@@ -132,20 +254,6 @@
 		_playerTwo.hpText = new Kinetic.Text(_playerTwo.hpConf);
 		_playerTwo.TextLayer.add(_playerTwo.hpText);
 
-		// fill the bg
-		var colors = ["#ffffff", "#dddddd", "#bbbbbb", "#999999"];
-		var sizes = [0.5, 0.8, 1];
-		var star, i;
-		for ( i = 0; i < 500; i++) {
-			star = new Kinetic.Circle({
-				x : Math.random() * _options.width,
-				y : Math.random() * _options.height,
-				radius : sizes[Math.floor(Math.random() * sizes.length)],
-				fill : colors[Math.floor(Math.random() * colors.length)]
-			});
-			bgLayer.add(star);
-		}
-
 		// add the layer to the stage
 		_stage.add(bgLayer);
 		_stage.add(_playerOne.TextLayer);
@@ -164,7 +272,7 @@
 		else
 			col = "white";
 
-		if (_msg.TextLayer == null) {
+		if (_msg.TextLayer === null) {
 			_msg.TextLayer = new Kinetic.Layer();
 			_msg.hpConf = {
 				x : _options.width / 2.5,
@@ -184,7 +292,7 @@
 			_msg.TextLayer.add(_msg.hpText);
 			_stage.draw();
 		}
-	}
+	};
 
 	Game.prototype.drawPlayers = function() {
 		var stage = _stage;
@@ -197,14 +305,15 @@
 			rotation : Math.PI / 2,
 			width : 100,
 			height : 100
-		}, layer, stage);
+		}, layer);
 		loadSprite("img/av1.jpg", {
 			x : 0,
 			y : 0,
 			width : 100,
 			height : 100
-		}, layer, stage);
+		}, layer);
 		_playerOne.x = 120;
+		_playerOne.y = stage.getHeight() / 3;
 
 		// player 2
 		loadSprite("img/ship2.png", {
@@ -213,14 +322,17 @@
 			rotation : -Math.PI / 2,
 			width : 100,
 			height : 100
-		}, layer, stage);
+		}, layer);
 		loadSprite("img/av2.gif", {
 			x : _options.width - 100,
 			y : 0,
 			width : 100,
 			height : 100
-		}, layer, stage);
+		}, layer);
 		_playerTwo.x = _options.width - 100;
+		_playerTwo.y = stage.getHeight() / 3;
+
+		stage.add(layer);
 	};
 
 	var shoot = function(fromPlayer, toPlayer, damage, bullet) {
@@ -236,13 +348,13 @@
 
 		var yellowGroup = new Kinetic.Group({
 			x : fromPlayer.x,
-			y : _options.height / 2 - 50
+			y : _options.height / 2 - 70
 		});
 		var bulletSprite;
 		for (var i = 0; i < 10; i++) {
 			bulletSprite = new Kinetic.Image({
-				x : 0,
-				y : Math.random() * 100,
+				x : Math.random() * 5,
+				y : i * 7,
 				rotation : rot,
 				image : bullet,
 				width : 50,
@@ -262,11 +374,15 @@
 		var anim = new Kinetic.Animation({
 			func : function(frame) {
 				if ((yellowGroup.getX() >= endX && toPlayer.x > fromPlayer.x) || (yellowGroup.getX() <= endX && toPlayer.x < fromPlayer.x)) {
+					// clear animation
 					anim.stop();
 					anim = null;
 					projectileLayer.remove(yellowGroup);
 					_stage.remove(projectileLayer);
 					yellowGroup = null;
+					// show explosion
+					createExplosion(toPlayer);
+					// damage
 					damagePlayer(toPlayer, damage);
 				} else {
 					yellowGroup.move(step, 0);
@@ -275,6 +391,29 @@
 			node : projectileLayer
 		});
 		anim.start();
+	};
+
+	var createExplosion = function(player) {
+		var explosionLayer = new Kinetic.Layer();
+
+		var x = player.x < 200 ? (player.x - 50) : (player.x);
+		var explosionSprite = new Kinetic.Sprite({
+			x: x,
+			y: player.y,
+			image: _explosionSpritesheet,
+			animation: "explode",
+			animations: _explodeAnim,
+			frameRate: 15
+		});
+		explosionSprite.afterFrame(2,function(){
+			explosionSprite.stop();
+			explosionLayer.remove(explosionSprite);
+			_stage.remove(explosionLayer);
+		});
+		explosionLayer.add(explosionSprite);
+
+		_stage.add(explosionLayer);
+		explosionSprite.start();
 	};
 
 	var damagePlayer = function(player, damage) {
@@ -293,7 +432,7 @@
 	};
 
 	var startCountdown = function() {
-		var timeTotal = 10;
+		var timeTotal = _roundTime;
 		var oldClockLayer = null, oldClock = null;
 		var drawClock = function() {
 			if (oldClock !== null)
@@ -326,8 +465,12 @@
 		VERILINKS.commit();
 		VERILINKS.lock();
 
+		// shoot one
 		shoot(_playerOne, _playerTwo, 10, _bulletRed);
-		shoot(_playerTwo, _playerOne, 10, _bulletWhite);
+		// shoot two with delay
+		setTimeout(function(){
+			shoot(_playerTwo, _playerOne, 10, _bulletWhite);
+		},500);
 	};
 
 	Game.prototype.shoot = function(fromPlayer, toPlayer, damage) {

@@ -1,6 +1,7 @@
 require([
     "kinetic.min",
-    "game"
+    "game",
+    "verilinks"
 ], function(){
     // init game
     var game = new Game('gameContainer');
@@ -11,6 +12,7 @@ require([
     };
     
     window.drawMsg = function(msg){
-	game.drawMsg(msg);};
+        game.drawMsg(msg);
+    };
 	
 });
