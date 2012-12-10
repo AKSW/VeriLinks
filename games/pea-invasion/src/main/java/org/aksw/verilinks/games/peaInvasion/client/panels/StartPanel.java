@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.aksw.verilinks.games.peaInvasion.shared.Configuration;
-import org.aksw.verilinks.games.peaInvasion.shared.Linkset;
+import org.aksw.verilinks.games.peaInvasion.shared.msg.Linkset;
 
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.TextCell;

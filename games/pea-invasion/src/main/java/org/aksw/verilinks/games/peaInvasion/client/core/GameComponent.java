@@ -293,8 +293,6 @@ public class GameComponent implements Game, Pointer.Listener, Keyboard.Listener 
 
             key3Pressed(); 
         }
-        
-        
       }
       
       // PAUSE 

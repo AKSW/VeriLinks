@@ -306,19 +306,46 @@ public class DBTool{
                               PropertyConstants.DB_TABLE_TEMPLATES_PROPERTY_IMAGE +" VARCHAR(150), " +
                                  "PRIMARY KEY("+PropertyConstants.DB_TABLE_TEMPLATES_PROPERTY_NAME+") );";
     
-    String createLinkedOntologiesTable= "CREATE TABLE "+PropertyConstants.DB_TABLE_NAME_LINKEDONTOLOGIES + " ( " +
-    													PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID+ " VARCHAR(50), " +
-                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_SUBJECT+ " VARCHAR(50), " +
-                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_PREDICATE +" VARCHAR(100),"+
-                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_OBJECT + " VARCHAR(50)," +
-                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DESCRIPTION + " VARCHAR(200)," +
-                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DIFFICULTY + " VARCHAR(20)," +
-                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_READY + " TINYINT(1)," +
-                              		"PRIMARY KEY ("+PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID+") );";
+//    String createLinkedOntologiesTable= "CREATE TABLE "+PropertyConstants.DB_TABLE_NAME_LINKEDONTOLOGIES + " ( " +
+//    													PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID+ " VARCHAR(50), " +
+//                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_SUBJECT+ " VARCHAR(50), " +
+//                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_PREDICATE +" VARCHAR(100),"+
+//                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_OBJECT + " VARCHAR(50)," +
+//                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DESCRIPTION + " VARCHAR(200)," +
+//                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DIFFICULTY + " VARCHAR(20)," +
+//                              PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_READY + " TINYINT(1)," +
+//                              		"PRIMARY KEY ("+PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID+") );";
 
     
-  
+    String createLinksetTable= "CREATE TABLE "+PropertyConstants.DB_TABLE_NAME_LINKEDONTOLOGIES + " ( " +
+	PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID+ " VARCHAR(50), " +
+PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_SUBJECT+ " VARCHAR(50) not null, " +
+PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_PREDICATE +" VARCHAR(100) not null,"+
+PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_OBJECT + " VARCHAR(50) not null," +
+"PRIMARY KEY ("+PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID+") );";
     
+    String createTemplateTable= "CREATE TABLE "+PropertyConstants.DB_TABLE_NAME_TEMPLATES + " ( " +
+	PropertyConstants.DB_TABLE_TEMPLATES_ID+ " VARCHAR(100), " +
+PropertyConstants.DB_TABLE_TEMPLATES_LINKSET+ " VARCHAR(50) not null, " +
+PropertyConstants.DB_TABLE_TEMPLATES_DESCRIPTION + " VARCHAR(200)," +
+PropertyConstants.DB_TABLE_TEMPLATES_DIFFICULTY + " VARCHAR(20) not null," +
+PropertyConstants.DB_TABLE_TEMPLATES_READY + " TINYINT(1)," +
+"PRIMARY KEY ("+PropertyConstants.DB_TABLE_TEMPLATES_ID+") );";
+
+    
+    String createTaskTable= "CREATE TABLE "+PropertyConstants.DB_TABLE_NAME_TASK + " ( " +
+	    PropertyConstants.DB_TABLE_TASK_LINKSET+ " VARCHAR(50), " +
+	    PropertyConstants.DB_TABLE_TASK_FILE + " VARCHAR(100)," +
+	    PropertyConstants.DB_TABLE_TASK_TIME + " DATETIME," +
+		PropertyConstants.DB_TABLE_TASK_SUBJECT+ " VARCHAR(50) not null, " +
+		PropertyConstants.DB_TABLE_TASK_PREDICATE +" VARCHAR(100) not null,"+
+		PropertyConstants.DB_TABLE_TASK_OBJECT + " VARCHAR(50) not null," +
+		PropertyConstants.DB_TABLE_TASK_TEMPLATE+ " VARCHAR(100) not null, " +
+		PropertyConstants.DB_TABLE_TASK_DESCRIPTION + " VARCHAR(200)," +
+		PropertyConstants.DB_TABLE_TASK_DIFFICULTY + " VARCHAR(20) not null," +
+		PropertyConstants.DB_TABLE_TASK_DONE + " TINYINT(1)," +
+		"PRIMARY KEY ("+PropertyConstants.DB_TABLE_TASK_LINKSET+" , "+PropertyConstants.DB_TABLE_TASK_FILE+") );";
+
     String createUnsureView = "create view unsure as " +
     		"select ID, (Counter - Positive - Negative) as Unsure from links";
     		
@@ -391,7 +418,9 @@ public class DBTool{
       db.queryUpdate(createInstanceTable, con);
       db.queryUpdate(createHighscoreTable, con);
       //db.queryUpdate(createTemplatesTable, con);
-      db.queryUpdate(createLinkedOntologiesTable, con);
+      db.queryUpdate(createLinksetTable, con);
+      db.queryUpdate(createTemplateTable, con);
+      db.queryUpdate(createTaskTable, con);
       db.queryUpdate(createUserTable, con);
       db.queryUpdate(createPositiveTable, con);
       db.queryUpdate(createNegativeTable, con);

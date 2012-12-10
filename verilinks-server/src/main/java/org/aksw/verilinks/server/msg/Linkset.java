@@ -3,6 +3,7 @@ package org.aksw.verilinks.server.msg;
 public class Linkset{
 
 	private String id;
+	private String template;
 	private String subject;
 	private String object;
 	private String predicate;
@@ -83,6 +84,14 @@ public class Linkset{
 
 	public void setKongregate(boolean kongregate) {
 		this.kongregate = kongregate;
+	}
+
+	public void setTemplate(String template) {
+		this.template = template;
+	}
+
+	public String getTemplate() {
+		return template;
 	}
 	
 }

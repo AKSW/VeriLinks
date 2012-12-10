@@ -64,6 +64,7 @@ public class PropertyConstants {
   public final static String DB_TABLE_NAME_USER = "user";
   public final static String DB_TABLE_NAME_POSITIVE = "positive";
   public final static String DB_TABLE_NAME_NEGATIVE = "negative";
+  public static final String DB_TABLE_NAME_TASK = "tasks";
   
   public final static String DB_TABLE_LINKS_PROPERTY_ID = "ID";
   public final static String DB_TABLE_LINKS_PROPERTY_SUBJECT = "Subject";
@@ -150,6 +151,26 @@ public class PropertyConstants {
 	public static final String DB_TABLE_NAME_DIFFICULTY = "difficulty";
   public final static String DB_TABLE_DIFFICULTY_DIFFICULTY = "Difficulty";
 	public static final String DB_TABLE_DIFFICULTY_LINKEDONTOLOGIES = "linkedOntologies";
+	
+	public static final String DB_TABLE_TASK_TEMPLATE = "Template";
+	public static final String DB_TABLE_TASK_LINKSET = "Linkset";
+	public static final String DB_TABLE_TASK_SUBJECT = "Subject";
+	public static final String DB_TABLE_TASK_OBJECT = "Object";
+	public static final String DB_TABLE_TASK_PREDICATE = "Predicate";
+	public static final String DB_TABLE_TASK_DESCRIPTION = "Description";
+	public static final String DB_TABLE_TASK_FILE = "File";
+	public static final String DB_TABLE_TASK_TIME = "DateTime";
+	public static final String DB_TABLE_TASK_DONE = "Done";
+	public static final String DB_TABLE_TASK_DIFFICULTY = "Difficulty";
+	
+	public static final String DB_TABLE_TEMPLATES_ID = "ID";
+	public static final String DB_TABLE_TEMPLATES_LINKSET = "Linkset";
+	public static final String DB_TABLE_TEMPLATES_DESCRIPTION = "Description";
+	public static final String DB_TABLE_TEMPLATES_DIFFICULTY = "Difficulty";
+	public static final String DB_TABLE_TEMPLATES_READY = "Ready";
+	
+	
+	
 
 
 

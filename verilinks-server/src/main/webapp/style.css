@@ -65,10 +65,15 @@ li{
 	padding: 10px;
 }
 
-#addLinkTask td input{
-	margin: 5px;
+#addLinkTask td {
+	padding: 8px;
 /*	float:right;*/
 }
+
+#addLinkTask input[type="text"] {
+	width: 220px;
+}
+
 .lb {
 	text-align:left;
 /*	font-weight: bold;*/

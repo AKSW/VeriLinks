@@ -1,0 +1,46 @@
+<!-- jsrender template-->
+<table id ='link'>
+	<tr>
+	<td valign=middle><div id='subject'>
+	{{for subject.properties}}
+		{{if property == '<http://dbpedia.org/ontology/thumbnail>'}}
+			<img class='image' title='subject' src='{{:value}}'/>
+		{{else type == 'txt'}}
+			<p>{{>value}}</p>
+		{{else type == 'map'}}
+			{{if property== '<http://www.w3.org/2003/01/geo/wgs84_pos#lat>'}}
+			<p>lat</p>
+			{{else property =='<http://www.w3.org/2003/01/geo/wgs84_pos#long>'}}
+			<p>long</p>
+			{{/if}}
+		{{/if}}
+	{{/for}}</div></td>
+	<td valign=middle><div id='predicate'>{{>predicate}}</div>
+	<div id='buttons'>
+	<p class='vertical-align'>
+	<a href="#" title='True' onclick="VERILINKS.verify(VERILINKS.TRUE())"><img src="img/trueButton.png"></a>
+	</p>
+	<p class='vertical-align'>
+	<a href="#" title='False'onclick="VERILINKS.verify(VERILINKS.FALSE())"><img src="img/falseButton.png"></a>
+	</p>
+	<p class='vertical-align'>
+	<a href="#" title='Unsure' onclick="VERILINKS.verify(VERILINKS.UNSURE())"><img src="img/unsureButton.png"></a>
+	</p>
+	<p class='vertical-align'>
+		<button id='commit' onclick="VERILINKS.commit()">Commit</button>
+	</p>
+	</div></td>
+	<td valign=middle><div id='object'>
+	{{for object.properties}}
+		{{if type == 'img'}}
+			<img class='image' title='object' src='{{:value}}'/>
+		{{else type == 'txt'}}
+			<p>{{>value}}</p>
+		{{else property== '<http://www.w3.org/2003/01/geo/wgs84_pos#lat>'}}
+			{{>~setLat(value)}}
+		{{else property =='<http://www.w3.org/2003/01/geo/wgs84_pos#long>'}}
+			{{>~setLong(value)}}
+		{{/if}}
+	{{/for}}</div></td>
+	</tr>
+</table>

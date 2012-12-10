@@ -56,15 +56,14 @@ import org.xml.sax.SAXException;
  */
 public class Server extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Server() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Server() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	/** User List */
 	private HashMap<String, User> userList;
@@ -88,7 +87,7 @@ public class Server extends HttpServlet {
 	private static final int VALID = 1;
 	private static final int INVALID = 0;
 	private static final int UNSURE = -1;
-	
+
 	/** Resource path */
 	private String resourcePath = null;
 
@@ -106,8 +105,6 @@ public class Server extends HttpServlet {
 
 	/** Prefix Map **/
 	private HashMap<String, String> prefixMap;
-
-	
 
 	@Override
 	public void init() throws ServletException {
@@ -278,7 +275,7 @@ public class Server extends HttpServlet {
 		String service = req.getParameter("service");
 		echo("Req: " + service);
 		String response = null;
-		if(service == null)
+		if (service == null)
 			response = "Server running!";
 		else if (service.equals(GET_USERDATA)) // Userdata
 			response = getUserdata(req.getParameter("userId"),
@@ -295,13 +292,14 @@ public class Server extends HttpServlet {
 		else if (service.equals(GET_LINKSETS)) // Linkset
 			response = getLinkset().toString();
 		else if (service.equals(GET_TEMPLATE))
-			response = getTemplate();
+			response = getTemplate(req.getParameter("template"));
 		else if (service.equals(GET_TASKS))
 			response = getTasks().toString();
 		else if (service.equals(PERFORM_TASKS))
 			response = taskPerform();
 		else if (service.equals(DISCONNECT_USER))
-			response = disconnectUser(req.getParameter("userName"),req.getParameter("userId"),req.getParameter("time"));
+			response = disconnectUser(req.getParameter("userName"),
+					req.getParameter("userId"), req.getParameter("time"));
 		else if (service.equals(CHECK_STATUS))
 			response = "Server running!";
 
@@ -318,7 +316,7 @@ public class Server extends HttpServlet {
 		}
 		echo(response);
 		resp.getWriter().write(response);
-//		resp.getWriter().write("bla");
+		// resp.getWriter().write("bla");
 	}
 
 	private String postScore(String id, String userName, String score,
@@ -327,8 +325,8 @@ public class Server extends HttpServlet {
 		try {
 			DBTool db = new DBTool(resourcePath + dbIniFile);
 			con = db.getConnection();
-			String query = "INSERT IGNORE INTO highscores (ID, Name, Score) VALUES  ('" + id
-					+ "' , '" + userName + "' ," + score + ")";
+			String query = "INSERT IGNORE INTO highscores (ID, Name, Score) VALUES  ('"
+					+ id + "' , '" + userName + "' ," + score + ")";
 			Statement stmt = con.createStatement();
 			stmt.executeUpdate(query);
 			con.close();
@@ -365,19 +363,19 @@ public class Server extends HttpServlet {
 		echo("CommitVerification: " + req);
 		if (req.getParameterMap().size() != 2) {
 			echo("param: " + req.getParameterMap().size());
-//			return "Error: Invalid request parameters!";
+			// return "Error: Invalid request parameters!";
 		}
-		
+
 		// ParseJson
 		echo("get param names:");
-		ArrayList<Verification> verifications =null;
+		ArrayList<Verification> verifications = null;
 		User user = new User();
 		List<String> requestParameterNames = Collections
 				.list((Enumeration<String>) req.getParameterNames());
-		echo("Size: "+requestParameterNames.size());
+		echo("Size: " + requestParameterNames.size());
 		for (String parameterName : requestParameterNames) {
 			echo("param Name: " + parameterName);
-			if (!parameterName.equals("service")){
+			if (!parameterName.equals("service")) {
 				echo("not equals service!");
 				// veri
 				verifications = parseJson(parameterName);
@@ -386,7 +384,7 @@ public class Server extends HttpServlet {
 				JsonObject j = JSON.parse(parameterName);
 				echo("j!");
 				JsonObject jUser = j.get("user").getAsObject();
-				echo("Jsuer: "+jUser.toString());
+				echo("Jsuer: " + jUser.toString());
 				String userId = jUser.get("id").toString();
 				String userName = jUser.get("name").toString();
 				user.setId(userId);
@@ -395,7 +393,7 @@ public class Server extends HttpServlet {
 				echo("set user done");
 			}
 		}
-		
+
 		// Connect to db
 		DBTool db = new DBTool(resourcePath + dbIniFile);
 		Connection con = db.getConnection();
@@ -406,11 +404,11 @@ public class Server extends HttpServlet {
 		// Get user strength
 		double userStrength = 0;
 		try {
-			userStrength = getUserStrength(user.getName(),user.getId(),con);
+			userStrength = getUserStrength(user.getName(), user.getId(), con);
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-			echo("Get User strength error! "+e1.getMessage());
+			echo("Get User strength error! " + e1.getMessage());
 			return "ERROR: Get user strength!";
 		}
 
@@ -421,23 +419,23 @@ public class Server extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		JsonObject str = new JsonObject();
 		str.put("userstrength", Balancing.getStringUserStrength(userStrength));
-		
-		echo("Commitverification done: User strength: "+userStrength);
-		
+
+		echo("Commitverification done: User strength: " + userStrength);
+
 		return str.toString();
 	}
 
 	private ArrayList<Verification> parseJson(String data) {
 		echo("Parse Json: " + data);
 		ArrayList<Verification> arr = new ArrayList<Verification>();
-		
+
 		try {
 			JsonObject j = JSON.parse(data);
-//			String userId = j.get("userId").toString();
-//			String userName = j.get("userName").toString();
+			// String userId = j.get("userId").toString();
+			// String userName = j.get("userName").toString();
 			JsonValue veriValue = j.get("verification");
 			echo("verivalue: " + veriValue);
 
@@ -461,12 +459,12 @@ public class Server extends HttpServlet {
 		return arr;
 	}
 
-	
-
 	/**
 	 * Update db
+	 * 
 	 * @param con
-	 * @param verifications currentList
+	 * @param verifications
+	 *            currentList
 	 * @param agree
 	 * @param disagree
 	 * @param unsure
@@ -475,89 +473,112 @@ public class Server extends HttpServlet {
 	 * @return userStrength
 	 */
 	private void updateDB(Connection con,
-			ArrayList<Verification> verifications, int agree, int disagree, int unsure, int penalty, User user, boolean credible) {
+			ArrayList<Verification> verifications, int agree, int disagree,
+			int unsure, int penalty, User user, boolean credible) {
 
-		echo("##Server: Commit Verifications of User " + user.getName() + "####");
-		
+		echo("##Server: Commit Verifications of User " + user.getName()
+				+ "####");
 
 		// Links statistics
 		updateLinksStatistics(con, verifications, user, credible);
-		
+
 		// User statistics
-//		updateUserStatistics(con, verifications, agree, disagree, unsure, penalty, user);
-		
-		
-//		return msg;
+		// updateUserStatistics(con, verifications, agree, disagree, unsure,
+		// penalty, user);
+
+		// return msg;
 	}
 
-	private void updateUserStatistics(Connection con, ArrayList<Verification> verifications, int agree,  int disagree, int unsure, int penalty, User user) {
-		String sqlQuery=null;
-		Statement dbStmt=null;
-		
+	private void updateUserStatistics(Connection con,
+			ArrayList<Verification> verifications, int agree, int disagree,
+			int unsure, int penalty, User user) {
+		String sqlQuery = null;
+		Statement dbStmt = null;
+
 		// Gaming stats
-		if(user.getCurrentLevel()<4){
+		if (user.getCurrentLevel() < 4) {
 			try {
 				echo("\n>>>>Update GameStats for user '" + user.getName() + "'");
 				// Level cleared
-				sqlQuery = "UPDATE user SET `Level"
-						+ user.getCurrentLevel() + "Cleared` = (`Level"+user.getCurrentLevel()+"Cleared` +1) "
-						+ "WHERE `" + PropertyConstants.DB_TABLE_USER_ID +"` = '"+user.getId()+"' AND `"
-						+ PropertyConstants.DB_TABLE_USER_NAME +"` = '"+user.getName()+"' ";
+				sqlQuery = "UPDATE user SET `Level" + user.getCurrentLevel()
+						+ "Cleared` = (`Level" + user.getCurrentLevel()
+						+ "Cleared` +1) " + "WHERE `"
+						+ PropertyConstants.DB_TABLE_USER_ID + "` = '"
+						+ user.getId() + "' AND `"
+						+ PropertyConstants.DB_TABLE_USER_NAME + "` = '"
+						+ user.getName() + "' ";
 				dbStmt = con.createStatement();
 				dbStmt.executeUpdate(sqlQuery);
-				echo("Update level cleared query: "+sqlQuery);
+				echo("Update level cleared query: " + sqlQuery);
 				// Duration for level
-				double time = user.getCurrentLevelTime()/1000;
-				sqlQuery = "UPDATE user SET `Level"
-					+ user.getCurrentLevel() + "Time` = (`Level"+user.getCurrentLevel()+"Time` +"+ time+") "
-					+ "WHERE `" + PropertyConstants.DB_TABLE_USER_ID +"` = '"+user.getId()+"' AND `"
-					+ PropertyConstants.DB_TABLE_USER_NAME +"` = '"+user.getName()+"' ";
-				echo("Update level cleared TIME query: "+sqlQuery);
+				double time = user.getCurrentLevelTime() / 1000;
+				sqlQuery = "UPDATE user SET `Level" + user.getCurrentLevel()
+						+ "Time` = (`Level" + user.getCurrentLevel()
+						+ "Time` +" + time + ") " + "WHERE `"
+						+ PropertyConstants.DB_TABLE_USER_ID + "` = '"
+						+ user.getId() + "' AND `"
+						+ PropertyConstants.DB_TABLE_USER_NAME + "` = '"
+						+ user.getName() + "' ";
+				echo("Update level cleared TIME query: " + sqlQuery);
 				dbStmt.executeUpdate(sqlQuery);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+
 		// Verification stats
 		try {
 			// Agree
-			String sqlAgree = "update user set Agreement = (Agreement + "+agree+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			String sqlAgree = "update user set Agreement = (Agreement + "
+					+ agree + ") where UserName= '" + user.getName()
+					+ "' AND UserID='" + user.getId() + "'";
 			echo(sqlAgree);
 			// Disagree
-			String sqlDisagree = "update user set Disagreement = (Disagreement + "+disagree+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			String sqlDisagree = "update user set Disagreement = (Disagreement + "
+					+ disagree
+					+ ") where UserName= '"
+					+ user.getName()
+					+ "' AND UserID='" + user.getId() + "'";
 			echo(sqlDisagree);
 			// Unsure
-			String sqlUnsure = "update user set Unsure = (Unsure + "+unsure+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			String sqlUnsure = "update user set Unsure = (Unsure + " + unsure
+					+ ") where UserName= '" + user.getName() + "' AND UserID='"
+					+ user.getId() + "'";
 			echo(sqlUnsure);
 			// Penalty
-			String sqlPenalty = "update user set Penalty = (Penalty + "+penalty+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			String sqlPenalty = "update user set Penalty = (Penalty + "
+					+ penalty + ") where UserName= '" + user.getName()
+					+ "' AND UserID='" + user.getId() + "'";
 			echo(sqlPenalty);
 			// All
-			String sqlAll = "update user set Verified = (Verified + "+verifications.size()+") where UserName= '"+user.getName()+"' AND UserID='"+user.getId()+"'";
+			String sqlAll = "update user set Verified = (Verified + "
+					+ verifications.size() + ") where UserName= '"
+					+ user.getName() + "' AND UserID='" + user.getId() + "'";
 			echo(sqlAll);
 			dbStmt = con.createStatement();
-			if(agree!=0)
-					dbStmt.executeUpdate(sqlAgree);
-			if(disagree!=0)
+			if (agree != 0)
+				dbStmt.executeUpdate(sqlAgree);
+			if (disagree != 0)
 				dbStmt.executeUpdate(sqlDisagree);
-			if(unsure!=0)
+			if (unsure != 0)
 				dbStmt.executeUpdate(sqlUnsure);
-			if(penalty!=0)
+			if (penalty != 0)
 				dbStmt.executeUpdate(sqlPenalty);
 			dbStmt.executeUpdate(sqlAll);
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 	}
 
-
-	private void updateLinksStatistics(Connection con, ArrayList<Verification> verifications, User user, boolean credible) {
-		if (credible== false){
-			echo("User: "+user.getName()+" had too many false verifications! Don't save decisions!");
+	private void updateLinksStatistics(Connection con,
+			ArrayList<Verification> verifications, User user, boolean credible) {
+		if (credible == false) {
+			echo("User: "
+					+ user.getName()
+					+ " had too many false verifications! Don't save decisions!");
 			return;
 		}
 		String msg = null;
@@ -576,10 +597,12 @@ public class Server extends HttpServlet {
 			try {
 				echo("\n>>>>Update statements with ID '" + id + "'");
 				sqlQuery = "UPDATE links SET `"
-						+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_COUNTER + "`= `"
 						+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_COUNTER
-						+ "` + 1 WHERE `" + PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID
-						+ "` = " + id;
+						+ "`= `"
+						+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_COUNTER
+						+ "` + 1 WHERE `"
+						+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID + "` = "
+						+ id;
 				dbStmt = con.createStatement();
 				dbStmt.executeUpdate(sqlQuery);
 			} catch (SQLException e) {
@@ -593,22 +616,28 @@ public class Server extends HttpServlet {
 
 					if (selection == VALID) {
 						sqlQuery = "UPDATE links SET `"
-								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_POSITIVE + "`= `"
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_POSITIVE
+								+ "`= `"
 								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_POSITIVE
 								+ "` + 1 WHERE `"
-								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID + "` = " + id;
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID
+								+ "` = " + id;
 						sqlQueryVerify = "INSERT INTO `"
-								+ PropertyConstants.DB_TABLE_NAME_POSITIVE + "` VALUES ('" + id
-								+ "' , '" + user.getId() + "', '"+user.getName()+"')";
+								+ PropertyConstants.DB_TABLE_NAME_POSITIVE
+								+ "` VALUES ('" + id + "' , '" + user.getId()
+								+ "', '" + user.getName() + "')";
 					} else {
 						sqlQuery = "UPDATE links SET `"
-								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_NEGATIVE + "`= `"
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_NEGATIVE
+								+ "`= `"
 								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_NEGATIVE
 								+ "` + 1 WHERE `"
-								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID + "` = " + id;
+								+ PropertyConstants.DB_TABLE_LINKS_PROPERTY_ID
+								+ "` = " + id;
 						sqlQueryVerify = "INSERT INTO `"
-								+ PropertyConstants.DB_TABLE_NAME_NEGATIVE + "` VALUES ('" + id
-								+ "' , '" + user.getId() + "','"+user.getName()+"')";
+								+ PropertyConstants.DB_TABLE_NAME_NEGATIVE
+								+ "` VALUES ('" + id + "' , '" + user.getId()
+								+ "','" + user.getName() + "')";
 					}
 					dbStmt = con.createStatement();
 					dbStmt.executeUpdate(sqlQuery);
@@ -617,17 +646,19 @@ public class Server extends HttpServlet {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else{ //if not sure do nothing in db, just inc norSureCounter of statement
+			} else { // if not sure do nothing in db, just inc norSureCounter of
+						// statement
 				echo("Evaluation: Unsure(-1)  ---> Do Nothing in links table");
 			}
-			msg = "Commit verifications of user " + user.getName() + " successful";
+			msg = "Commit verifications of user " + user.getName()
+					+ " successful";
 		}
-		if (msg == null){
+		if (msg == null) {
 			msg = "Commit verifications of user " + user.getName() + " failed";
 		}
 		echo(msg);
 	}
-	
+
 	private boolean isJSONPRequest(HttpServletRequest httpRequest) {
 		String callbackMethod = httpRequest.getParameter("callback");
 		return (callbackMethod != null && callbackMethod.length() > 0);
@@ -655,19 +686,19 @@ public class Server extends HttpServlet {
 
 		// Evaluate verification
 		double eval = 1111; // no verification
-		if(verification != null)
+		if (verification != null)
 			eval = evaluateVerification(curLink, verification, con);
-		
+
 		// Get difficulty
 		double diff = 0;
-		if(curLink!=null)
+		if (curLink != null)
 			try {
-				diff = getLinkDifficulty(curLink,con);
+				diff = getLinkDifficulty(curLink, con);
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		
+
 		// Get link
 		Link link = getNewLink(userName, userId, linkset, nextLink,
 				verifiedLinks);
@@ -691,7 +722,8 @@ public class Server extends HttpServlet {
 				prop = new JsonObject();
 				prop.put("property", subjectProp.get(i).getProperty());
 				prop.put("value", subjectProp.get(i).getValue());
-				echo("s: " + prop.toString());
+				// debug
+//				echo("s: " + prop.toString());
 				propArray.add(prop);
 			}
 			echo("subjectProp size: " + subjectProp.size());
@@ -708,24 +740,26 @@ public class Server extends HttpServlet {
 				prop = new JsonObject();
 				prop.put("property", objectProp.get(i).getProperty());
 				prop.put("value", objectProp.get(i).getValue());
-				echo("o: " + prop.toString());
+				// debug
+//				echo("o: " + prop.toString());
 				propArray.add(prop);
 			}
 			echo("objectProp size: " + subjectProp.size());
 			// Property names
-			object.put("properties", propArray);;
+			object.put("properties", propArray);
+			;
 
 			// Link
 			linkJson.put("id", link.getId());
 			linkJson.put("subject", subject);
 			linkJson.put("object", object);
 			linkJson.put("predicate", link.getPredicate());
-			if(verification != null){
+			if (verification != null) {
 				JsonValue e = JsonNumber.value(eval);
 				linkJson.put("prevLinkEval", e);
 			}
 			linkJson.put("difficulty", Double.toString(diff));
-			
+
 		} catch (JsonException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -756,7 +790,7 @@ public class Server extends HttpServlet {
 	 */
 	private Link getNewLink(String userName, String userId, String linkset,
 			String nextLinkType, String verifiedLinks) {
-		echo("Get new statement for client '" + linkset + "'");
+		echo("Get new Link for client with Linkset = '" + linkset + "'");
 		// Only get statements, which were not shown yet
 		echo("verifiedLinks: " + verifiedLinks);
 		String notIn = "";
@@ -776,14 +810,11 @@ public class Server extends HttpServlet {
 		// 1.connect to db
 		DBTool db = new DBTool(resourcePath + dbIniFile);
 		Connection con = db.getConnection();
-		echo("nextLink: ");
-		boolean nextLink = Boolean.parseBoolean(nextLinkType);
-		echo("generate slq");
+	
 		int id = 0;
 		Link statement = null;
 		Statement stmt = null;
 		ResultSet rs = null;
-
 		// Generate SQL query
 		String SQLqueryLinks = generateLinkQuery(userName, userId, linkset,
 				nextLinkType, verifiedLinks, con);
@@ -890,9 +921,6 @@ public class Server extends HttpServlet {
 		return statement;
 	}
 
-	
-	
-	
 	private Link getInstances(Link statement, Statement stmt)
 			throws SQLException {
 		String sqlInstanceQuery = null;
@@ -912,10 +940,10 @@ public class Server extends HttpServlet {
 		ResultSet rs = stmt.executeQuery(sqlInstanceQuery);
 		while (rs.next()) {
 			prop = rs.getString("Property");
-			if(prop.equals("<http://dbpedia.org/ontology/thumbnail>"))
-				val = parse(rs.getString("Value"),false); // prefix =false
+			if (prop.equals("<http://dbpedia.org/ontology/thumbnail>"))
+				val = parse(rs.getString("Value"), false); // prefix =false
 			else
-				val = parse(rs.getString("Value"),true);
+				val = parse(rs.getString("Value"), true);
 			subjectProp.add(new Property(prop, val));
 			echo(i + ".property of subject instance: " + prop + " >> " + val);
 			i++;
@@ -934,10 +962,10 @@ public class Server extends HttpServlet {
 		rs = stmt.executeQuery(sqlInstanceQuery);
 		while (rs.next()) {
 			prop = rs.getString("Property");
-			if(prop.equals("<http://dbpedia.org/ontology/thumbnail>"))
-				val = parse(rs.getString("Value"),false);
+			if (prop.equals("<http://dbpedia.org/ontology/thumbnail>"))
+				val = parse(rs.getString("Value"), false);
 			else
-				val = parse(rs.getString("Value"),true);
+				val = parse(rs.getString("Value"), true);
 			objectProp.add(new Property(prop, val));
 			echo(i + ".property of subject instance: " + prop + " >> " + val);
 			i++;
@@ -970,8 +998,9 @@ public class Server extends HttpServlet {
 			notIn = getNotInQuery(verifications);
 		} else
 			verifications = new String[1];
+		echo("nextLink = "+nextLinkType);
 		boolean nextLink = Boolean.parseBoolean(nextLinkType);
-		echo("generateLink nextLink");
+		
 		// normal
 		if (verifications.length < 3) {
 			echo("Get Easy Link! Number of verifications: "
@@ -1143,28 +1172,28 @@ public class Server extends HttpServlet {
 		return eval;
 	}
 
-//	private double getLinkDifficulty(String id){
-//		// Get LinkDifficulty
-//		double difficulty=0;
-//		String sqlQuery = "Select * from difficulty where ID = "+id;
-//		echo("Difficulty query: "+sqlQuery);
-//		Statement dbStmt=null;
-//		ResultSet rs = null; 
-//		try {
-//			rs = dbStmt.executeQuery(sqlQuery);
-//		if(rs.next()){
-//			difficulty = rs.getDouble("Difficulty");
-//			echo("Query Difficulty success: id = " + rs.getInt("ID") + " Difficulty: "+difficulty);
-//		}else
-//			echo("Server MYSQL Error: Couldn't retrieve difficulty for id = "+id);
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		return difficulty;
-//	}
-	
-	
+	// private double getLinkDifficulty(String id){
+	// // Get LinkDifficulty
+	// double difficulty=0;
+	// String sqlQuery = "Select * from difficulty where ID = "+id;
+	// echo("Difficulty query: "+sqlQuery);
+	// Statement dbStmt=null;
+	// ResultSet rs = null;
+	// try {
+	// rs = dbStmt.executeQuery(sqlQuery);
+	// if(rs.next()){
+	// difficulty = rs.getDouble("Difficulty");
+	// echo("Query Difficulty success: id = " + rs.getInt("ID") +
+	// " Difficulty: "+difficulty);
+	// }else
+	// echo("Server MYSQL Error: Couldn't retrieve difficulty for id = "+id);
+	// } catch (SQLException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	// return difficulty;
+	// }
+
 	/**
 	 * Connect user and get userdata
 	 * 
@@ -1305,7 +1334,8 @@ public class Server extends HttpServlet {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				s = new Score(rs.getString("Name"), rs.getString("ID"), rs.getInt("Score"));
+				s = new Score(rs.getString("Name"), rs.getString("ID"),
+						rs.getInt("Score"));
 				sBuff = new JsonObject();
 				sBuff.put("name", s.getName());
 				if (s.getId() == null)
@@ -1321,7 +1351,7 @@ public class Server extends HttpServlet {
 			con.close();
 			// Out
 			hScoreJson.put("highscore", hScoreArray);
-//			hScoreJson.put("bla", "test");
+			// hScoreJson.put("bla", "test");
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -1340,10 +1370,8 @@ public class Server extends HttpServlet {
 		echo("Get Linkset");
 
 		ArrayList<Linkset> tmp = new ArrayList<Linkset>();
-
-		String query = "SELECT * FROM "
-				+ PropertyConstants.DB_TABLE_NAME_LINKEDONTOLOGIES + " WHERE "
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_READY + " = 1";
+		
+		String query = "SELECT * FROM linked_ontologies join templates on linked_ontologies.ID = templates.Linkset where templates.Ready =true";
 
 		// db connect
 		DBTool db = new DBTool(resourcePath + dbIniFile);
@@ -1367,7 +1395,9 @@ public class Server extends HttpServlet {
 				linkset.setDifficulty(rs
 						.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DIFFICULTY));
 				linkset.setId(rs
-						.getString(PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID));
+						.getString("linked_ontologies.ID"));
+				linkset.setTemplate(rs
+						.getString("templates.ID"));
 				tmp.add(linkset);
 				i++;
 				// echo(tmp.get(i)+" i "+i);
@@ -1398,6 +1428,8 @@ public class Server extends HttpServlet {
 				lSet.put("predicate", lBuff.getPredicate());
 				lSet.put("description", lBuff.getDescription());
 				lSet.put("difficulty", lBuff.getDifficulty());
+				lSet.put("linkset", lBuff.getId());
+				lSet.put("template", lBuff.getTemplate());
 				lSetArray.add(lSet);
 			}
 			// Out
@@ -1420,12 +1452,23 @@ public class Server extends HttpServlet {
 			return true;
 	}
 
-	private String getTemplate() {
+	private String getTemplate(String tmpl) {
+		echo("Get Template: "+tmpl);
+		String template = tmpl;
+		if(template == null){
+			echo("No template specified! Return standart template!");
+			template = "standart";
+		}
 		String file = "";
 		try {
-			String templateFile = "template.json";
+			String suffix = ".tmpl.html";
+//			String templateFile = "templates/dbpedia-linkedgeodata.tmpl.html";
+			// templateFile = "templates/dbpedia-linkedgeodata_labels.tmpl.html";
+			String templateFile = template+suffix;
+			echo("Filename: "+templateFile);
+			
 			FileInputStream fstream = new FileInputStream(this.resourcePath
-					+ templateFile);
+					+ "templates/"+templateFile);
 			// Get the object of DataInputStream
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -1442,31 +1485,36 @@ public class Server extends HttpServlet {
 		}
 		return file;
 	}
-	
 
-	private String disconnectUser(String id, String name,
-			String playTime) {
+	private String disconnectUser(String id, String name, String playTime) {
 		echo("##Disconect User##");
-		String msg="User "+name +"Disconnected!";
-		if(userList.remove("id") != null){
+		String msg = "User " + name + "Disconnected!";
+		if (userList.remove("id") != null) {
 			echo(msg);
 
 			// Inc times played counter
-			String sqlQuery = "UPDATE `"+ PropertyConstants.DB_TABLE_NAME_USER + 
-					"` SET  `" +PropertyConstants.DB_TABLE_USER_GAMESPLAYED+"` = (`"+PropertyConstants.DB_TABLE_USER_GAMESPLAYED+"` + 1) "+  
-					"WHERE `"+PropertyConstants.DB_TABLE_USER_ID+"` = '"+id+"' AND "+
-					"`"+PropertyConstants.DB_TABLE_USER_NAME+"` = '"+name+"'";
+			String sqlQuery = "UPDATE `" + PropertyConstants.DB_TABLE_NAME_USER
+					+ "` SET  `" + PropertyConstants.DB_TABLE_USER_GAMESPLAYED
+					+ "` = (`" + PropertyConstants.DB_TABLE_USER_GAMESPLAYED
+					+ "` + 1) " + "WHERE `"
+					+ PropertyConstants.DB_TABLE_USER_ID + "` = '" + id
+					+ "' AND " + "`" + PropertyConstants.DB_TABLE_USER_NAME
+					+ "` = '" + name + "'";
 			echo("Times played Query: " + sqlQuery);
-			
+
 			// Set duration of game
-			double time =  Integer.valueOf(playTime)/1000;
-			echo("User "+name+ " played "+time+" seconds!");
-			String sqlQuery2 = "UPDATE `"+ PropertyConstants.DB_TABLE_NAME_USER + 
-					"` SET  `" +PropertyConstants.DB_TABLE_USER_PLAYTIME+"` = (`"+PropertyConstants.DB_TABLE_USER_PLAYTIME+"` + " + time+") "+  
-					"WHERE `"+PropertyConstants.DB_TABLE_USER_ID+"` = '"+id+"' AND "+
-					"`"+PropertyConstants.DB_TABLE_USER_NAME+"` = '"+name+"'";
+			double time = Integer.valueOf(playTime) / 1000;
+			echo("User " + name + " played " + time + " seconds!");
+			String sqlQuery2 = "UPDATE `"
+					+ PropertyConstants.DB_TABLE_NAME_USER + "` SET  `"
+					+ PropertyConstants.DB_TABLE_USER_PLAYTIME + "` = (`"
+					+ PropertyConstants.DB_TABLE_USER_PLAYTIME + "` + " + time
+					+ ") " + "WHERE `" + PropertyConstants.DB_TABLE_USER_ID
+					+ "` = '" + id + "' AND " + "`"
+					+ PropertyConstants.DB_TABLE_USER_NAME + "` = '" + name
+					+ "'";
 			echo("PlayTime Query: " + sqlQuery2);
-			
+
 			DBTool db = new DBTool(resourcePath + dbIniFile);
 			Connection con = db.getConnection();
 			try {
@@ -1483,11 +1531,12 @@ public class Server extends HttpServlet {
 					e.printStackTrace();
 				}
 			}
-		}else{
-			msg = "Server Error: User = "+name+" wasn't found! Couldn't calculate play time!";
+		} else {
+			msg = "Server Error: User = " + name
+					+ " wasn't found! Couldn't calculate play time!";
 			echo(msg);
 		}
-		
+
 		return msg;
 	}
 
@@ -1496,63 +1545,49 @@ public class Server extends HttpServlet {
 		JsonObject tJson = null;
 		JsonArray tasks = new JsonArray();
 		JsonObject tasksJson = new JsonObject();
-
-		BufferedReader br = null;
-		String buffer;
-		String[] split = new String[Task.SIZE + 1];
-
+		// Connect to db
+		DBTool db = new DBTool(resourcePath + dbIniFile);
+		Connection con = db.getConnection();
 		try {
-			br = new BufferedReader(new FileReader(resourcePath + "linkFiles/"
-					+ "task.tk"));
-			while ((buffer = br.readLine()) != null) {
-				split = buffer.split(Task.SEPERATOR);
-				// For debugging
-				for (int i = 0; i < split.length; i++)
-					echo("Split: " + split[i]);
+			Statement dbStmt = null;
+			ResultSet rs = null;
 
-				if (split[Task.SIZE].equals("1")
-						|| split[0].equals("[subject]"))
-					// Only Send tasks with done-value=0
-					continue;
+			String sqlQuery = "SELECT * FROM tasks WHERE Done=false";
+			echo("task query: " + sqlQuery);
 
-				Task t = new Task();
-				t.setTask(split);
-
+			dbStmt = con.createStatement();
+			rs = dbStmt.executeQuery(sqlQuery);
+			while (rs.next()) {
 				tJson = new JsonObject();
-				tJson.put("subject", t.getSubject());
-				tJson.put("object", t.getObject());
-				tJson.put("predicate", t.getPredicate());
-				tJson.put("description", t.getDescription());
-				tJson.put("difficulty", t.getDifficulty());
-				tJson.put("date", t.getDate());
-				tJson.put("file", t.getFile());
-				tJson.put("linkset", t.getLinkset());
+				tJson.put("subject", rs.getString("Subject"));
+				tJson.put("object", rs.getString("Object"));
+				tJson.put("predicate", rs.getString("Predicate"));
+				tJson.put("description", rs.getString("Description"));
+				tJson.put("difficulty", rs.getString("Difficulty"));
+				tJson.put("date", rs.getTime("DateTime").toString());
+				tJson.put("file", rs.getString("File"));
+				tJson.put("linkset", rs.getString("Linkset"));
+				tJson.put("template", rs.getString("Template"));
 
 				tasks.add(tJson);
 			}
 			// all tasks
 			tasksJson.put("tasks", tasks);
 
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (JsonException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-
 		echo("getTasks => Done\n");
 		return tasksJson;
 	}
@@ -1566,100 +1601,53 @@ public class Server extends HttpServlet {
 	public String taskPerform() {
 		echo(" Perform Task");
 		String msg = "Error Performing Task";
-		taskSuccess = false;
-		String originalTaskFilePath = resourcePath + "linkFiles/" + "task.tk";
-		String tempTaskFilePath = resourcePath + "linkFiles/" + "task.tmp";
-		BufferedReader br = null;
-		BufferedWriter brWrite = null;
-		String buffer;
-		String[] split = new String[Task.SIZE + 1];
-		int i = 0;
+	
+		// Connect to db
+		DBTool db = new DBTool(resourcePath + dbIniFile);
+		Connection con = db.getConnection();
 		try {
-			// Open file to read
-			br = new BufferedReader(new FileReader(originalTaskFilePath));
-			// Create tempFile for writing
-			brWrite = new BufferedWriter(new FileWriter(tempTaskFilePath));
+			Statement dbStmt = null;
+			ResultSet rs = null;
 
+			String getTaskQuery = "SELECT * FROM tasks WHERE Done=false";
+			echo("task query: " + getTaskQuery);
+
+			dbStmt = con.createStatement();
+			rs = dbStmt.executeQuery(getTaskQuery);
+			int i =0;
 			// Read lines
-			while ((buffer = br.readLine()) != null) {
-				split = buffer.split(Task.SEPERATOR);
-				// /*Test method
-				echo("{Test} Show split:");
-				for (int j = 0; j < split.length; j++)
-					echo("split[" + j + "]: " + split[j]);
-				echo("buffer: " + buffer + "\n");
-				// */
-				if ((split[Task.SIZE].equals("1"))
-						|| (split[0].equals("[subject]"))) {
-					// If task-file has to-do task
-					brWrite.write(buffer);
-					brWrite.newLine();
-					continue;
-				}
+			while (rs.next()) {
+				
 				Task t = new Task();
-				t.setTask(split);
+				t.setSubject(rs.getString("Subject"));
+				t.setObject(rs.getString("Object"));
+				t.setPredicate(rs.getString("Predicate"));
+				t.setDescription(rs.getString("Description"));
+				t.setDifficulty(rs.getString("Difficulty"));
+				t.setLinkset(rs.getString("Linkset"));
+				t.setLinkFile(rs.getString("File"));
+				t.setTemplate(rs.getString("Template"));
+				
 				echo("\n<<<<<< " + i + ".Task, Subject: " + t.getSubject()
 						+ ", Object: " + t.getObject() + ", File: "
-						+ t.getFile() + " >>>>>>\n");
+						+ t.getLinkFile() + " >>>>>>\n");
+				i++;
+				
 				if (insertLinksIntoDB(t)) {
-					// Write to tempFile
-					brWrite.write(split[0] + Task.SEPERATOR + split[1]
-							+ Task.SEPERATOR + split[2] + Task.SEPERATOR
-							+ split[3] + Task.SEPERATOR + split[4]
-							+ Task.SEPERATOR + split[5] + Task.SEPERATOR
-							+ split[6] + Task.SEPERATOR + split[7]
-							+ Task.SEPERATOR + "1");
 					taskSuccess = true;
 				} else
-					brWrite.write(split[0] + Task.SEPERATOR + split[1]
-							+ Task.SEPERATOR + split[2] + Task.SEPERATOR
-							+ split[3] + Task.SEPERATOR + split[4]
-							+ Task.SEPERATOR + split[5] + Task.SEPERATOR
-							+ split[6] + Task.SEPERATOR + split[7]
-							+ Task.SEPERATOR + "0");
-
-				brWrite.newLine();
+					msg ="Tasked failed!";
 			}
 
 			msg = "Server: Performing Tasks successfully!";
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			try {
-				// Close Reader and Writer
-				if (br != null)
-					br.close();
-				if (brWrite != null)
-					brWrite.close();
-
-				// Delete original task-file
-				File fDelete = new File(originalTaskFilePath);
-				boolean delete = fDelete.delete();
-				if (delete)
-					echo("Delete template file success");
-				else
-					echo("Delete template file failed");
-				// Rename tempTaskFile
-				File fRename = new File(tempTaskFilePath);
-				boolean rename = fRename
-						.renameTo(new File(originalTaskFilePath));
-				if (rename)
-					echo("Rename template file success");
-				else
-					echo("Rename template file failed");
-				/*
-				 * if (taskSuccess) restart();
-				 */
-				restart();
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			/*
+			 * if (taskSuccess) restart();
+			 */
+			restart();
 
 		}
 		echo("####Server: Performing Tasks successfully!####\n");
@@ -1675,9 +1663,9 @@ public class Server extends HttpServlet {
 		String msg = null;
 		boolean status = false;
 		RDFHandler rdf = new RDFHandler(resourcePath + "linkFiles/"
-				+ t.getFile(), resourcePath + "db_settings.ini", resourcePath
+				+ t.getLinkFile(), resourcePath + "db_settings.ini", resourcePath
 				+ templateFile, t);
-		echo("Path: " + t.getFile() + "\nxmlPath: " + resourcePath
+		echo("Path: " + t.getLinkFile() + "\nxmlPath: " + resourcePath
 				+ templateFile);
 		XMLTool xml = new XMLTool(resourcePath + templateFile);
 		try {
@@ -1695,7 +1683,7 @@ public class Server extends HttpServlet {
 		TemplateLinkset template = xml.getLinkset(t.getLinkset());
 
 		// echo("Names: "+name+" , "+name_2);
-		if (t.getFile().endsWith(".xml"))
+		if (t.getLinkFile().endsWith(".xml"))
 			msg = rdf.start(template, RDFHandler.formatXML);
 		else
 			msg = rdf.start(template, RDFHandler.formatNT);
@@ -1707,16 +1695,17 @@ public class Server extends HttpServlet {
 
 	/**
 	 * Parse method. Remove brackets and replace prefix with abbreviation
-	 * @param prefix 
+	 * 
+	 * @param prefix
 	 */
 	private String parse(String s, boolean prefix) {
 		// Remove '<' and '>'
-		 echo("##Server: Parse "+s+"##");
+		echo("##Server: Parse " + s + "##");
 		String removedBrackets = s.replaceAll("<", "").replaceAll(">", "");
-		 echo("##Server: Removed Brackets "+removedBrackets+"##");
-		if(prefix==false)
+		echo("##Server: Removed Brackets " + removedBrackets + "##");
+		if (prefix == false)
 			return removedBrackets;
-		 // Set Prefix
+		// Set Prefix
 		String buffer;
 		String parsed = "";
 
@@ -1741,12 +1730,12 @@ public class Server extends HttpServlet {
 																			// ??
 				else
 					parsed += split[j];
-				 echo(j+".parsed split: "+parsed);
+				echo(j + ".parsed split: " + parsed);
 			}
 		} else {
 			parsed = setPrefix(removedBrackets);
 		}
-		 echo("Parsed: "+parsed);
+		echo("Parsed: " + parsed);
 		// echo("##Server: Parse "+s+" done##");
 		return parsed;
 
@@ -1847,6 +1836,5 @@ public class Server extends HttpServlet {
 	private void echo(String s) {
 		System.out.println("[Server]: " + s);
 	}
-
 
 }

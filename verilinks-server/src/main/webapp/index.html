@@ -9,6 +9,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<!-- 	<script type="text/javascript" src="js/script.js"></script> -->
 		<script type="text/javascript">
+			var template;
 			var xmlHttp = null;
 			var gotLinkTask = false;
 			var rootURL ="";
@@ -23,7 +24,7 @@
 				// http req
 				if (gotLinkTask)
 					return;
-				var url = rootURL+ "/server?service=getTasks";
+				var url = rootURL+ "http://localhost:8080/verilinks-server/server?service=getTasks";
 				xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = processRequest;
 				xmlHttp.open("GET", url, true);
@@ -44,7 +45,8 @@
 			}
 
 			function performLinkTask() {
-				var url = rootURL+"/server?service=performTasks";
+				document.getElementById("performBtn").disabled = false;
+				var url = rootURL+"http://localhost:8080/verilinks-server/server?service=performTasks";
 				xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = processAnswer;
 				xmlHttp.open("GET", url, true);
@@ -83,6 +85,7 @@
 			}
 
 			function addLinkTask() {
+				getTemplate();
 				// show/hide
 				// addLinkTask
 				if (document.getElementById('addLinkTask').style.display == "none")
@@ -93,6 +96,48 @@
 				document.getElementById('processLinkTask').style.display = "none"
 			}
 
+			function addProperty(id){
+				var name = 'propElement';
+				if(id!='subjectProperty')
+					name = 'propElement2';
+				var div = document.createElement("div");
+				var input = document.createElement("input");
+ 				input.setAttribute("type", 'text');
+    			input.setAttribute("name", name);
+				div.appendChild(input);
+				var del = document.createElement("input");
+				del.setAttribute("type", 'button');
+    			
+    			del.setAttribute("onclick", 'removeProperty(this)');
+    			del.setAttribute("value", '-');
+    			
+				div.appendChild(del);
+				document.getElementById(id).appendChild(div);
+				
+				// innerHtml +="<div><input name='prop0Element' type='text'/><a href='#' title='remove this property' onclick='removeProperty(this)'>[-]</a><div>";
+			}
+			
+			function removeProperty(node){
+				 node.parentNode.parentNode.removeChild(node.parentNode);
+			}
+			
+			function getTemplate(){
+				var url = rootURL+ "http://localhost:8080/verilinks-server/server?service=getTemplate";
+				var xmlHttp = new XMLHttpRequest();
+				xmlHttp.onreadystatechange = function(){
+					if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+					if (xmlHttp.responseText == "Not found") {
+						document.getElementById("TextBoxCustomerName").value = "Not found";
+						document.getElementById("TextBoxCustomerAddress").value = "";
+					} else {
+						document.getElementById("template").value=xmlHttp.responseText;
+						// template = ;
+					}
+				}};
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+			
 			function validate() {
 				var elems = document.getElementsByTagName('input');
 				var len = elems.length;
@@ -168,15 +213,15 @@
 			<p class='aksw'>
 				Options
 			</p>
-			<button onclick="addLinkTask()">
+			<button onclick="getTemplate()">
 				Add Link-Task
 			</button>
 			<button onclick="getLinkTasks()">
 				Process Link-Task
 			</button>
-			<form id='addLinkTask' style="display: none"
+			<form id='addLinkTask' 
 			enctype="multipart/form-data"
-			action="/verilinks-server/upload" method="post" onsubmit='return validate();'>
+			action="http://localhost:8080/verilinks-server/upload" method="post" onsubmit='return validate();'>
 				<h2>Admin Panel</h2>
 				<table>
 					<tr>
@@ -198,16 +243,12 @@
 					<tr>
 						<td class='lb'>existing template?</td>
 						<td>
-						<input class='noDisable' style="margin: 15px"
-						id='existsElement' type="checkbox" onChange='cbChanged()'>
+						<input class='noDisable' id='existsElement' type="checkbox" onChange='cbChanged()'>
 						</td>
 						<td class='desc'>Check if template does exist in db</td>
 					</tr>
 					<tr>
 						<td class='fat'>3.Instances</td>
-					</tr>
-					<tr>
-						<td></td>
 						<td>Subject</td>
 						<td>Object</td>
 					</tr>
@@ -233,28 +274,14 @@
 					</tr>
 					<tr>
 						<td class='lb'>property:</td>
-						<td>
-						<select>
-							<option value="text">text</option>
-							<option value="image">image</option>
-							<option value="map">map</option>
-						</select></td>
-						<td>
-						<select>
-							<option value="text">text</option>
-							<option value="image">image</option>
-							<option value="map">map</option>
-						</select></td>
-						<td class='desc'>Property to display</td>
+						<td><input value='Add Subject Property' type='button' onclick="addProperty('subjectProperty');return false;"/></td>
+						<td><input value='Add Object Property' type='button' onclick="addProperty('objectProperty');return false;"/></td>
+						<td class='desc'>Add field to specify property</td>
 					</tr>
 					<tr>
 						<td></td>
-						<td>
-						<input name="prop0Element" type="text" />
-						</td>
-						<td>
-						<input name="prop0element2" type="text" />
-						</td>
+						<td id='subjectProperty'></td>
+						<td id='objectProperty'></td>
 					</tr>
 					<tr>
 						<td class='fat'>4.Predicate</td>
@@ -275,13 +302,21 @@
 						<td>
 						<select class='noDisable' name="difficultyElement">
 							<option value="easy">easy</option>
-							<option value="n">medium</option>
-							<option value="map">hard</option>
+							<option value="medium">medium</option>
+							<option value="hard">hard</option>
 						</select></td>
 						<td class='desc'>Describe difficulty of linkset</td>
 					</tr>
+					<tr>
+						<td class='fat'>7.JsRender Template</td>
+						<td>
+						<input class='noDisable' name="templateElement" type="text" />
+						</td>
+						<td class='desc'>ID of Template</td>
+					</tr>
 				</table>
-
+				<div class='desc'>Define JsRender Template for diplaying data of linkset</div>
+				<div><textarea id='template' cols="100" rows="10" name="jsrenderElement"></textarea></div>
 				<button id='submitBtn' >
 					submit
 				</button>

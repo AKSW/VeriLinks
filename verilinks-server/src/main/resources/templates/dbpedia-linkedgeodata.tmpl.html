@@ -1,0 +1,23 @@
+<!-- jsrender template-->
+<table id ='link'>
+	<tr>
+	<!-- subject -->
+	<td valign=middle><div id='subject'>
+	{{for subject.properties}}
+		{{if property == '<http://dbpedia.org/ontology/thumbnail>'}}
+			<img class='image' title='subject' src='{{:value}}'/>
+		{{/if}}
+	{{/for}}</div></td>
+	<!-- predicate -->
+	<td valign=middle><div id='predicate'>{{>predicate}}</div></td>
+	<!-- object -->
+	<td valign=middle><div id='object'>
+	{{for object.properties}}
+		{{if property== '<http://www.w3.org/2003/01/geo/wgs84_pos#lat>'}}
+			{{>~setLat(value)}}
+		{{else property =='<http://www.w3.org/2003/01/geo/wgs84_pos#long>'}}
+			{{>~setLong(value)}}
+		{{/if}}
+	{{/for}}</div></td>
+	</tr>
+</table>

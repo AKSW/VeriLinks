@@ -960,22 +960,13 @@ public class RDFHandler {
 		}
 		echo("Querying rdf statements done");
 
-		// Insert linkedOntologies into table linkedOntologies
-		String sqlLinkedOntologies = "REPLACE INTO "
-				+ PropertyConstants.DB_TABLE_NAME_LINKEDONTOLOGIES + "("
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_SUBJECT + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_PREDICATE + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_OBJECT + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DESCRIPTION + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DIFFICULTY + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_READY + ") VALUES ('"
-				+ template.getLinkset() + "','"
-				+ ontologyNameSubject + "','" + this.task.getPredicate() + "','"
-				+ ontologyNameObject + "','" + this.task.getDescription() + "','"
-				+ this.task.getDifficulty() + "','" + "1" + "')";
+		String setTaskSuccessQuery = "UPDATE tasks set Ready = true WHERE Linkset =`"+this.task.getLinkset()+"` and File =`"+this.task.getLinkFile()+"`";
+		String setTemplatesSuccessQuery = "UPDATE templates set Ready = true where ID=`"+this.task.getTemplate()+"` AND linkset =`"+this.task.getLinkset()+"`";
+		
+		
 		if (linkSuccess > 3) {
-			db.queryUpdate(sqlLinkedOntologies, con);
+			db.queryUpdate(setTaskSuccessQuery, con);
+			db.queryUpdate(setTemplatesSuccessQuery, con);
 		} else
 			msg += "RDFHandler: "
 					+ ontologyNameSubject

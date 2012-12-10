@@ -10,6 +10,8 @@ public class Linkset implements IsSerializable{
 	private String predicate;
 	private String description;
 	private String difficulty;
+	private String template;
+	
 	/** Should be shown to kongregate user?*/
 	private boolean kongregate;
 	
@@ -85,6 +87,14 @@ public class Linkset implements IsSerializable{
 
 	public void setKongregate(boolean kongregate) {
 		this.kongregate = kongregate;
+	}
+
+	public void setTemplate(String template) {
+		this.template = template;
+	}
+
+	public String getTemplate() {
+		return template;
 	}
 	
 }

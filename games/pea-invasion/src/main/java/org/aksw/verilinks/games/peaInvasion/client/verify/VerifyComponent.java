@@ -44,25 +44,9 @@ public class VerifyComponent extends HorizontalPanel {
 
 	private static final CharSequence SEPERATOR = PropertyConstants.SEPERATOR_PROPERTY_VALUE;
 
-	private HTML predicateHTML;
-
-	// Panel
-	private VerticalPanel subPanel;
-	private VerticalPanel obPanel;
-	private VerticalPanel predicatePanel;
-
-	private VerticalPanel subjectImagePanel;
-	private VerticalPanel objectImagePanel;
 	private final String noImage = "PeaInvasion/images/noImage.png";
 
-	private TemplateInstance subjectTemplate;
-	private TemplateInstance objectTemplate;
-	private TemplateLinkset template;
-
 	private boolean isBothMapInstances = false;
-	private BothMapsPanel bothMapsPanel;
-
-	private KongregatePanel kongregate;
 
 	private MapWidget mapWidget;
 
@@ -71,13 +55,10 @@ public class VerifyComponent extends HorizontalPanel {
 	 * 
 	 * @param model
 	 */
-	public VerifyComponent(TemplateLinkset template, Configuration config) {
+	public VerifyComponent(Configuration config) {
 
 		super();
 
-		this.template = template;
-		this.subjectTemplate = template.getSubject();
-		this.objectTemplate = template.getObject();
 		this.config = config;
 		init();
 
@@ -85,143 +66,17 @@ public class VerifyComponent extends HorizontalPanel {
 
 	}
 
-	public void updateStatement(Link stmt, TemplateLinkset temp) {
-
+	public void updateStatement(String json) {
 		System.out.println("\n##VerifyComponent: Update Table##");
 
-		System.out.println("Using templates: "
-				+ temp.getSubject().getOntology() + "-"
-				+ temp.getObject().getOntology() + "'");
-
-		Instance instanceSubject = stmt.getSubject();
-		Instance instanceObject = stmt.getObject();
-
-		// here
-		// if(config.isKongregate() || config.isSimple())
-		// updateKongregate(stmt);
-		// else if (!isBothMapInstances)
-		// updateNormal(stmt);
-		// else
-		// updateBothMaps(stmt);
-		updateNormal(stmt);
-
-		// Predicate panel
-		DOM.getElementById("predicate").setInnerHTML(
-				parsePredicate(stmt.getPredicate()));
-
-		// Image panel
-		// Subject image
-		subjectImagePanel.clear();
-		String buffer = null;
-		String sParsedImage = parseImage(instanceSubject.getImage());
-		System.out
-				.println("Image Size: " + instanceSubject.getImage().length());
-
-		// TODO length of NO_DECLARATION ?
-		if (sParsedImage == null)
-			// No image available
-			subjectImagePanel.add(new HTML("<img class='image' src='" + noImage
-					+ "' title='no image available' />"));
-		else if (instanceSubject.getImage().length() > 10
-				&& !sParsedImage.equals(PropertyConstants.NO_DECLARATION)) // Image
-																			// available
-		{
-			buffer = "<a class='small' href='#nogo'>" + "<img src='"
-					+ sParsedImage + "' title='subject image' />"
-					+ "<img class='large' src='" + sParsedImage + "'  /></a>";
-			subjectImagePanel.add(new HTML(buffer));
-			System.out.println("CMON: " + buffer);
-		} else
-			// No image available
-			subjectImagePanel.add(new HTML("<img class='image' src='" + noImage
-					+ "' title='no image available' />"));
-
-		// Object image
-		objectImagePanel.clear();
-		String oParsedImage = parseImage(instanceObject.getImage());
-		// Image available
-		if (oParsedImage == null) {
-			// No image available
-			objectImagePanel.add(new HTML("<img class='image' src='" + noImage
-					+ "' title='no image available' />"));
-		} else if (oParsedImage.length() > 10
-				&& !oParsedImage.equals(PropertyConstants.NO_DECLARATION)) {
-			buffer = "<a class='small' href='#nogo' title='small object image'>"
-					+ "<img src='"
-					+ oParsedImage
-					+ "' title='object image' />"
-					+ "<img class='large' src='" + oParsedImage + "'  /></a>";
-			objectImagePanel.add(new HTML(buffer));
-		} else
-			// No image available
-			objectImagePanel.add(new HTML("<img class='image' src='" + noImage
-					+ "' title='no image available' />"));
-
+		// Render template
+		render(json);
+		// Draw map
+		if(getIsMap())
+			loadMap();
+		
 		System.out.println("##VerifyCOmponent: Update Table done ##");
 
-	}
-
-	/**
-	 * Update statement in VerifyComponent for text-type instances. Or 1
-	 * text-type and 1 map-type instance.
-	 * 
-	 * @param newLink
-	 */
-	private void updateNormal(Link stmt) {
-		echo("Update normal");
-		
-		Instance instanceSubject = stmt.getSubject();
-		Instance instanceObject = stmt.getObject();
-		System.out.println("Set subject panel");
-		subPanel.clear();
-		subPanel.add(new HTML(removeDuplicate(instanceSubject.getLabel())));
-		// subPanel.add(new HTML(instanceSubject.getUri()));
-		// subPanel.add(new HTML(instanceSubject.getOptional()));
-
-		echo("subjectTemplate type: " + subjectTemplate.getType());
-		if (subjectTemplate.getType().equals("map")) {
-			subPanel.add(new HTML("MAPTYPE"));
-			// subjectPanel.setLatitude(instanceSubject.getLatitude());
-			// subjectPanel.setLongitude(instanceSubject.getLongitude());
-		}else if(subjectTemplate.getType().equals("img")){
-//			drawImg("subject",instanceSubject.getImage());
-			drawImg("subject",instanceSubject.getImage());
-		}
-		System.out.println("Subject Uri: " + instanceSubject.getUri());
-		System.out.println("Set subject panel done");
-
-		System.out.println("Set object panel");
-		obPanel.clear();
-		echo("objectTemplate.getType(): " + objectTemplate.getType());
-		if (objectTemplate.getType().equals("map")) {
-			double lati = Double.parseDouble(instanceObject
-					.getValue("<http://www.w3.org/2003/01/geo/wgs84_pos#lat>"));
-			double longi = Double
-					.parseDouble(instanceObject
-							.getValue("<http://www.w3.org/2003/01/geo/wgs84_pos#long>"));
-			drawMap(obPanel,instanceObject, lati, longi);
-		} else if (objectTemplate.getType().equals("txt")) {
-			obPanel.add(new HTML(removeDuplicate(instanceObject.getLabel())));
-		}else if(objectTemplate.getType().equals("img")){
-			drawImg("object",instanceObject.getImage());
-		}
-		System.out.println("Object Uri: " + instanceObject.getUri());
-		System.out.println("Set object panel done");
-	}
-
-	private void drawImg(String divId, String imgUrl){
-		String img = "<img class='kongregateImage' src='"+imgUrl+"' title='"+divId+"'>";
-		DOM.getElementById(divId).setInnerHTML(img);
-	}
-	
-	private void drawMap(VerticalPanel panel,Instance instance, double lati, double longi) {
-		echo("draw map");
-		initializeMap(instance, lati, longi);
-		panel.add(mapWidget);
-		// Resize mapWidget
-		LatLng CENTER = LatLng.newInstance(lati, longi);
-		MapHandlerRegistration.trigger(mapWidget, MapEventType.RESIZE);
-		mapWidget.setCenter(CENTER);
 	}
 
 	private void initializeMap(Instance instance, double latitude,
@@ -309,49 +164,6 @@ public class VerifyComponent extends HorizontalPanel {
 		test = test.replace("<FONT style='BACKGROUND-COLOR: yellow'>", "back");
 		echo("2: " + test + "\n\n");
 		return end;
-	}
-
-	/**
-	 * Update statement in VerifyComponent for both map-type instances
-	 * 
-	 * @param link
-	 */
-	private void updateBothMaps(rdfStatement link) {
-		echo("Update both");
-		if (config.equals(Configuration.KNOWLEDGE_EXPERT))
-			this.bothMapsPanel.update(link);
-		else {
-			rdfInstance sub = link.getSubject();
-			rdfInstance ob = link.getObject();
-
-			sub.setType(removeNamespace(sub.getType()));
-			ob.setType(removeNamespace(ob.getType()));
-
-			rdfStatement stmt = link;
-			link.setSubject(sub);
-			link.setObject(ob);
-			this.bothMapsPanel.update(link);
-		}
-	}
-
-	/**
-	 * Update statement in VerifyComponent for both map-type instances
-	 * 
-	 * @param link
-	 */
-	private void updateKongregate(rdfStatement link) {
-		echo("Update Kongregate");
-		rdfInstance sub = link.getSubject();
-		rdfInstance ob = link.getObject();
-
-		sub.setType(removeNamespace(sub.getType()));
-		ob.setType(removeNamespace(ob.getType()));
-
-		rdfStatement stmt = link;
-		link.setSubject(sub);
-		link.setObject(ob);
-
-		this.kongregate.update(stmt);
 	}
 
 	private String removeDuplicate(String value) {
@@ -572,8 +384,6 @@ public class VerifyComponent extends HorizontalPanel {
 	// Init checkboxes and queries
 	private void init() {
 		echo("##VerifyComponent: Init VerifyComponent");
-		echo("subjectTemplate type: " + subjectTemplate.getType());
-		echo("objectTemplate type: " + objectTemplate.getType());
 		// Subject and object Both map-type instances
 		// if (config.isKongregate() || config.isSimple()){
 		// initKongregate();
@@ -608,89 +418,56 @@ public class VerifyComponent extends HorizontalPanel {
 		echo("Init Normal");
 		this.setSpacing(2);
 		
-		String text="";
-		echo("linkset: "+this.template.getLinkset());
-		if(this.template.getLinkset().equals("dbpedia-linkedgeodata"))
-			text ="Does this flag/image belong to this country?";
-		if(this.template.getLinkset().equals("dbpedia-factbook"))
-			text ="Is this language spoken in this country?";
-		if(this.template.getLinkset().equals("dbpedia-bbcwildlife"))
-			text ="Are these the same animals?";
-		DOM.getElementById("quizHead").setInnerHTML(text);
-		
-		this.subPanel = new VerticalPanel();
-		DOM.getElementById("subject").setInnerHTML("");
-		RootPanel.get("subject").add(subPanel);
-
-		this.obPanel = new VerticalPanel();
-		DOM.getElementById("object").setInnerHTML("");
-		RootPanel.get("object").add(obPanel);
-
-		// predicate (middlePanel)
-		initMiddlePanel();
-
-		// image Panels
-		initImagePanel();
-	}
-
-	/**
-	 * Init method for at least 1 text-type instance
-	 */
-	private void initKongregate() {
-		echo("Init Kongregate");
-		this.setSpacing(2);
-
-		// Kongregate Panel
-		kongregate = new KongregatePanel(template, config);
+//		String text="";
+//		echo("linkset: "+this.template.getLinkset());
+//		if(this.template.getLinkset().equals("dbpedia-linkedgeodata"))
+//			text ="Does this flag/image belong to this country?";
+//		if(this.template.getLinkset().equals("dbpedia-factbook"))
+//			text ="Is this language spoken in this country?";
+//		if(this.template.getLinkset().equals("dbpedia-bbcwildlife"))
+//			text ="Are these the same animals?";
+//		DOM.getElementById("quizHead").setInnerHTML(text);
+//		
+//		this.subPanel = new VerticalPanel();
+//		DOM.getElementById("subject").setInnerHTML("");
+//		RootPanel.get("subject").add(subPanel);
+//
+//		this.obPanel = new VerticalPanel();
+//		DOM.getElementById("object").setInnerHTML("");
+//		RootPanel.get("object").add(obPanel);
 
 		// predicate (middlePanel)
 		initMiddlePanel();
 
-		// image Panels
-		initImagePanel();
-
 	}
 
-	/**
-	 * Init method for 2 map-type instances
-	 */
-	private void initBothMapInstances() {
-		echo("Init both maps");
-		bothMapsPanel = new BothMapsPanel(template, config);
-
-		initMiddlePanel();
-
-		initImagePanel();
-
-		echo("Init both maps end");
-	}
 
 	private void initMiddlePanel() {
 		echo("Init middle panel");
 
-		this.predicatePanel = new VerticalPanel();
+		VerticalPanel predicatePanel = new VerticalPanel();
 		HTML predicateHeader = new HTML("<b>Predicate</b>");
 		String predicateString = "<i>Predicate</i>";
-		predicateHTML = new HTML(predicateString);
+		HTML predicateHTML = new HTML(predicateString);
 		predicatePanel.add(predicateHeader);
 		predicatePanel.add(predicateHTML);
 		predicatePanel.setStyleName("predicatePanel");
 
 		// ButtonGroup
 		HorizontalPanel r1Panel = new HorizontalPanel();
-		r1Panel.setHorizontalAlignment(ALIGN_CENTER);
-		trueButton = new PushButton(new Image(
+		r1Panel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
+		this.trueButton = new PushButton(new Image(
 				"PeaInvasion/images/verification/trueButton.png"));
 		r1Panel.add(trueButton);
 
-		falseButton = new PushButton(new Image(
+		this.falseButton = new PushButton(new Image(
 				"PeaInvasion/images/verification/falseButton.png"));
 		HorizontalPanel r2Panel = new HorizontalPanel();
-		r2Panel.setHorizontalAlignment(ALIGN_CENTER);
+		r2Panel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		r2Panel.add(falseButton);
 
 		HorizontalPanel r3Panel = new HorizontalPanel();
-		r3Panel.setHorizontalAlignment(ALIGN_CENTER);
+		r3Panel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		// // r3Panel.add(rdbtnNotSure);
 		// Image i3 = new Image("Application/images/verification/unsure.png");
 		// // i3.setSize("25px", "25px");
@@ -698,13 +475,13 @@ public class VerifyComponent extends HorizontalPanel {
 		// r3Panel.add(k3);
 		// r3Panel.add(i3);
 		// r3Panel.setSpacing(2);
-		unsureButton = new PushButton(new Image(
+		this.unsureButton = new PushButton(new Image(
 				"PeaInvasion/images/verification/unsureButton.png"));
 		r3Panel.add(unsureButton);
 
 		VerticalPanel rdbtnPanel = new VerticalPanel();
 		rdbtnPanel.setStyleName("RdbtnPanel");
-		rdbtnPanel.setVerticalAlignment(ALIGN_MIDDLE);
+		rdbtnPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 		rdbtnPanel.add(r1Panel);
 		rdbtnPanel.add(r2Panel);
 		rdbtnPanel.add(r3Panel);
@@ -724,26 +501,33 @@ public class VerifyComponent extends HorizontalPanel {
 		middlePanel.setStyleName("middlePanel");
 		RootPanel.get("verifyButtons").add(middlePanel);
 		echo("Init middle panel done");
+		
+	
+//		trueButton.addClickHandler(new ClickHandler() {
+//
+//			public void onClick(ClickEvent event) {
+//				key1Pressed();
+//			}
+//		});
+//
+//		falseButton.addClickHandler(new ClickHandler() {
+//
+//			public void onClick(ClickEvent event) {
+//				key2Pressed();
+//
+//			}
+//		});
+//
+//		unsureButton.addClickHandler(new ClickHandler() {
+//
+//			public void onClick(ClickEvent event) {
+//				key3Pressed();
+//
+//			}
+//		});
+		
 	}
-
-	private void initImagePanel() {
-		echo("Init image panel");
-		// subject image
-		subjectImagePanel = new VerticalPanel();
-		subjectImagePanel.add(new HTML("<img class='image' src='" + noImage
-				+ "'/>"));
-
-		// object image
-		objectImagePanel = new VerticalPanel();
-		objectImagePanel.add(new HTML("<img class='image' src='" + noImage
-				+ "'/>"));
-
-		if (!config.isSimple()) {
-			RootPanel.get("imageSubject").add(subjectImagePanel);
-			RootPanel.get("imageObject").add(objectImagePanel);
-		}
-		echo("Init image panel done");
-	}
+	
 
 /**
 	 * Remove '<' and '>' of an image url
@@ -838,4 +622,75 @@ public class VerifyComponent extends HorizontalPanel {
 		this.falseButton.setEnabled(false);
 		this.unsureButton.setEnabled(false);
 	}
+	
+	
+	public void loadMap() {
+		echo("load map:");
+		RootPanel.get("object").clear();
+		echo("clear");
+		double latitude = Double.parseDouble(getLat());
+		double longitude = Double.parseDouble(getLong());
+		echo("lat: "+latitude+" long: "+longitude);
+		LatLng CENTER = LatLng.newInstance(latitude, longitude);
+
+		final MapOptions options = MapOptions.newInstance();
+		// Zoom level. Required
+		// options.setZoom(Integer.parseInt(template.getZoom())); hurr
+		options.setZoom(6);
+		// Open a map centered on Cawker City, KS USA. Required
+		options.setCenter(CENTER);
+		// Map type. Required.
+		options.setMapTypeId(MapTypeId.TERRAIN);
+
+		// Enable maps drag feature. Disabled by default.
+		options.setDraggable(true);
+		// Enable and add default navigation control. Disabled by default.
+		// options.setNavigationControl(true);
+		// Enable and add map type control. Disabled by default.
+		options.setMapTypeControl(true);
+		this.mapWidget = new MapWidget(options);
+		mapWidget.setStyleName("kongregateMap");
+		mapWidget.setSize("450px", "270px");
+		DOM.setStyleAttribute(mapWidget.getElement(), "border",
+				"1px solid black");
+		DOM.setStyleAttribute(mapWidget.getElement(), "margin", "8px");
+		MarkerOptions markerOptions = MarkerOptions.newInstance();
+		markerOptions.setPosition(CENTER);
+
+		final Marker marker = Marker.newInstance(markerOptions);
+		marker.setMap(mapWidget);
+
+		marker.addClickHandler(new ClickMapHandler() {
+			public void onEvent(ClickMapEvent event) {
+				// drawInfoWindow(marker, event.getMouseEvent(),mapWidget);
+			}
+		});
+		// Resize mapWidget
+		MapHandlerRegistration.trigger(mapWidget, MapEventType.RESIZE);
+		mapWidget.setCenter(CENTER);
+
+		RootPanel.get("object").add(mapWidget);
+		// Resize mapWidget
+		MapHandlerRegistration.trigger(mapWidget, MapEventType.RESIZE);
+		mapWidget.setCenter(CENTER);
+
+	}
+
+	public static native void render(String data) /*-{
+		var tmp = $wnd.jQuery.parseJSON(data);
+		$wnd.jQuery("#render").html($wnd.jQuery("#template").render(tmp));
+
+	}-*/;
+
+	public static native String getLat() /*-{
+		return $wnd.lati;
+	}-*/;
+	
+	public static native String getLong() /*-{
+		return $wnd.longi;
+	}-*/;
+	
+	public static native boolean getIsMap() /*-{
+		return $wnd.isMap;
+	}-*/;
 }

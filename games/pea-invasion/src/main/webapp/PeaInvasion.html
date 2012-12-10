@@ -19,6 +19,26 @@
 <!--                                           -->
 <title>VeriLinks: Interlinking Game</title>
 
+<!-- js libs -->
+<script type="text/javascript" src='PeaInvasion/js/libs/jquery-1.8.3.min.js'></script>
+<!-- jsrender: template -->
+<script type="text/javascript" src='PeaInvasion/js/libs/jsrender.js'></script>
+<script id="template" type="text/x-jsrender"></script>
+<!-- helper functions -->
+<script type="text/javascript">
+	var isMap =false;
+	var lati =0;
+	var longi = 0;
+	$.views.helpers({
+		setLat : function(val) {
+			lati = val;
+			isMap =true;
+		},
+		setLong : function(val) {
+			longi=val;
+		}
+	});
+</script>
 <!--                                           -->
 <!-- This script loads your compiled module.   -->
 <!-- If you add any GWT meta tags, they must   -->
@@ -38,7 +58,6 @@
 	<!-- OPTIONAL: include this if you want history support -->
 	<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
 		style="position: absolute; width: 0; height: 0; border: 0"></iframe>
-
 	<!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
 	<noscript>
 		<div
@@ -52,40 +71,41 @@
 	<table class="upperContent">
 		<tr>
 			<td class="imageTable">
-				<div id="imageSubject"></div></td>
+				<div id="imageSubject"></div>
+			</td>
 			<td>
 				<div id='playn-root'>
 					<div id="loading">
 						<img class="load" src="PeaInvasion/images/loading.png" />
 					</div>
-				</div></td>
+				</div>
+			</td>
 			<td class="imageTable">
-				<div id="imageObject"></div></td>
+				<div id="imageObject"></div>
+			</td>
 		</tr>
 	</table>
 	<table class='lowerContent'>
 		<tr>
 			<td valign='top'>
 				<div id='verifyCnt'>
-					<table><tr><td>
-					<div class='kongregateWholeQuestion'>
-						<div id='quizHead'>Quiz:</div>
-						<div class='kongregateQuestion'>
-							<table>
-								<tr>
-									<td valign='middle'><div id='subject'>Subject</div>
-									</td>
-									<td valign='middle'><div id='predicate'>Predicate</div>
-									</td>
-									<td valign='middle'><div id='object'>Object</div>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</div></td>
-					<td><div id='verifyButtons'></div></td>
-					</tr></table>
-				</div></td>
+					<table>
+						<tr>
+							<td>
+								<div class='kongregateWholeQuestion'>
+									<div id='quizHead'>Quiz:</div>
+									<div class='kongregateQuestion'>
+										<!-- template rendering -->
+										<div id='render'></div>
+									</div>
+								</div>
+							</td>
+							<td><div id='verifyButtons'></div>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
 		</tr>
 
 		<!-- <tr>

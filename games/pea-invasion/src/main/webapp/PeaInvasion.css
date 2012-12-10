@@ -48,11 +48,18 @@ img.load {
 }
 
 img.image {
-	width: 110px;
+	/* width: 110px;
 	border-width: 1px;
 	border-style: dashed;
 	border-color: #D3D3D3;
+	padding: 0px; */
+	border: 1px solid black;
+	margin: 8px 12px;
 	padding: 0px;
+	height: 140px;
+	-moz-box-shadow: 1px 3px 2px 0px grey;
+	-webkit-box-shadow: 1px 3px 2px 0px grey;
+	box-shadow: 1px 3px 2px 0px grey;
 }
 /** Images */
 #imageSubject,#imageObject {

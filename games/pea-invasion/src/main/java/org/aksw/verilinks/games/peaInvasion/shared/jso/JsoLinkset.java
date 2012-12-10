@@ -30,4 +30,8 @@ public class JsoLinkset extends JavaScriptObject {
 	public final native String getDifficulty() /*-{
 		return this.difficulty;
 	}-*/;
+	
+	public final native String getTemplate() /*-{
+	return this.template;
+}-*/;
 }

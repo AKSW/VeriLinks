@@ -9,8 +9,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -48,24 +52,18 @@ public class TemplateUploadServlet extends HttpServlet {
 	private static final String DEFAULT_TEMP_DIR = ".";
 	private static final String taskFile = "task.tk";
 
+	public final static String TEMPLATE = "templateElement";
+	public final static String JSRENDER = "jsrenderElement";
 	public final static String LINKSET = "linksetElement";
+	
 	public final static String NAME = "nameElement";
 	public final static String ENDPOINT = "endpointElement";
-	public final static String PROP0 = "prop0Element";
-	public final static String PROP1 = "prop1Element";
-	public final static String PROP2 = "prop2Element";
-	public final static String PROP3 = "prop3Element";
-	public final static String IMAGE = "imageElement";
-	public final static String TYPE = "typeElement";
+	public final static String PROP = "propElement";
 
 	public final static String NAME_2 = "nameElement2";
 	public final static String ENDPOINT_2 = "endpointElement2";
-	public final static String PROP0_2 = "prop0Element2";
-	public final static String PROP1_2 = "prop1Element2";
-	public final static String PROP2_2 = "prop2Element2";
-	public final static String PROP3_2 = "prop3Element2";
-	public final static String IMAGE_2 = "imageElement2";
-	public final static String TYPE_2 = "typeElement2";
+	public final static String PROP_2 = "propElement2";
+
 
 	public final static String FILE = "fileElement";
 	public final static String DIFFICULTY = "difficultyElement";
@@ -75,27 +73,25 @@ public class TemplateUploadServlet extends HttpServlet {
 
 	private String name = "";
 	private String endpoint = "";
-	private String prop0 = "";
-	private String prop1 = "";
-	private String prop2 = "";
-	private String prop3 = "";
-	private String image = "";
-	private String type = "";
+	private String prop = "";
+	private Set<String> propList = new HashSet<String>();
 
 	private String name_2 = "";
 	private String endpoint_2 = "";
-	private String prop0_2 = "";
-	private String prop1_2 = "";
-	private String prop2_2 = "";
-	private String prop3_2 = "";
-	private String image_2 = "";
-	private String type_2 = "";
-
+	private String prop_2 = "";
+	private Set<String> propList_2 = new HashSet<String>();
+	
+	private String fileName;
 	private String filePath;
-	private String difficulty="";
+	private String difficulty=null;
 	private String predicate;
 	private String description;
-	private String linkset;
+	private String id;
+	private String jsrender = null;
+	private String template = null;
+	private String linkset = null;
+	
+	
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -112,7 +108,6 @@ public class TemplateUploadServlet extends HttpServlet {
 		echo("ConenType: " + req.getContentType());
 		echo("Path: " + req.getContextPath());
 		echo("cntLength: "+req.getContentLength());
-		
 		
 		// process only multipart requests
 		if (ServletFileUpload.isMultipartContent(req)) {
@@ -132,59 +127,42 @@ public class TemplateUploadServlet extends HttpServlet {
 			try {
 				List<FileItem> items = upload.parseRequest(req);
 				System.out.println("Number of items: " + items.size());
-				String fileName = null;
+				fileName = null;
 				for (FileItem fileItem : items) {
 					// process only file upload
 					// System.out.println("FileItem name: "+fileItem.getFieldName());
 					String itemName = fileItem.getFieldName();
 					echo("itemName: "+itemName);
 					
-					
 					// first
 					if (itemName.equals(NAME))
 						name = fileItem.getString();
 					if (itemName.equals(ENDPOINT))
 						endpoint = fileItem.getString();
-					if (itemName.equals(PROP0))
-						prop0 = fileItem.getString();
-					if (itemName.equals(PROP1))
-						prop1 = fileItem.getString();
-					if (itemName.equals(PROP2))
-						prop2 = fileItem.getString();
-					if (itemName.equals(PROP3))
-						prop3 = fileItem.getString();
-					if (itemName.equals(IMAGE))
-						image = fileItem.getString();
-					if (itemName.equals(TYPE))
-						type = fileItem.getString();
-
+					if (itemName.equals(PROP)){
+						propList.add(fileItem.getString());
+					}
 					// second
 					if (itemName.equals(NAME_2))
 						name_2 = fileItem.getString();
 					if (itemName.equals(ENDPOINT_2))
 						endpoint_2 = fileItem.getString();
-					if (itemName.equals(PROP0_2))
-						prop0_2 = fileItem.getString();
-					if (itemName.equals(PROP1_2))
-						prop1_2 = fileItem.getString();
-					if (itemName.equals(PROP2_2))
-						prop2_2 = fileItem.getString();
-					if (itemName.equals(PROP3_2))
-						prop3_2 = fileItem.getString();
-					if (itemName.equals(IMAGE_2))
-						image_2 = fileItem.getString();
-					if (itemName.equals(TYPE_2))
-						type_2 = fileItem.getString();
+					if (itemName.equals(PROP_2))
+						propList_2.add(fileItem.getString());
 
+					
 					if (itemName.equals(DIFFICULTY))
 						difficulty = fileItem.getString();
 					if (itemName.equals(PREDICATE))
 						predicate = fileItem.getString();
 					if (itemName.equals(DESCRIPTION))
 						description = fileItem.getString();
+					if (itemName.equals(TEMPLATE))
+						template = fileItem.getString();
+					if (itemName.equals(JSRENDER))
+						jsrender = fileItem.getString();
 					if (itemName.equals(LINKSET))
 						linkset = fileItem.getString();
-
 					if (itemName.equals(FILE)) {
 						fileName = fileItem.getName();
 
@@ -210,7 +188,7 @@ public class TemplateUploadServlet extends HttpServlet {
 							fileItem.write(uploadedFile);
 							resp.setStatus(HttpServletResponse.SC_CREATED);
 							resp.getWriter()
-									.print("The file was created successfully. The task has been added. Now you can choose to perform this task.");
+									.println("The resource file was uploaded!");
 							resp.flushBuffer();
 						} else
 							throw new IOException(
@@ -219,43 +197,51 @@ public class TemplateUploadServlet extends HttpServlet {
 
 				}
 
-				// Add to template
-				addTemplates();
+				// Add to Sparql template file
+//				addToSparqlTemplate();
 
+				// Add linkedOntologies+difficulty into db
+//				addTask();
+				
+				// Create JsRender Template file in folder templates/
+				createJsRenderTemplate(resp);
+				
 				// add task to task-file, for later processing
 				// updateDatabase(filePath);
-				addTask(name, name_2, predicate, description, difficulty,
-						fileName, linkset);
+//				addTask(name, name_2, predicate, description, difficulty,
+//						fileName, id);
 
 				System.out.println("Print received template");
 				System.out.println("First");
 				System.out.println("Name: " + name);
 				System.out.println("EP: " + endpoint);
-				System.out.println("PROP0: " + prop0);
-				System.out.println("PROP1: " + prop1);
-				System.out.println("PROP2: " + prop2);
-				System.out.println("PROP3: " + prop3);
-				System.out.println("Image: " + image);
-				echo("Type: " + type);
-
+				Iterator<String> itr = propList.iterator();
+			    while(itr.hasNext()){
+				      System.out.println("PROP: "+itr.next());
+				}
+				
 				System.out.println("\nSecond");
 				System.out.println("Name: " + name_2);
 				System.out.println("EP: " + endpoint_2);
-				System.out.println("PROP0: " + prop0_2);
-				System.out.println("PROP1: " + prop1_2);
-				System.out.println("PROP2: " + prop2_2);
-				System.out.println("PROP3: " + prop3_2);
-				System.out.println("Image: " + image_2);
-				echo("Type: " + type_2);
+				itr = propList_2.iterator();
+			    while(itr.hasNext()){
+				      System.out.println("PROP_2: "+itr.next());
+				}
+			
 				echo("Predicate: " + predicate);
 				echo("Description: " + description);
 				System.out.println("\nDifficulty: " + difficulty);
 				System.out.println("\nFileName: " + fileName);
-				System.out.println("\nLinkset: " + linkset);
+				echo("Linkset: "+linkset);
+				echo("Template: "+template);
+				echo("JsRender: "+jsrender);
 				flush();
 
-				System.out
-						.println("####Upload Servlet: Receiving formular done");
+				resp.setStatus(HttpServletResponse.SC_CREATED);
+				resp.getWriter()
+						.println("Adding Link Task done! Now you can choose to perform the Link Task!");
+				resp.flushBuffer();
+				echo("Receiving formular done");
 
 			} catch (Exception e) {
 				resp.sendError(
@@ -268,11 +254,6 @@ public class TemplateUploadServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
 					"Request contents type is not supported by the servlet.");
 		}
-	}
-
-	private void updateDatabease(File uploadedFile2) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private File getTempDir() {
@@ -292,8 +273,41 @@ public class TemplateUploadServlet extends HttpServlet {
 		return resourcePath;
 	}
 
-	private void addTemplates() {
-		System.out.println("ADDD Template---------------------- ");
+	private void createJsRenderTemplate(HttpServletResponse resp) throws IOException{
+		echo("Create JsRender Template");
+		if(template==null ){
+			echo("Template ID wasn't specified");
+			return;
+		}
+		if(jsrender==null ){
+			echo("No JsRender Template specified");
+			return;
+		}
+		String templateFile = template+".tmpl.html";
+		BufferedWriter outputStream = null;
+		try {
+				outputStream = new BufferedWriter(new FileWriter(
+						getResourceDir() + "templates/" + templateFile, true));
+				outputStream.write(jsrender);
+				outputStream.newLine();
+				System.out.println("Wrote to File: " + jsrender);
+				resp.setStatus(HttpServletResponse.SC_CREATED);
+				resp.getWriter()
+						.println("JsRender Template '"+templateFile+"' created! ");
+				echo("Create JsRender Template Done!");
+		} finally {
+			try {
+				if (outputStream != null)
+					outputStream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void addToSparqlTemplate() {
+		System.out.println("ADDD Sparql Template---------------------- ");
 		XMLTool xml = new XMLTool(getResourceDir() + "Templates.xml");
 
 		// xml.addOntology(temp);
@@ -316,13 +330,11 @@ public class TemplateUploadServlet extends HttpServlet {
 			Template temp = new Template(); // Template subject
 			temp.setName(name);
 			temp.setEndpoint(endpoint);
-			temp.setProp0(addBrackets(prop0));
-			temp.setProp1(addBrackets(prop1));
-			temp.setProp2(addBrackets(prop2));
-			temp.setProp3(addBrackets(prop3));
-			temp.setImage(addBrackets(image));
-			temp.setType(type);
-			xml.addOntology(temp);
+//			Iterator<String> it = propList.iterator();
+//			while(it.hasNext()){
+//				temp.setProp(addBrackets(it.next()));
+//			}
+//			xml.addOntology(temp);
 			System.out.println("Add 1.Template DONE");
 		}
 		echo("1");
@@ -330,57 +342,79 @@ public class TemplateUploadServlet extends HttpServlet {
 			Template temp2 = new Template();
 			temp2.setName(name_2);
 			temp2.setEndpoint(endpoint_2);
-			temp2.setProp0(addBrackets(prop0_2));
-			temp2.setProp1(addBrackets(prop1_2));
-			temp2.setProp2(addBrackets(prop2_2));
-			temp2.setProp3(addBrackets(prop3_2));
-			temp2.setImage(addBrackets(image_2));
-			temp2.setType(type_2);
-			xml.addOntology(temp2);
+//			Iterator<String> it = propList_2.iterator();
+//			while(it.hasNext()){
+//				temp2.setProp(addBrackets(it.next()));
+//			}
+//			xml.addOntology(temp2);
 			System.out.println("Add 2.Template DONE");
 		}
 		echo("2");
-		// Add linkedOntologies+difficulty into db
-		if (!difficulty.isEmpty())
-			insertIntoDB();
 
-		System.out.println("ADD Template DONE---------------------- ");
+		System.out.println("ADD Sparql Template DONE---------------------- ");
 	}
-
-	private void insertIntoDB() {
+	
+	
+	private void addTask(){
+		echo("Add Task into DB: ");
 		echo("Insert '" + name + "-" + name_2 + "' with difficulty '"
 				+ difficulty + "' into database");
-		// Insert linkedOntologies into table linkedOntologies
-		// String query =
-		// "INSERT IGNORE INTO "+PropertyConstants.DB_TABLE_NAME_DIFFICULTY+
-		// "("+
-		// PropertyConstants.DB_TABLE_DIFFICULTY_LINKEDONTOLOGIES+","+PropertyConstants.DB_TABLE_DIFFICULTY_DIFFICULTY+") "
-		// +
-		// "VALUES ('"+ name+"-"+name_2+"','"+difficulty+"')";
-		// Insert linkedOntologies into table linkedOntologies
-		String query = "INSERT IGNORE INTO "
+		
+		if (!difficulty.isEmpty()){
+			echo("Won't add task! Difficulty is empty");
+			return;
+		}
+	
+		String taskQuery = "INSERT IGNORE INTO "
+			+ PropertyConstants.DB_TABLE_NAME_TASK + "("
+			+ PropertyConstants.DB_TABLE_TASK_LINKSET + ","
+			+ PropertyConstants.DB_TABLE_TASK_FILE + ","
+			+ PropertyConstants.DB_TABLE_TASK_TIME + ","
+			+ PropertyConstants.DB_TABLE_TASK_SUBJECT + ","
+			+ PropertyConstants.DB_TABLE_TASK_PREDICATE + ","
+			+ PropertyConstants.DB_TABLE_TASK_OBJECT +" , "
+			+ PropertyConstants.DB_TABLE_TASK_TEMPLATE +" , "
+			+ PropertyConstants.DB_TABLE_TASK_DESCRIPTION +" , "
+			+ PropertyConstants.DB_TABLE_TASK_DIFFICULTY +" , "
+			+ PropertyConstants.DB_TABLE_TASK_DONE 
+			+ ") VALUES ('" +linkset+"','"+fileName+"', now(),'"+ name + "','" + predicate + "','" + name_2+ "','"
+			+ template +"','"+ description+"','"+difficulty+"', 0 )";
+		System.out.println("taskQuery Query: " + taskQuery);
+		
+		String linksetQuery = "INSERT IGNORE INTO "
 				+ PropertyConstants.DB_TABLE_NAME_LINKEDONTOLOGIES + "("
+				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_ID + ","
 				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_SUBJECT + ","
 				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_PREDICATE + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_OBJECT + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DESCRIPTION + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_DIFFICULTY + ","
-				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_READY
-				+ ") VALUES ('" + name + "','" + predicate + "','" + name_2
-				+ "','" + description + "','" + difficulty + "','" + "0" + "')";
-		System.out.println("blaaaaa: " + query);
+				+ PropertyConstants.DB_TABLE_LINKEDONTOLOGIES_OBJECT
+				+ ") VALUES ('" +linkset+"','"+ name + "','" + predicate + "','" + name_2+ "')";
+		System.out.println("Linkset Query: " + linksetQuery);
+		
+		String templateQuery = "INSERT IGNORE INTO "
+			+ PropertyConstants.DB_TABLE_NAME_TEMPLATES + "("
+			+ PropertyConstants.DB_TABLE_TEMPLATES_ID + ","
+			+ PropertyConstants.DB_TABLE_TEMPLATES_LINKSET + ","
+			+ PropertyConstants.DB_TABLE_TEMPLATES_DESCRIPTION + ","
+			+ PropertyConstants.DB_TABLE_TEMPLATES_DIFFICULTY + ","
+			+ PropertyConstants.DB_TABLE_TEMPLATES_READY
+			+ ") VALUES ('" + template + "','" + linkset + "','" + description+"','"+difficulty+"', 0 )";
+	System.out.println("Template Query: " + templateQuery);
+		
 		// db connect
 		try {
 			DBTool db = new DBTool(getResourceDir() + "db_settings.ini");
 			Connection con = db.getConnection(); // establish connection
-			db.queryUpdate(query, con);
+			db.queryUpdate(taskQuery, con);
+			db.queryUpdate(linksetQuery, con);
+			db.queryUpdate(templateQuery, con);
 
 		} catch (Exception e) {
-			echo("Server: ERROR getting linked Ontologies: " + e.getMessage());
+			echo("Server: ERROR inserting task: " + e.getMessage());
 		}
-		echo("Insert Done!");
-
+		echo("Add Task Done!");
 	}
+
+	
 
 	private String addBrackets(String prop) {
 		String parsed = null;
@@ -391,21 +425,17 @@ public class TemplateUploadServlet extends HttpServlet {
 	}
 
 	private void flush() {
+		fileName =null;
+		jsrender = null;
+		template = null;
+		difficulty=null;
 		name = "";
 		endpoint = "";
-		prop0 = "";
-		prop1 = "";
-		prop2 = "";
-		prop3 = "";
-		image = "";
+		propList.clear();
 
 		name_2 = "";
 		endpoint_2 = "";
-		prop0_2 = "";
-		prop1_2 = "";
-		prop2_2 = "";
-		prop3_2 = "";
-		image_2 = "";
+		propList_2.clear();
 	}
 
 	// private void updateDatabase(String filePath) {
