@@ -1,5 +1,9 @@
 VERILINKS = (function() {
 
+	var lati = 0;
+	var longi = 0;
+	var isMap = false;
+
 	// constants
 	const TRUE = 1;
 	const FALSE = 0;
@@ -10,9 +14,9 @@ VERILINKS = (function() {
 	const EVAL_FIRST = -2;
 	const EVAL_ERROR = -1111;
 	const EVAL_THRESHOLD = 0.3;
-	// const SERVER_URL = "http://localhost:8080/verilinks-server/server";
+	// const SERVER_URL = "http://localhost:8080/verilinks-server/";
 	// const SERVER_URL = "/verilinks-server/server";
-	const SERVER_URL = "http://[2001:638:902:2010:0:168:35:113]:8080/verilinks-server/";
+	const SERVER_URL = "http://verilinks.aksw.org/";
 	var link = null;
 	// template for displaying
 	var template = null;
@@ -25,21 +29,47 @@ VERILINKS = (function() {
 
 	var locked = true;
 
+	var startOfGame = true;
 	var timeout;
 
 	$(document).ready(function() {
-		init();
+
+		insertScript(init);
+		// init();
 	});
 
 	function init() {
 		login();
 		templateRequest();
 		linkRequest(generateURL(), function() {
-			drawInstance("subject");
-			$("#predicate").html(link.predicate);
-			drawInstance("object");
+			loadMap();
 			VERILINKS.lock();
+			startOfGame = false;
 		});
+	}
+
+	function insertScript(callback) {
+		// openlayers
+		var headID = document.getElementsByTagName("head")[0];
+		var mapScript = document.createElement('script');
+		mapScript.src = 'http://www.openlayers.org/api/OpenLayers.js';
+		mapScript.onload = function() {
+			// jsrScript
+			var jsrScript = document.createElement('script');
+			jsrScript.type = 'text/x-jsrender';
+			jsrScript.id = 'template';
+			headID.appendChild(jsrScript);
+			// jsr helper
+			var helperScript = document.createElement('script');
+			helperScript.type = 'text/javascript';
+			headID.appendChild(helperScript);
+			var code = "$.views.helpers({setLat : function(val) {VERILINKS.setLat(val);VERILINKS.setIsMap(true);},setLong : function(val) {VERILINKS.setLong(val);}});"
+			helperScript.text = code;
+			if (callback != undefined && typeof callback == 'function')
+				callback();
+		};
+		headID.appendChild(mapScript);
+
 	}
 
 	// ajax call to get new link
@@ -49,28 +79,48 @@ VERILINKS = (function() {
 			alert("Can't request link!");
 			return null;
 		}
-		// alert(req);
-		$.ajax({
-			url : req,
-			success : function(data) {
-				handleLink(data);
-				if (callback != undefined && typeof callback == 'function')
-					callback();
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				alert("Error getting Link: " + textStatus.toString);
-				return null;
+
+		xmlHttp = new XMLHttpRequest();
+		xmlHttp.onreadystatechange = function() {
+			if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+				if (xmlHttp.responseText == "Not found") {
+					alert("Error: Receiving Link!");
+				} else {
+					var data = eval("(" + xmlHttp.responseText + ")");
+					handleLink(data);
+					if (callback != undefined && typeof callback == 'function')
+						callback();
+				}
 			}
-		});
+		}
+		xmlHttp.open("GET", req, true);
+		xmlHttp.send(null);
+
+		// alert(req);
+		// ERROR in Chrome ----------- fallback to native js
+		// $.ajax({
+		// url : req,
+		// success : function(data) {
+		// handleLink(data);
+		// if (callback != undefined && typeof callback == 'function')
+		// callback();
+		// },
+		// error : function(jqXHR, textStatus, errorThrown) {
+		// alert("Error getting Link: " + textStatus.toString);
+		// return null;
+		// }
+		// });
 	}
 
 	function handleLink(data) {
 		link = new Link(data);
+		render(data);
 	}
 
 	/** Objects **/
 	function Link(json) {
-		var link = jQuery.parseJSON(json);
+		// var link = jQuery.parseJSON(json);
+		var link = json;
 		this.id = link.id;
 		this.predicate = link.predicate;
 		this.subject = new Instance(link.subject, "subject");
@@ -128,7 +178,10 @@ VERILINKS = (function() {
 
 	/* END */
 
-	function loadMap(long, lat, div) {
+	function loadMap(callback) {
+		if (!isMap)
+			return;
+		var div = 'object';
 		var mapDiv = "map_" + div;
 		if ($("#" + mapDiv).length == 0) {
 			$("#" + div).append("<div id='" + mapDiv + "'></div>");
@@ -141,7 +194,7 @@ VERILINKS = (function() {
 		// Transform from WGS 1984
 		var toProjection = new OpenLayers.Projection("EPSG:900913");
 		// to Spherical Mercator Projection
-		var position = new OpenLayers.LonLat(parseFloat(long), parseFloat(lat)).transform(fromProjection, toProjection);
+		var position = new OpenLayers.LonLat(parseFloat(longi), parseFloat(lati)).transform(fromProjection, toProjection);
 		var zoom = 5;
 
 		map.addLayer(mapnik);
@@ -156,6 +209,11 @@ VERILINKS = (function() {
 		markers.addMarker(new OpenLayers.Marker(position, icon.clone()));
 
 		map.setCenter(position, zoom);
+
+		// callback
+		if (callback != undefined && typeof callback == 'function') {
+			callback();
+		}
 	}
 
 	function htmlEntities(str) {
@@ -163,12 +221,8 @@ VERILINKS = (function() {
 	}
 
 	// draw link
-	function draw() {
-		// clear();
-		drawInstance("subject");
-		$("#predicate").html(link.predicate);
-		drawInstance("object");
-
+	function render(data) {
+		$("#render").html($("#template").render(data));
 		window.drawMsg(VERILINKS.getEval());
 		VERILINKS.lock();
 		timer();
@@ -178,50 +232,6 @@ VERILINKS = (function() {
 		$("#subject").html("");
 		$("#object").html("");
 		$("#predicate").html("");
-	}
-
-	function drawInstance(div) {
-		// get Template
-		var tmp;
-		if (div == "subject")
-			tmp = template.subject;
-		else
-			tmp = template.object;
-
-		// draw Props
-		var search;
-		var inst;
-		for (var i = 0; i < tmp.properties.length; i++) {
-			search = tmp.properties[i].property;
-			// search link
-			if (div == "subject")
-				inst = link.subject;
-			else
-				inst = link.object;
-			var val = inst.getProperty(search);
-
-			// draw (draw map at end)
-			if (val.match(/(.jpg|.svg|.gif|.png)/)) {// picture
-				drawImg(val, div);
-			} else if (tmp.type == 'txt') {// text
-				$("#" + div).html(val);
-			}
-		}
-
-		if (tmp.type == 'map') {// map
-			var long = inst.getProperty("<http://www.w3.org/2003/01/geo/wgs84_pos#long>");
-			var lat = inst.getProperty("<http://www.w3.org/2003/01/geo/wgs84_pos#lat>");
-			loadMap(long, lat, div);
-		}
-	}
-
-	function drawImg(val, div) {
-		var valCache = val;
-		var img = new Image();
-		img.onload = function() {
-			$("#" + div).html(img);
-		};
-		img.src = valCache;
 	}
 
 	function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
@@ -242,15 +252,20 @@ VERILINKS = (function() {
 		ctx.fillText(line, x, y);
 	}
 
-	function templateRequest() {
-		$.ajax({
-			url : SERVER_URL + "server?service=getTemplate",
-			success : function(data) {
-				// alert(data);
-				templates = jQuery.parseJSON(data);
-				template = getTemplate("dbpedia-linkedgeodata");
-			}
-		});
+	function templateRequest(callback) {
+		// var url = "http://localhost:8080/verilinks-server/server?service=getTemplate";
+		// var url = SERVER_URL + "server?service=getTemplate";
+		var url = SERVER_URL + "server?service=getTemplate&template=dbpedia-linkedgeodata";
+		// $.ajax({
+			// url : url,
+			// success : function(data) {
+				// // alert(data);
+				// $('#template').html(data);
+				// if (callback != undefined && typeof callback == 'function')
+					// callback();
+			// }
+		// });
+		$('#template').load(url);
 	}
 
 	function getTemplate(linksetId) {
@@ -337,8 +352,11 @@ VERILINKS = (function() {
 	// }
 
 	function timer() {
-		timeout = setTimeout('VERILINKS.unlock()', 1300);
+		if (!startOfGame)
+			timeout = setTimeout('VERILINKS.unlock()', 1300);
 	}
+
+	// JsRender Helper functions
 
 	return {
 		// Get evaluation of previous link-verification
@@ -375,7 +393,7 @@ VERILINKS = (function() {
 				verifiedLinks.push(veri);
 			}
 
-			linkRequest(generateURL(verification), draw);
+			linkRequest(generateURL(verification), loadMap);
 		},
 		// Commit user's verification
 		commit : function() {
@@ -402,12 +420,19 @@ VERILINKS = (function() {
 			});
 			// $("#start").removeAttr('disabled');
 		},
+		lockVerify : function() {
+			locked = true;
+			$(".lock").css({
+				opacity : 0.3
+			});
+			$("#start").removeAttr('disabled');
+		},
 		unlock : function() {
 			locked = false;
 			$(".lock").css({
 				opacity : 1
 			});
-			// $("#start").attr('disabled','disabled');
+			$("#start").attr('disabled', 'disabled');
 		},
 		TRUE : function() {
 			return TRUE;
@@ -417,6 +442,15 @@ VERILINKS = (function() {
 		},
 		UNSURE : function() {
 			return UNSURE;
+		},
+		setLat : function(val) {
+			lati = val;
+		},
+		setLong : function(val) {
+			longi = val;
+		},
+		setIsMap : function(val) {
+			isMap = val;
 		}
 	};
 

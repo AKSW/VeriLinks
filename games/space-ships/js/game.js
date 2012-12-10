@@ -272,7 +272,7 @@
 		else
 			col = "white";
 
-		if (_msg.TextLayer === null) {
+		if (_msg.TextLayer == null) {
 			_msg.TextLayer = new Kinetic.Layer();
 			_msg.hpConf = {
 				x : _options.width / 2.5,
@@ -463,7 +463,7 @@
 
 	var phaseEnd = function() {
 		VERILINKS.commit();
-		VERILINKS.lock();
+		VERILINKS.lockVerify();
 
 		// shoot one
 		shoot(_playerOne, _playerTwo, 10, _bulletRed);

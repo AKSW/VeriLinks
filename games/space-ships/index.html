@@ -10,7 +10,7 @@
 
 		<!-- libs -->
 		<script src="js/lib/jquery-1.8.2.min.js"></script>
-		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+		<script type="text/javascript" src='js/lib/jsrender.js'></script>
 
 		<!-- main logic -->
 		<script data-main="js/main" src="js/require.js"></script>
@@ -19,30 +19,27 @@
 		<!-- gfx container -->
 		<div id="gameContainer"></div>
 
-		<!-- -->
-<!-- 		<a href="#" onclick="emulate()" style="position:absolute; right:10px; color:white;">Start round</a> -->
-<!-- 		<a href="#" onclick="drawMsg('boo')" style="position:absolute; right:10px; color:white;">Draw</a> -->
 		<!-- verify -->
 		<div id="verilinksContainer">
-			<table id ='link'>
+			<table>
 				<tr>
-					<td valign=top><div id='subject'></div></td>
-					<td valign=top><div id='predicate'></div>
-					<div id='buttons'>
+					<!-- template rendering-->
+					<td id='render'></td>
+					<!-- buttons -->
+					<td id='buttons'>
 						<p class='vertical-align'>
-							<a href="#" title='True' onclick="VERILINKS.verify(VERILINKS.TRUE())"><img class="lock" src="img/verify/trueButton.png"></a>
+							<a id='true' href="#" title='True' onclick='VERILINKS.verify(VERILINKS.TRUE())'><img class='lock' src='img/verify/trueButton.png'></a>
 						</p>
 						<p class='vertical-align'>
-							<a href="#" title='False'onclick="VERILINKS.verify(VERILINKS.FALSE())"><img class="lock" src="img/verify/falseButton.png"></a>
+							<a id='false' href="#" title='False' onclick='VERILINKS.verify(VERILINKS.FALSE())'><img class='lock' src='img/verify/falseButton.png'></a>
 						</p>
 						<p class='vertical-align'>
-							<a href="#" title='Unsure' onclick="VERILINKS.verify(VERILINKS.UNSURE())"><img class="lock" src="img/verify/unsureButton.png"></a>
+							<a id='unsure' href="#" title='Unsure' onclick='VERILINKS.verify(VERILINKS.UNSURE())'><img class='lock' src='img/verify/unsureButton.png'></a>
 						</p>
 						<p class='vertical-align'>
 							<button id='start' onclick="emulate()">Start</button>
 						</p>
-					</div></td>
-					<td valign=top><div id='object'></div></td>
+					</td>
 				</tr>
 			</table>
 		</div>
