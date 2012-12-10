@@ -960,12 +960,14 @@ public class RDFHandler {
 		}
 		echo("Querying rdf statements done");
 
-		String setTaskSuccessQuery = "UPDATE tasks set Ready = true WHERE Linkset =`"+this.task.getLinkset()+"` and File =`"+this.task.getLinkFile()+"`";
-		String setTemplatesSuccessQuery = "UPDATE templates set Ready = true where ID=`"+this.task.getTemplate()+"` AND linkset =`"+this.task.getLinkset()+"`";
+		String setTaskSuccessQuery = "UPDATE tasks set Done = true WHERE Linkset ='"+this.task.getLinkset()+"' and File ='"+this.task.getLinkFile()+"'";
+		String setTemplatesSuccessQuery = "UPDATE templates set Ready = true where ID='"+this.task.getTemplate()+"' AND linkset ='"+this.task.getLinkset()+"'";
 		
 		
 		if (linkSuccess > 3) {
+			echo("Task Query: "+setTaskSuccessQuery);
 			db.queryUpdate(setTaskSuccessQuery, con);
+			echo("Template Query: "+setTemplatesSuccessQuery);
 			db.queryUpdate(setTemplatesSuccessQuery, con);
 		} else
 			msg += "RDFHandler: "

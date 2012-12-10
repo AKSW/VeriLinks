@@ -198,10 +198,10 @@ public class TemplateUploadServlet extends HttpServlet {
 				}
 
 				// Add to Sparql template file
-//				addToSparqlTemplate();
+				addToSparqlTemplate();
 
 				// Add linkedOntologies+difficulty into db
-//				addTask();
+				addTask();
 				
 				// Create JsRender Template file in folder templates/
 				createJsRenderTemplate(resp);
@@ -230,8 +230,8 @@ public class TemplateUploadServlet extends HttpServlet {
 			
 				echo("Predicate: " + predicate);
 				echo("Description: " + description);
-				System.out.println("\nDifficulty: " + difficulty);
-				System.out.println("\nFileName: " + fileName);
+				echo("Difficulty: " + difficulty);
+				echo("FileName: " + fileName);
 				echo("Linkset: "+linkset);
 				echo("Template: "+template);
 				echo("JsRender: "+jsrender);
@@ -360,7 +360,7 @@ public class TemplateUploadServlet extends HttpServlet {
 		echo("Insert '" + name + "-" + name_2 + "' with difficulty '"
 				+ difficulty + "' into database");
 		
-		if (!difficulty.isEmpty()){
+		if (difficulty.isEmpty()){
 			echo("Won't add task! Difficulty is empty");
 			return;
 		}
