@@ -5,8 +5,12 @@
 	};
 
 	var _stage, _projectileLayer, _clock,
-		_bulletRed, _bulletWhite,
-		_explosionSpritesheet, _explodeAnim;
+		_images = {
+			'bulletRed': null,
+			'bulletWhite': null,
+			'explosionSpritesheet': null
+		},
+		_explodeAnim;
 
 	var _options = {
 		"frameRate" : 60,
@@ -44,25 +48,25 @@
 	};
 
 	var preloadImage = function(url, holder, callback) {
-		img = new Image();
+		var img = new Image();
 		img.src = url;
 		img.onload = function() {
-			holder = img;
+			_images[holder] = img;
 			callback(img);
 		};
 	};
 
 	var preloadResources = function() {
 		// preload projectiles
-		imagesToPreload = [
-			{ url: "img/plasma-red.png", holder: _bulletRed },
-			{ url: "img/plasma-white.png", holder: _bulletWhite },
-			{ url: "img/explosion.png", holder: _explosionSpritesheet }
+		var imagesToPreload = [
+			{ url: "img/plasma-red.png", holder: "bulletRed" },
+			{ url: "img/plasma-white.png", holder: "bulletWhite" },
+			{ url: "img/explosion.png", holder: "explosionSpritesheet" }
 		];
 		var i = 0;
 		var preloadNext = function() {
 			if(i >= imagesToPreload.length) return;
-			preloadImage(imagesToPreload[i].url, imagesToPreload[i].holder, preloadNext);
+			preloadImage(imagesToPreload[i]["url"], imagesToPreload[i]["holder"], preloadNext);
 			i++;
 		};
 		preloadNext();
@@ -416,7 +420,7 @@
 		var explosionSprite = new Kinetic.Sprite({
 			x: x,
 			y: player.y,
-			image: _explosionSpritesheet,
+			image: _images.explosionSpritesheet,
 			animation: "explode",
 			animations: _explodeAnim,
 			frameRate: 15
@@ -482,10 +486,10 @@
 		VERILINKS.lockVerify();
 
 		// shoot one
-		shoot(_playerOne, _playerTwo, 10, _bulletRed);
+		shoot(_playerOne, _playerTwo, 10, _images.bulletRed);
 		// shoot two with delay
 		setTimeout(function(){
-			shoot(_playerTwo, _playerOne, 10, _bulletWhite);
+			shoot(_playerTwo, _playerOne, 10, _images.bulletWhite);
 		},500);
 	};
 
