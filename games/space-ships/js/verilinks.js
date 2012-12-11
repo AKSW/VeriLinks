@@ -24,7 +24,7 @@ VERILINKS = (function() {
 	var verifiedLinks = [];
 	var user = null;
 	var linkset = null;
-	// evaluation of user's verification
+
 	var prevLinkEval = 1111;
 
 	var locked = true;
@@ -32,11 +32,11 @@ VERILINKS = (function() {
 	var startOfGame = true;
 	var timeout;
 
-	$(document).ready(function() {
+	window.onload = function() {
 
 		insertScript(init);
 		// init();
-	});
+	};
 
 	function init() {
 		login();
@@ -48,28 +48,43 @@ VERILINKS = (function() {
 		});
 	}
 
+	// TODO: any other way to realize script insertion?
 	function insertScript(callback) {
-		// openlayers
 		var headID = document.getElementsByTagName("head")[0];
-		var mapScript = document.createElement('script');
-		mapScript.src = 'http://www.openlayers.org/api/OpenLayers.js';
-		mapScript.onload = function() {
-			// jsrScript
-			var jsrScript = document.createElement('script');
-			jsrScript.type = 'text/x-jsrender';
-			jsrScript.id = 'template';
-			headID.appendChild(jsrScript);
-			// jsr helper
-			var helperScript = document.createElement('script');
-			helperScript.type = 'text/javascript';
-			headID.appendChild(helperScript);
-			var code = "$.views.helpers({setLat : function(val) {VERILINKS.setLat(val);VERILINKS.setIsMap(true);},setLong : function(val) {VERILINKS.setLong(val);}});"
-			helperScript.text = code;
-			if (callback != undefined && typeof callback == 'function')
-				callback();
-		};
-		headID.appendChild(mapScript);
-
+		// jQuery
+		var jqueryScript = document.createElement('script');
+		jqueryScript.type = 'text/javascript';
+		jqueryScript.src = '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js';
+		jqueryScript.onload = function() {
+			// openlayers
+			var mapScript = document.createElement('script');
+			mapScript.src = 'http://www.openlayers.org/api/OpenLayers.js';
+			mapScript.onload = function() {
+				// jsrender
+				var jsrenderScript = document.createElement('script');
+				jsrenderScript.src = 'https://raw.github.com/BorisMoore/jsrender/master/jsrender.js';
+				jsrenderScript.type = 'text/javascript';
+				jsrenderScript.onload = function() {
+					// jsrScript
+					var jsrScript = document.createElement('script');
+					jsrScript.type = 'text/x-jsrender';
+					jsrScript.id = 'template';
+					headID.appendChild(jsrScript);
+					// jsr helper
+					var helperScript = document.createElement('script');
+					helperScript.type = 'text/javascript';
+					headID.appendChild(helperScript);
+					var code = "$.views.helpers({setLat : function(val) {VERILINKS.setLat(val);VERILINKS.setIsMap(true);},setLong : function(val) {VERILINKS.setLong(val);}});"
+					helperScript.text = code;
+					// callback
+					if (callback != undefined && typeof callback == 'function')
+						callback();
+				}
+				headID.appendChild(jsrenderScript);
+			};
+			headID.appendChild(mapScript);
+		}
+		headID.appendChild(jqueryScript);
 	}
 
 	// ajax call to get new link
@@ -169,6 +184,7 @@ VERILINKS = (function() {
 	function Commit() {
 		this.user = user;
 		this.verification = verifiedLinks;
+		verifiedLinks = [];
 	}
 
 	function User(userId, userName) {
@@ -257,13 +273,13 @@ VERILINKS = (function() {
 		// var url = SERVER_URL + "server?service=getTemplate";
 		var url = SERVER_URL + "server?service=getTemplate&template=dbpedia-linkedgeodata";
 		// $.ajax({
-			// url : url,
-			// success : function(data) {
-				// // alert(data);
-				// $('#template').html(data);
-				// if (callback != undefined && typeof callback == 'function')
-					// callback();
-			// }
+		// url : url,
+		// success : function(data) {
+		// // alert(data);
+		// $('#template').html(data);
+		// if (callback != undefined && typeof callback == 'function')
+		// callback();
+		// }
 		// });
 		$('#template').load(url);
 	}
