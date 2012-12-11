@@ -145,10 +145,10 @@
 		];
 		var fogColors = fogColorsAll[Math.floor(Math.random() * fogColorsAll.length)];
 		var fog, x, y, radius, gradient, color;
-		for(i = 0; i < 10000; i++) {
+		for(i = 0; i < 5000; i++) {
 			x = Math.random() * _options.width;
 			y = Math.random() * _options.height;
-			radius = 10 + Math.random() * 10;
+			radius = 20 + Math.random() * 10;
 			color = fogColors[Math.floor(Math.random() * fogColors.length)];
 
 			gradient = {
@@ -169,7 +169,7 @@
 				x: x,
 				y: y,
 				radius: radius,
-				blur: 10 + Math.random()*5,
+				blur: 10,
 				fill: gradient,
 				opacity: 0.03,
 				strokeWidth: 0
