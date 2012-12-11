@@ -271,7 +271,7 @@ public class Server extends HttpServlet {
 		// TODO Auto-generated method stub
 		// super.doGet(req, resp);
 
-		echo("Processing GET");
+		echo("############## Processing GET ##############");
 		String service = req.getParameter("service");
 		echo("Req: " + service);
 		String response = null;

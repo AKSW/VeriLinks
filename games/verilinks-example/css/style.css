@@ -1,0 +1,25 @@
+/* Container defined in JsRender Template */
+#subject, #object, #predicate{
+	margin: 10px;
+	text-align: center;
+	text-shadow: 2px 3px 3px #565051;
+	font: 25px MisoRegular;
+}
+
+#difficulty{
+	color: grey;
+	text-shadow: 1px 2px 3px #565051;
+	font: 17px MisoRegular;
+}
+/* End */
+
+
+/* Map Component*/ 
+#map {
+	font: 12px MisoRegular;
+}
+/* Label from OpenStreetMap*/
+.olControlAttribution {
+	margin-bottom: 140px;
+	margin-right: 5px;
+}
