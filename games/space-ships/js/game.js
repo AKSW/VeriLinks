@@ -43,15 +43,31 @@
 		imageObj.src = url;
 	};
 
+	var preloadImage = function(url, holder, callback) {
+		img = new Image();
+		img.src = url;
+		img.onload = function() {
+			holder = img;
+			callback(img);
+		};
+	};
+
 	var preloadResources = function() {
 		// preload projectiles
-		_bulletRed = new Image();
-		_bulletRed.src = "img/plasma-red.png";
-		_bulletWhite = new Image();
-		_bulletWhite.src = "img/plasma-white.png";
-		// make explosion
-		_explosionSpritesheet = new Image();
-		_explosionSpritesheet.src = "img/explosion.png";
+		imagesToPreload = [
+			{ url: "img/plasma-red.png", holder: _bulletRed },
+			{ url: "img/plasma-white.png", holder: _bulletWhite },
+			{ url: "img/explosion.png", holder: _explosionSpritesheet }
+		];
+		var i = 0;
+		var preloadNext = function() {
+			if(i >= imagesToPreload.length) return;
+			preloadImage(imagesToPreload[i].url, imagesToPreload[i].holder, preloadNext);
+			i++;
+		};
+		preloadNext();
+
+		// prepare
 		prepareExplosionSprite();
 	};
 
