@@ -891,7 +891,7 @@ public class PeaInvasion extends HtmlGame {
 	 */
 	private void initGUI() {
 		echo("Init GUI");
-		this.verifyComponent = new VerifyComponent(config);
+		this.verifyComponent = new VerifyComponent(linkset, config);
 
 		// VerifyComponent Button handler
 		PushButton trueButton = verifyComponent.getTrueButton();

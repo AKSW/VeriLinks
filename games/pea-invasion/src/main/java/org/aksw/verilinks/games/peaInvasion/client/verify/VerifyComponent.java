@@ -30,11 +30,13 @@ import org.aksw.verilinks.games.peaInvasion.shared.rdfInstance;
 import org.aksw.verilinks.games.peaInvasion.shared.rdfStatement;
 import org.aksw.verilinks.games.peaInvasion.shared.msg.Instance;
 import org.aksw.verilinks.games.peaInvasion.shared.msg.Link;
+import org.aksw.verilinks.games.peaInvasion.shared.msg.Linkset;
 import org.aksw.verilinks.games.peaInvasion.shared.templates.TemplateInstance;
 import org.aksw.verilinks.games.peaInvasion.shared.templates.TemplateLinkset;
 
 public class VerifyComponent extends HorizontalPanel {
 
+	private Linkset linkset;
 	private Configuration config;
 	private Button verifyButton;
 
@@ -55,11 +57,12 @@ public class VerifyComponent extends HorizontalPanel {
 	 * 
 	 * @param model
 	 */
-	public VerifyComponent(Configuration config) {
+	public VerifyComponent(Linkset linkset , Configuration config) {
 
 		super();
 
 		this.config = config;
+		this.linkset=linkset;
 		init();
 
 		this.setStyleName("verifyComponent");
@@ -418,15 +421,15 @@ public class VerifyComponent extends HorizontalPanel {
 		echo("Init Normal");
 		this.setSpacing(2);
 		
-//		String text="";
-//		echo("linkset: "+this.template.getLinkset());
-//		if(this.template.getLinkset().equals("dbpedia-linkedgeodata"))
-//			text ="Does this flag/image belong to this country?";
-//		if(this.template.getLinkset().equals("dbpedia-factbook"))
-//			text ="Is this language spoken in this country?";
-//		if(this.template.getLinkset().equals("dbpedia-bbcwildlife"))
-//			text ="Are these the same animals?";
-//		DOM.getElementById("quizHead").setInnerHTML(text);
+		String text="";
+		echo("linkset: "+linkset.getTemplate());
+		if(linkset.getTemplate().equals("dbpedia-linkedgeodata"))
+			text ="Does this flag/image belong to this country?";
+		if(linkset.getTemplate().equals("dbpedia-factbook"))
+			text ="Is this language spoken in this country?";
+		if(linkset.getTemplate().equals("dbpedia-bbcwildlife"))
+			text ="Are these the same animals?";
+		DOM.getElementById("quizHead").setInnerHTML(text);
 //		
 //		this.subPanel = new VerticalPanel();
 //		DOM.getElementById("subject").setInnerHTML("");
