@@ -689,20 +689,21 @@ public class Server extends HttpServlet {
 		if (verification != null)
 			eval = evaluateVerification(curLink, verification, con);
 
-		// Get difficulty
-		double diff = 0;
-		if (curLink != null)
-			try {
-				diff = getLinkDifficulty(curLink, con);
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 
 		// Get link
 		Link link = getNewLink(userName, userId, linkset, nextLink,
 				verifiedLinks);
 
+		// Get difficulty
+		double diff = 0;
+		if (link != null)
+			try {
+				diff = getLinkDifficulty(curLink, con);
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+		}
+		
 		// Create Json
 		JsonObject linkJson = new JsonObject();
 		try {
