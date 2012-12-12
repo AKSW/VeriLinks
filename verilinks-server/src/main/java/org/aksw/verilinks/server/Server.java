@@ -758,7 +758,8 @@ public class Server extends HttpServlet {
 				JsonValue e = JsonNumber.value(eval);
 				linkJson.put("prevLinkEval", e);
 			}
-			linkJson.put("difficulty", Double.toString(diff));
+//			linkJson.put("difficulty", Double.toString(diff));
+			linkJson.put("difficulty",Balancing.getStringLinkDifficulty(diff));
 
 		} catch (JsonException e) {
 			// TODO Auto-generated catch block

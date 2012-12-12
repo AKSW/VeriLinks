@@ -18,7 +18,7 @@
 		"height" : 600
 	};
 	// time of round in seconds
-	var _roundTime = 10;
+	var _roundTime = 20;
 
 	var _playerOne = {
 		hp : 100
