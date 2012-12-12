@@ -698,7 +698,7 @@ public class Server extends HttpServlet {
 		double diff = 0;
 		if (link != null)
 			try {
-				diff = getLinkDifficulty(curLink, con);
+				diff = getLinkDifficulty(Integer.toString(link.getId()), con);
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
