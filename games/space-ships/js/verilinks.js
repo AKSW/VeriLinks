@@ -237,6 +237,7 @@ VERILINKS = (function() {
 	// draw link
 	function render(data) {
 		$("#"+CONTAINER).html($("#template").render(data));
+		window.drawMsg(VERILINKS.getEval());
 		VERILINKS.lock();
 		timer();
 	}
