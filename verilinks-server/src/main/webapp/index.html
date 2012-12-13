@@ -1,343 +1,209 @@
-<!doctype html> <!-- The DOCTYPE declaration above will set the    -->
-<!-- browser's rendering engine into               -->
-<!-- "Standards Mode". Replacing this declaration  -->
-<!-- with a "Quirks Mode" doctype may lead to some -->
-<!-- differences in layout.                        -->
-
+<!DOCTYPE HTML>
+<!--
+	Halcyonic 1.0 by nodethirtythree + FCT
+	http://nodethirtythree.com | @nodethirtythree
+	Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com/license)
+-->
 <html>
 	<head>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<!-- 	<script type="text/javascript" src="js/script.js"></script> -->
-		<script type="text/javascript">
-			var template;
-			var xmlHttp = null;
-			var gotLinkTask = false;
-			var rootURL ="";
-			function getLinkTasks() {
-				// show
-				if (document.getElementById('processLinkTask').style.display == "none")
-					document.getElementById('processLinkTask').style.display = "block";
-				else
-					document.getElementById('processLinkTask').style.display = "none";
-				// hide addLinktask
-				document.getElementById('addLinkTask').style.display = "none";
-				// http req
-				if (gotLinkTask)
-					return;
-				var url = rootURL+ "/server?service=getTasks";
-				xmlHttp = new XMLHttpRequest();
-				xmlHttp.onreadystatechange = processRequest;
-				xmlHttp.open("GET", url, true);
-				xmlHttp.send(null);
-			}
-
-			function processRequest() {
-				if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-					if (xmlHttp.responseText == "Not found") {
-						//err
-					} else {
-						var task = eval("(" + xmlHttp.responseText + ")");
-						parseLinkTask(task);
-						gotLinkTask = true;
-					}
-				}
-			}
-
-			function performLinkTask() {
-				document.getElementById("performBtn").disabled = false;
-				var url = rootURL+"/server?service=performTasks";
-				xmlHttp = new XMLHttpRequest();
-				xmlHttp.onreadystatechange = processAnswer;
-				xmlHttp.open("GET", url, true);
-				xmlHttp.send(null);
-			}
-
-			function processAnswer() {
-				document.getElementById("msg").innerHTML = xmlHttp.responseText;
-				if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-					window.alert(xmlHttp.responseText);
-				}
-			}
-
-			function parseLinkTask(task) {
-				if (task.tasks.length == 0) {
-					document.getElementById("msg").innerHTML = "No task to perform!";
-				}
-				else
-					document.getElementById("performBtn").disabled = false;
-				for (var i = 0; i < task.tasks.length; i++) {
-					var table = document.getElementById("linkTaskTable");
-					var row = table.insertRow(-1);
-					var subject = row.insertCell(0);
-					var object = row.insertCell(1);
-					var predicate = row.insertCell(2);
-					var description = row.insertCell(3);
-					var difficulty = row.insertCell(4);
-					var file = row.insertCell(5);
-					subject.innerHTML = task.tasks[i].subject;
-					object.innerHTML = task.tasks[i].object;
-					predicate.innerHTML = task.tasks[i].predicate;
-					description.innerHTML = task.tasks[i].description;
-					difficulty.innerHTML = task.tasks[i].difficulty;
-					file.innerHTML = task.tasks[i].file;
-				}
-			}
-
-			function addLinkTask() {
-				if(document.getElementById("template").val == null)
-					getTemplate();
-				// show/hide
-				// addLinkTask
-				if (document.getElementById('addLinkTask').style.display == "none")
-					document.getElementById('addLinkTask').style.display = "block";
-				else
-					document.getElementById('addLinkTask').style.display = "none";
-				// processLinktask
-				document.getElementById('processLinkTask').style.display = "none"
-			}
-
-			function addProperty(id){
-				var name = 'propElement';
-				if(id!='subjectProperty')
-					name = 'propElement2';
-				var div = document.createElement("div");
-				var input = document.createElement("input");
- 				input.setAttribute("type", 'text');
-    			input.setAttribute("name", name);
-				div.appendChild(input);
-				var del = document.createElement("input");
-				del.setAttribute("type", 'button');
-    			
-    			del.setAttribute("onclick", 'removeProperty(this)');
-    			del.setAttribute("value", '-');
-    			
-				div.appendChild(del);
-				document.getElementById(id).appendChild(div);
-				
-				// innerHtml +="<div><input name='prop0Element' type='text'/><a href='#' title='remove this property' onclick='removeProperty(this)'>[-]</a><div>";
-			}
-			
-			function removeProperty(node){
-				 node.parentNode.parentNode.removeChild(node.parentNode);
-			}
-			
-			function getTemplate(){
-				var url = rootURL+ "/server?service=getTemplate";
-				var xmlHttp = new XMLHttpRequest();
-				xmlHttp.onreadystatechange = function(){
-					if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-					if (xmlHttp.responseText == "Not found") {
-						document.getElementById("TextBoxCustomerName").value = "Not found";
-						document.getElementById("TextBoxCustomerAddress").value = "";
-					} else {
-						document.getElementById("template").value=xmlHttp.responseText;
-						// template = ;
-					}
-				}};
-				xmlHttp.open("GET", url, true);
-				xmlHttp.send(null);
-			}
-			
-			function validate() {
-				var elems = document.getElementsByTagName('input');
-				var len = elems.length;
-				for (var i = 0; i < len; i++) {
-					if (elems[i].value.length == 0){
-						if(elems[i].className !='noDisable' && document.getElementById('existsElement').checked){
-							continue;
-						} 
-						window.alert("Please fill in field: "+elems[i].name);
-						return false;
-					}
-				}
-				form.submit();
-			}
-
-			function cbChanged() {
-				if (document.getElementById('existsElement').checked) {
-					// disable
-					var elems = document.getElementsByTagName('input');
-					var len = elems.length;
-					for (var i = 0; i < len; i++) {
-						if (elems[i].className != 'noDisable')
-							elems[i].disabled = true;
-					}
-					var elemsSelect = document.getElementsByTagName('select');
-					for (var i = 0; i < elemsSelect.length; i++) {
-
-						if (elemsSelect[i].className != 'noDisable')
-							elemsSelect[i].disabled = true;
-					}
-				} else {
-					// enable
-					var elems = document.getElementsByTagName('input');
-					var len = elems.length;
-					for (var i = 0; i < len; i++) {
-						if (elems[i].className != 'noDisable')
-							elems[i].disabled = false;
-					}
-					var elemsSelect = document.getElementsByTagName('select');
-					for (var i = 0; i < elemsSelect.length; i++) {
-						if (elemsSelect[i].className != 'noDisable')
-							elemsSelect[i].disabled = false;
-					}
-				}
-			}
-		</script>
-		<!--                                                               -->
-		<!-- Consider inlining CSS to reduce the number of requested files -->
-		<!--                                                               -->
-		<link type="text/css" rel="stylesheet" href="style.css">
-
-		<!--                                           -->
-		<!-- Any title is fine                         -->
-		<!--                                           -->
-		<title>VeriLinks: Interlinking Games</title>
-
+		<title>VeriLinks Platform</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<!--5grid--<script src="css-template/css/5grid/viewport.js"></script><!--[if lt IE 9]><script src="css/5grid/ie.js"></script><![endif]--><link rel="stylesheet" href="css/5grid/responsive.css" /><!--/5grid-->
+		<link rel="stylesheet" href="css/style.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="css/style-ie9.css" /><![endif]-->
 	</head>
 	<body>
-		<h1>VeriLinks Project</h1>
-		<div id='descr'>
-			<div id='menue'></div>
-			<p>
-				Choose an interlinking game:
-			</p>
-			<ul class='games'>
-				<li>
-					<a href='http://pea-invasion.verilinks.aksw.org/'>Pea Invasion</a>
-				</li>
-				<li>
-					<a href='http://space-ships.verilinks.aksw.org/'>Space Ships</a>
-				</li>
-			</ul>
-			<p class='aksw'>
-				Options
-			</p>
-			<button onclick="addLinkTask()">
-				Add Link-Task
-			</button>
-			<button onclick="getLinkTasks()">
-				Process Link-Task
-			</button>
-			<form id='addLinkTask' 
-			enctype="multipart/form-data"
-			action="/upload" style="display:none;" method="post" onsubmit='return validate();'>
-				<h2>Admin Panel</h2>
-				<table>
-					<tr>
-						<td class='fat'>1.Linkset:</td>
-						<td>
-						<input class='noDisable' name="linksetElement" type="text" />
-						</td>
-						<td class='desc'>ID of linkset</td>
-					</tr>
-					<tr>
-						<td class='fat'>2.Linkfile:</td>
-						<td>
-						<input class='noDisable' name="fileElement" type="file"
-						size="10" />
-						</td>
-						<td class='desc'>Upload rdf/xml or n-triple file</td>
 
-					</tr>
-					<tr>
-						<td class='lb'>existing template?</td>
-						<td>
-						<input class='noDisable' id='existsElement' type="checkbox" onChange='cbChanged()'>
-						</td>
-						<td class='desc'>Check if template does exist in db</td>
-					</tr>
-					<tr>
-						<td class='fat'>3.Instances</td>
-						<td>Subject</td>
-						<td>Object</td>
-					</tr>
-					<tr>
-						<td class='lb'>ontology:</td>
-						<td>
-						<input class='noDisable' name="nameElement" type="text" />
-						</td>
-						<td>
-						<input class='noDisable' name="nameElement2" type="text" />
-						</td>
-						<td class='desc'>Name of ontology</td>
-					</tr>
-					<tr>
-						<td class='lb'>endpoint:</td>
-						<td>
-						<input name="endpointElement" type="text" />
-						</td>
-						<td>
-						<input name="endpointElement2" type="text" />
-						</td>
-						<td class='desc'>SPARQL endpoint</td>
-					</tr>
-					<tr>
-						<td class='lb'>property:</td>
-						<td><input value='Add Subject Property' type='button' onclick="addProperty('subjectProperty');return false;"/></td>
-						<td><input value='Add Object Property' type='button' onclick="addProperty('objectProperty');return false;"/></td>
-						<td class='desc'>Add field to specify property</td>
-					</tr>
-					<tr>
-						<td></td>
-						<td id='subjectProperty'></td>
-						<td id='objectProperty'></td>
-					</tr>
-					<tr>
-						<td class='fat'>4.Predicate</td>
-						<td>
-						<input class='noDisable' name="predicateElement" type="text" />
-						</td>
-						<td class='desc'>Name of the relation</td>
-					</tr>
-					<tr>
-						<td class='fat'>5.Description</td>
-						<td>
-						<input class='noDisable' name="descriptionElement" type="text" />
-						</td>
-						<td class='desc'>Description of linkset</td>
-					</tr>
-					<tr>
-						<td class='fat'>6.Difficulty</td>
-						<td>
-						<select class='noDisable' name="difficultyElement">
-							<option value="easy">easy</option>
-							<option value="medium">medium</option>
-							<option value="hard">hard</option>
-						</select></td>
-						<td class='desc'>Describe difficulty of linkset</td>
-					</tr>
-					<tr>
-						<td class='fat'>7.JsRender Template</td>
-						<td>
-						<input class='noDisable' name="templateElement" type="text" />
-						</td>
-						<td class='desc'>ID of Template</td>
-					</tr>
-				</table>
-				<div class='desc'>Define JsRender Template for diplaying data of linkset</div>
-				<div><textarea id='template' cols="100" rows="10" name="jsrenderElement"></textarea></div>
-				<button id='submitBtn' >
-					submit
-				</button>
-			</form>
-			<!-- Process -->
-			<div id='processLinkTask' style='display: none'>
-				<table id='linkTaskTable'>
-					<tr>
-						<th>Subject</th>
-						<th>Object</th>
-						<th>Preidcate</th>
-						<th>Description</th>
-						<th>Difficulty</th>
-						<th>File</th>
-					</tr>
-				</table>
-				<p id='msg'></p>
-				<button id='performBtn'  disabled = 'true' onclick="performLinkTask()">
-					Perform Link-Task
-				</button>
+		<!-- Header -->
+			<div id="header-wrapper">
+				<header id="header" class="5grid">
+					<div class="12u-first">
+					
+						<!-- Logo -->
+							<h1><a href="#">VeriLinks Platform</a></h1>
+						
+						<!-- Nav -->
+							<nav>
+								<a href="index.html">Home</a>
+								<a href="html/games.html">Games</a>
+								<a href="html/addLinkTask.html">Add Link Task</a>
+								<a href="html/performLinkTask.html">Perform Link Task</a>
+								<a href="#">Contact</a>
+								<!-- <a href="onecolumn.html">One Column</a> -->
+							</nav>
+					</div>
+				</header>
+				<div id="banner">
+					<div class="5grid 5grid-alt">
+						<div class="6u-first">
+						
+							<!-- Banner Copy -->
+								<p>Welcome to VeriLlinks. Turn the world into a better place by playing games ;-)</p>
+								<a href="#" class="button-big">Login</a>
+
+						</div>
+						<div class="6u">
+							
+							<!-- Banner Image -->
+								<!-- <a href="#" class="bordered-feature-image"><img src="images/banner.jpg" alt="" /></a> -->
+								<div class='desc'>
+								VeriLinks is a light-weight game platform with the purpose of validating links of the Web of Data. 
+								A task that even allmighty computer algorithms can't solve completely. That's why we need your help!
+								</div>
+						</div>
+						<div class="5grid-clear"></div>
+					</div>
+				</div>
 			</div>
-		</div>
+
+		<!-- Features -->
+			<div id="features-wrapper">
+				<div id="features">
+					<div id='features-head'>List of Games:</div>
+					<div class="5grid">
+						<div class="3u-first">
+						
+							<!-- Feature #1 -->
+								<section>
+									<a href="http://pea-invasion.verilinks.aksw.org/" class="bordered-feature-image"><img src="images/gamescreen.png" alt="" /></a>
+									<h2>Pea Invasion</h2>
+									<p>
+										Do you have multitasking skills? 
+										Try to defend from evil peas, while answering a quiz.
+									</p>
+								</section>
+
+						</div>
+						<div class="3u">
+							
+							<!-- Feature #2 -->
+								<section>
+									<a href="http://space-ships.verilinks.aksw.org/" class="bordered-feature-image"><img src="images/space-ships.png" alt="" /></a>
+									<h2>Space Ships</h2>
+									<p>
+										Play this turn based quiz game. Defeat your opponent by correctly answering as many questions as possible. 
+									</p>
+								</section>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		<!-- Content -->
+			<div id="content-wrapper">
+				<div id="content">
+					<div class="5grid">
+						<div class="4u-first">
+
+							<!-- Box #1 -->
+								<section>
+									<header>
+										<h2>Source</h2>
+										<h3>Access our source code at GitHub</h3>
+									</header>
+									<a href="https://github.com/AKSW/VeriLinks" class="feature-image"><img src="https://raw.github.com/github/media/master/logos/github_logo_social_coding_outlined.png" alt="" /></a>
+									<p>
+										VeriLinks is an open source project. Take a look at the source code hosted at GitHub, or download it <a href="https://github.com/AKSW/VeriLinks/archive/master.zip">here</a>. 
+									</p>
+								</section>
+
+						</div>
+						<div class="4u">
+
+							<!-- Box #2 -->
+								<section>
+									<header>
+										<h2>Features</h2>
+										<h3>What can VeriLinks do for you?</h3>
+									</header>
+									<ul class="check-list">
+										<li>System for managing, retrieving, displaying and verifying Semantic Web Links</li>
+										<li>Central Server with communication API</li>
+										<li>Core functionality for game administration</li>
+										<li>User and game statistic management</li>
+										<li>Rewarding and balancing system</li>
+										<li><a href='https://github.com/AKSW/VeriLinks'>more features</a></li>
+									</ul>
+								</section>
+
+						</div>
+						<div class="4u">
+							
+							<!-- Box #3 -->
+								<section>
+									<header>
+										<h2>Use VeriLinks in your game</h2>
+										<h3>Integrate our Javascript Widget into your own game to unlock all the features of VeriLinks.</h3>
+									</header>
+									<p>
+										Take a look at our <a href="">tutorial</a> on how to integrate and utilize the Widget.
+									</p>
+									<!-- <ul class="quote-list">
+										<li>
+											<img src="images/pic06.jpg" alt="" />
+											<p>"Neque nisidapibus mattis"</p>
+											<span>Jane Doe, CEO of UntitledCorp</span>
+										</li>
+										<li>
+											<img src="images/pic07.jpg" alt="" />
+											<p>"Lorem ipsum consequat!"</p>
+											<span>John Doe, President of FakeBiz</span>
+										</li>
+									</ul> -->
+								</section>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+		<!-- Footer -->
+			<div id="footer-wrapper">
+				<footer id="footer" class="5grid">
+					<div class="8u-first">
+					
+						<!-- Links -->
+							<section>
+								<h2>Links</h2>
+								<div class="3u-first">
+									<ul class="link-list last-child">
+										<li><a href="https://github.com/AKSW/VeriLinks">Source Code</a></li>
+										<li><a href="https://docs.google.com/spreadsheet/ccc?key=0An8FWTPcYP2kdGh1QnMzRXhnbkQtRDIwYjUyYW0tckE#gid=0">Server API</a></li>
+									</ul>
+								</div>
+								<div class="3u">
+									<ul class="link-list last-child">
+										<li><a href="http://aksw.org/About.html">AKSW Leipzig</a></li>
+										<li><a href="http://aksw.org/Projects/VeriLinks.html">AKSW/VeriLinks</a></li>
+									</ul>
+								</div>
+							</section>
+
+					</div>
+					<div class="4u">
+						
+						<!-- Blurb -->
+							<section>
+								<h2>Credits</h2>
+								<p>Game development by the Research Group 
+									</br>Agile Knowledge Engineering and Semantic Web (<a href="https://github.com/AKSW/VeriLinks">AKSW</a>).
+									Game design and implementation by 
+									Quan Nguyen and <a href="http://bis.informatik.uni-leipzig.de/TimofeyErmilov">Timofey Ermilov</a>.
+									Project supervised by <a href="http://jens-lehmann.org/">Dr. Jens Lehmann</a>.
+									Template design by <a href="http://nodethirtythree.com/">nodethirtythree</a>.
+								</p>
+							</section>
+					
+					</div>
+				</footer>
+			</div>
+
+		<!-- Copyright -->
+			<div id="copyright">
+				(c) 2012 VeriLinks. All rights reserved.
+			</div>
+
 	</body>
 </html>
