@@ -754,7 +754,13 @@ public class Server extends HttpServlet {
 			linkJson.put("id", link.getId());
 			linkJson.put("subject", subject);
 			linkJson.put("object", object);
-			linkJson.put("predicate", link.getPredicate());
+			String p = link.getPredicate();
+			if(p.equals("owl:sameAs") || p.equals("http://www.w3.org/2002/07/owl#sameAs"))
+				p = "same as";
+			else if(p.equals("http://dbpedia.org/ontology/spokenIn"))
+				p = "spoken in";
+			linkJson.put("predicate", p);
+//			linkJson.put("predicate", link.getPredicate());
 			if (verification != null) {
 				JsonValue e = JsonNumber.value(eval);
 				linkJson.put("prevLinkEval", e);
