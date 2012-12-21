@@ -1,0 +1,18 @@
+<!-- jsrender template-->
+<table id ='link'>
+	<tr>
+	<td valign=middle><div id='subject'>
+	{{for subject.properties}}
+		{{if property == '<http://www.w3.org/2000/01/rdf-schema#label>'}}
+			{{:value}}
+		{{/if}}
+	{{/for}}</div></td>
+	<td valign=middle><div id='predicate'>{{>predicate}}</div></td>
+	<td valign=middle><div id='object'>
+	{{for object.properties}}
+		{{if property == '<http://www.w3.org/2000/01/rdf-schema#label>'}}
+			{{:value}}
+		{{/if}}
+	{{/for}}</div></td>
+	</tr>
+</table>

@@ -16,7 +16,8 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 		<!--/5grid-->
 		<link rel="stylesheet" href="css/style.css" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="css/style-ie9.css" /><![endif]-->
-		<script src="js/performLinkTask.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script src="js/auth.js"></script>
 	</head>
 	<body class="subpage">
 
@@ -26,17 +27,17 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 				<div class="12u-first">
 
 					<!-- Logo -->
-					<h1><a href="#">Perform Link Task</a></h1>
+					<h1><a href="#">VeriLinks Administration</a></h1>
 
 					<!-- Nav -->
-							<nav>
-								<a href="index.html">Home</a>
-								<a href="html/games.html">Games</a>
-								<a href="html/verilinks.html">VeriLinks</a>
-								<a href="html/admin.html">Admin</a>
-								<a href="#">Contact</a>
-								<!-- <a href="onecolumn.html">One Column</a> -->
-							</nav>
+					<nav>
+						<a href="index.html">Home</a>
+						<a href="html/games.html">Games</a>
+						<a href="html/verilinks.html">VeriLinks</a>
+						<a href="html/admin.html">Admin</a>
+						<a href="#">Contact</a>
+						<!-- <a href="onecolumn.html">One Column</a> -->
+					</nav>
 
 				</div>
 			</header>
@@ -46,30 +47,32 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 		<div id="content-wrapper">
 			<div id="content">
 				<div class="5grid">
-					<div class="12u-first">
+					<div class="6u">
 
 						<!-- Main Content -->
 						<section>
-							<header>
-								<h2>Perform Link Task</h2>
-								<h3>Retrieve semantic web data and save it in the VeriLinks database</h3>
+							<header id='anchor'>
+								<h2>Administration</h2>
+								<h3>Administration of Links</h3>
 							</header>
-							<div id='processLinkTask' >
-								<table id='linkTaskTable'>
-									<tr>
-										<th>Subject</th>
-										<th>Object</th>
-										<th>Preidcate</th>
-										<th>Description</th>
-										<th>Difficulty</th>
-										<th>File</th>
-									</tr>
-								</table>
-								<p id='msg'></p>
-								<button id='performBtn'  disabled = 'true' onclick="performLinkTask()">
-									Perform Link-Task
-								</button>
-							</div>
+							
+							<p>
+								<p id="loginText">Login to use administration functionality:</p>
+								<a href="html/admin.html#anchor" onClick='login();' style='color:white;' class="button-big">Login</a>
+								
+								<a href="html/admin.html#anchor" style="display:none" id="logoutText" target='myIFrame' onclick="myIFrame.location='https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a>
+								<iframe name='myIFrame' id="myIFrame" style='display:none'></iframe>
+							</p>
+							
+							<p>
+								Add Link Task:
+								<a href='html/addLinkTask.html'>Add Link Task</a>
+							</p>
+							<p>
+								Perform Link Task:
+								<a href='html/performLinkTask.html'>Perform Link Task</a>
+							</p>
+
 
 						</section>
 

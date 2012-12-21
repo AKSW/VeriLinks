@@ -113,8 +113,9 @@ import com.google.gwt.maps.client.overlays.MarkerOptions;
  */
 public class PeaInvasion extends HtmlGame {
 
-//	public static final String SERVER_URL = "http://localhost:8080/verilinks-server/";
-	 public static final String SERVER_URL="http://verilinks.aksw.org/";
+	// public static final String SERVER_URL =
+	// "http://localhost:8080/verilinks-server/";
+	public static final String SERVER_URL = "http://verilinks.aksw.org/";
 	/** Semantic Web nerd, or newbie. */
 	private Configuration config;
 
@@ -377,7 +378,7 @@ public class PeaInvasion extends HtmlGame {
 		});
 
 		// hurr test
-//		landingPanel.add(asd2);
+		// landingPanel.add(asd2);
 		// landingPanel.add(butt);
 
 	}
@@ -1713,7 +1714,7 @@ public class PeaInvasion extends HtmlGame {
 	 * @param bonus
 	 *            money to add
 	 */
-	public void processEval(double eval, double difficulty) {
+	public void processEval(double eval, String difficulty) {
 		echo("Process Eval = " + eval + ", Diff = " + difficulty);
 
 		int bonus = 0;
@@ -1982,7 +1983,7 @@ public class PeaInvasion extends HtmlGame {
 			lSet.setDescription(jSet.getDescription());
 			lSet.setDifficulty(jSet.getDifficulty());
 			lSet.setTemplate(jSet.getTemplate());
-			
+
 			linksetList.add(lSet);
 		}
 		return linksetList;
@@ -2086,7 +2087,7 @@ public class PeaInvasion extends HtmlGame {
 		String tmpl = linkset.getTemplate();
 		System.out.println("Template: " + tmpl);
 
-		String url = SERVER_URL + "server?service=getTemplate&template="+tmpl;
+		String url = SERVER_URL + "server?service=getTemplate&template=" + tmpl;
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET,
 				URL.encode(url));
 		try {
@@ -2333,17 +2334,17 @@ public class PeaInvasion extends HtmlGame {
 					}
 					setDifficulty(linkset.getDifficulty());
 					startOfGame = false;
-					 initGame();
-					 initStartTime();
-					 initLeavePage();
+					initGame();
+					initStartTime();
+					initLeavePage();
 					glass.hide();
 					menu.hide();
 					// Check if user tutorial should be skipped
-					 if (!getSkipTutorial())
-					 initTutorial();
-					 else {
-					 firstQueryRequest();
-					 }
+					if (!getSkipTutorial())
+						initTutorial();
+					else {
+						firstQueryRequest();
+					}
 				}
 			});
 		} catch (RequestException e) {
@@ -2574,9 +2575,9 @@ public class PeaInvasion extends HtmlGame {
 				public void onResponseReceived(Request request,
 						Response response) {
 					echo("GET Link Success: " + response.getText());
-					
-					 parseLink(response.getText(),selection);
-					
+
+					parseLink(response.getText(), selection);
+
 				}
 			});
 		} catch (RequestException e) {
@@ -2588,16 +2589,19 @@ public class PeaInvasion extends HtmlGame {
 
 	private void parseLink(String json, int selection) {
 		System.out.println("Parse Link");
-		 JSONValue jsonValue = JSONParser.parseStrict(json);
-				 JSONObject jsonObject = jsonValue.isObject(); // assert
-				 //that
-				 // // an
-				 // object
-				 JsoLink jLink = jsonObject.getJavaScriptObject().cast();
-		
+		JSONValue jsonValue = JSONParser.parseStrict(json);
+		JSONObject jsonObject = jsonValue.isObject(); // assert
+		// that
+		// // an
+		// object
+		JsoLink jLink = jsonObject.getJavaScriptObject().cast();
+
+		// if (selection != this.FIRST_QUERY_REQUEST)
+		// processEval(jLink.getEval(),
+		// Double.parseDouble(jLink.getDifficulty()));
+
 		if (selection != this.FIRST_QUERY_REQUEST)
-			processEval(jLink.getEval(),
-					Double.parseDouble(jLink.getDifficulty()));
+			processEval(jLink.getEval(), jLink.getDifficulty());
 
 		setDifficulty(linkset.getDifficulty());
 
@@ -2628,15 +2632,16 @@ public class PeaInvasion extends HtmlGame {
 
 		link = new Link(jLink.getId(), sub, ob, jLink.getPredicate(), 0, 0);
 		// updae linkMsg
-		linkMsg.setText("Link difficulty: "
-				+ Balancing.getStringLinkDifficulty(Double.parseDouble(jLink
-						.getDifficulty())));
+		// linkMsg.setText("Link difficulty: "
+		// + Balancing.getStringLinkDifficulty(Double.parseDouble(jLink
+		// .getDifficulty())));
+		linkMsg.setText("Link difficulty: " + jLink.getDifficulty());
 
 		// Update VerifyComponent
 		echo("render!");
 		updateTable(json);
 		echo("render done");
-//		updateTable(link, template);
+		// updateTable(link, template);
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
 				verifyButton.setFocus(false);

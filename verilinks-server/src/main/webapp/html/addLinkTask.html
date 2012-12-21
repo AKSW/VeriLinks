@@ -16,6 +16,7 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 		<!--/5grid-->
 		<link rel="stylesheet" href="css/style.css" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="css/style-ie9.css" /><![endif]-->
+		<script src="js/addLinkTask.js"></script>
 	</head>
 	<body class="subpage">
 
@@ -25,17 +26,17 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 				<div class="12u-first">
 
 					<!-- Logo -->
-					<h1><a href="#">VeriLinks Administration</a></h1>
+					<h1><a href="#">Add Link Task</a></h1>
 
 					<!-- Nav -->
-					<nav>
-						<a href="index.html">Home</a>
-						<a href="html/games.html">Games</a>
-						<a href="html/addLinkTask.html">Add Link Task</a>
-						<a href="html/performLinkTask.html">Perform Link Task</a>
-						<a href="#">Contact</a>
-						<!-- <a href="onecolumn.html">One Column</a> -->
-					</nav>
+							<nav>
+								<a href="index.html">Home</a>
+								<a href="html/games.html">Games</a>
+								<a href="html/verilinks.html">VeriLinks</a>
+								<a href="html/admin.html">Admin</a>
+								<a href="#">Contact</a>
+								<!-- <a href="onecolumn.html">One Column</a> -->
+							</nav>
 
 				</div>
 			</header>
@@ -55,23 +56,22 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 							</header>
 							<form id='addLinkTask'
 							enctype="multipart/form-data"
-							action="/upload" method="post" onsubmit='return validate();'>
-								<h2>Admin Panel</h2>
+							action="/upload" method="post" onsubmit='return addLinkTask.validate();'>
 								<table>
 									<tr>
-										<td class='fat'>1.Linkset:</td>
+										<td class='fat'>1.Linkset</td>
 										<td>
 										<input class='noDisable' name="linksetElement" type="text" />
 										</td>
-										<td class='desc'>ID of linkset</td>
+										<td class='v_desc'>ID of linkset</td>
 									</tr>
 									<tr>
-										<td class='fat'>2.Linkfile:</td>
+										<td class='fat'>2.Linkfile</td>
 										<td>
 										<input class='noDisable' name="fileElement" type="file"
 										size="10" />
 										</td>
-										<td class='desc'>Upload rdf/xml or n-triple file</td>
+										<td class='v_desc'>Upload rdf/xml or n-triple file</td>
 
 									</tr>
 									<tr>
@@ -79,7 +79,7 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 										<td>
 										<input class='noDisable' id='existsElement' type="checkbox" onChange='cbChanged()'>
 										</td>
-										<td class='desc'>Check if template does exist in db</td>
+										<td class='v_desc'>Check if template does exist in db</td>
 									</tr>
 									<tr>
 										<td class='fat'>3.Instances</td>
@@ -94,7 +94,7 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 										<td>
 										<input class='noDisable' name="nameElement2" type="text" />
 										</td>
-										<td class='desc'>Name of ontology</td>
+										<td class='v_desc'>Name of ontology</td>
 									</tr>
 									<tr>
 										<td class='lb'>endpoint:</td>
@@ -104,17 +104,17 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 										<td>
 										<input name="endpointElement2" type="text" />
 										</td>
-										<td class='desc'>SPARQL endpoint</td>
+										<td class='v_desc'>SPARQL endpoint</td>
 									</tr>
 									<tr>
 										<td class='lb'>property:</td>
 										<td>
-										<input value='Add Subject Property' type='button' onclick="addProperty('subjectProperty');return false;"/>
+										<input value='Add Subject Property' type='button' onclick="addLinkTask.addProperty('subjectProperty');return false;"/>
 										</td>
 										<td>
-										<input value='Add Object Property' type='button' onclick="addProperty('objectProperty');return false;"/>
+										<input value='Add Object Property' type='button' onclick="addLinkTask.addProperty('objectProperty');return false;"/>
 										</td>
-										<td class='desc'>Add field to specify property</td>
+										<td class='v_desc'>Add field to specify property</td>
 									</tr>
 									<tr>
 										<td></td>
@@ -126,14 +126,14 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 										<td>
 										<input class='noDisable' name="predicateElement" type="text" />
 										</td>
-										<td class='desc'>Name of the relation</td>
+										<td class='v_desc'>Name of the relation</td>
 									</tr>
 									<tr>
 										<td class='fat'>5.Description</td>
 										<td>
 										<input class='noDisable' name="descriptionElement" type="text" />
 										</td>
-										<td class='desc'>Description of linkset</td>
+										<td class='v_desc'>Description of linkset</td>
 									</tr>
 									<tr>
 										<td class='fat'>6.Difficulty</td>
@@ -143,17 +143,17 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 											<option value="medium">medium</option>
 											<option value="hard">hard</option>
 										</select></td>
-										<td class='desc'>Describe difficulty of linkset</td>
+										<td class='v_desc'>Describe difficulty of linkset</td>
 									</tr>
 									<tr>
 										<td class='fat'>7.JsRender Template</td>
 										<td>
 										<input class='noDisable' name="templateElement" type="text" />
 										</td>
-										<td class='desc'>ID of Template</td>
+										<td class='v_desc'>ID of Template</td>
 									</tr>
 								</table>
-								<div class='desc'>
+								<div class='v_desc'>
 									Define JsRender Template for diplaying data of linkset
 								</div>
 								<div>

@@ -12,12 +12,47 @@
 /*********************************************************************************/
 
 	/* Basic */
-
+		
+		/* My */
 		.game-img{
 			width: 500px;
 			box-shadow: 3px 3px 3px 1px rgba(0,0,0,0.15);
 		}
 
+		/* Perform */
+		#linkTaskTable tbody tr th{
+			padding: 8px;
+			border: 1px solid grey;
+		}
+		
+		/* Add */
+		addLinkTask{
+	overflow:hidden;
+	margin: 10px;
+	border: 1px solid lightgrey;
+	padding: 10px;
+}
+
+#addLinkTask td {
+	padding: 8px;
+/*	float:right;*/
+}
+
+#addLinkTask input[type="text"] {
+	width: 220px;
+}
+		
+		
+		.fat {
+			text-align:left;
+			font-weight: bold;
+		}
+		.v_desc {
+	font-size: 80%;
+	font-style: italic;
+	color: 	#565051;
+}
+		
 		body
 		{
 			background: #D4D9DD url('images/bg03.jpg');
