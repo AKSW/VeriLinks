@@ -3,13 +3,15 @@ var tokenType;
 var expiresIn;
 var user;
 var loggedIn = false;
-var REDIRECT = 'http://127.0.0.1:8020/verilinks-server/oauth.html';
+// var REDIRECT = 'http://127.0.0.1:8020/verilinks-server/oauth.html';
+var REDIRECT = 'http://verilinks.aksw.org/oauth.html';
 var VALIDURL;
 // Google
 var login_google = {
 	'oauthUrl' : 'https://accounts.google.com/o/oauth2/auth?',
 	'validUrl' : 'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=',
-	'clientId' : '23285137063-h9ddnqshh1924a3808n78sgkdvfskjme.apps.googleusercontent.com',
+	// 'clientId' : '23285137063-h9ddnqshh1924a3808n78sgkdvfskjme.apps.googleusercontent.com',
+	'clientId' : '23285137063-mtsfum2dvllv8vet4cbrm45r4bdfoaa4.apps.googleusercontent.com',
 	'logout' : 'http://accounts.google.com/Logout',
 	'scope' : 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
 	'type' : 'token'
@@ -18,7 +20,8 @@ var login_google = {
 var login_facebook = {
 	oauthUrl : 'https://www.facebook.com/dialog/oauth?',
 	validUrl : 'https://graph.facebook.com/me?access_token=',
-	clientId : '468976209814720',
+	// clientId : '468976209814720',
+	clientId : '469580306410500',
 	logout : 'https://www.facebook.com/logout.php?next=' + REDIRECT + '&access_token=',
 	scope : 'email',
 	type : 'token'
