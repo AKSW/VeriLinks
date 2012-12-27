@@ -53,32 +53,54 @@ Released under the Creative Commons Attribution 3.0 license (nodethirtythree.com
 						<section>
 							<header id='anchor'>
 								<h2>Administration</h2>
-								<h3>Administration of Links</h3>
+								<h3>Login to use administration functionality</h3>
 							</header>
-							
-							<p>
-								<p id="loginText">Login to use administration functionality:</p>
-								<a href="html/admin.html#anchor" onClick='login();' style='color:white;' class="button-big">Login</a>
-								
-								<a href="html/admin.html#anchor" style="display:none" id="logoutText" target='myIFrame' onclick="myIFrame.location='https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a>
-								<iframe name='myIFrame' id="myIFrame" style='display:none'></iframe>
-							</p>
-							
-							<p>
-								Add Link Task:
-								<a href='html/addLinkTask.html'>Add Link Task</a>
-							</p>
-							<p>
-								Perform Link Task:
-								<a href='html/performLinkTask.html'>Perform Link Task</a>
-							</p>
 
+							<p>
+
+								<!-- login -->
+								<div id='loginPanel'>
+									<p>
+										<a href="html/admin.html#anchor" onClick='login();' style='color:white;' class="button-big">Login</a>
+										<select id='login' style='padding:5px;'>
+											<option value="facebook">Facebook</option>
+											<option value="google">Google</option>
+										</select>
+									</p>
+								</div>
+
+								<a href="html/admin.html#anchor" style="display:none" id="logoutText" target='myIFrame'> Click here to logout </a>
+								<iframe name='myIFrame' id="myIFrame" style='display:none'></iframe>
 
 						</section>
-
 					</div>
+
+					<!-- User -->
+					<div id='userPanel' style='display:none'>
+						<div class="3u">
+							<section>
+								<header>
+									<h2>Welcome</h2>
+								</header>
+								<img id='userPicture'/>
+								<div id='userName'></div>
+								<div id='userMail'></div>
+								</br>Operations:
+								<ul>
+									<li>
+										<a href='html/addLinkTask.html'>Add Link Task</a>
+									</li>
+									<li>
+										<a href='html/performLinkTask.html'>Perform Link Task</a>
+									</li>
+								</ul>
+							</section>
+						</div>
+					</div>
+
 				</div>
 			</div>
+
 		</div>
 
 		<!-- Footer -->
