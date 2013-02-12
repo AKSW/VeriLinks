@@ -114,7 +114,8 @@ import com.google.gwt.maps.client.overlays.MarkerOptions;
 public class PeaInvasion extends HtmlGame {
 
 	// local test
-//	 public static final String SERVER_URL ="http://localhost:8080/verilinks-server/";
+	// public static final String SERVER_URL
+	// ="http://localhost:8080/verilinks-server/";
 	public static final String SERVER_URL = "http://verilinks.aksw.org/";
 	/** Semantic Web nerd, or newbie. */
 	private Configuration config;
@@ -1702,12 +1703,11 @@ public class PeaInvasion extends HtmlGame {
 	 * 
 	 * @param money
 	 */
-	public void addMoney(int money,int moneyVer) {
-		if(money == GameConstants.BONUS_NEGATIVE){
+	public void addMoney(int money, int moneyVer) {
+		if (money == GameConstants.BONUS_NEGATIVE) {
 			game.world.resetMoney();
-		}
-		else{
-			game.world.addMoney(money+moneyVer);
+		} else {
+			game.world.addMoney(money + moneyVer);
 		}
 		game.world.getInfoText().updateMoney(game.world.getMoney());
 	}
@@ -1728,7 +1728,7 @@ public class PeaInvasion extends HtmlGame {
 			moneyVer = MONEY_FOR_NOT_SURE;
 			notSure = true;
 		}
-		
+
 		int bonus = 0;
 
 		String msg = null;
@@ -1744,25 +1744,25 @@ public class PeaInvasion extends HtmlGame {
 		} else if (eval == GameConstants.EVAL_FIRST) {// first
 			bonus = GameConstants.BONUS_FIRST;
 			setFirstVerification(bonus);
-		} else if ( (eval > GameConstants.EVAL_THRESHOLD) && (eval < GameConstants.EVAL_POSITIVE)) {// agree
+		} else if ((eval > GameConstants.EVAL_THRESHOLD)
+				&& (eval < GameConstants.EVAL_POSITIVE)) {// agree
 			bonus = GameConstants.BONUS_AGREE;
 			setAgreement(bonus);
-		} else if ( (eval <= GameConstants.EVAL_THRESHOLD) && (eval > GameConstants.EVAL_NEGATIVE)) { //disagree
+		} else if ((eval <= GameConstants.EVAL_THRESHOLD)
+				&& (eval > GameConstants.EVAL_NEGATIVE)) { // disagree
 			bonus = GameConstants.BONUS_DISAGREE;
 			setDisagreement();
 		}
 		echo("bonus: " + bonus);
-		
+
 		// documentation of verification
 		verificationStats.addEvaluation(bonus, notSure);
 
-		
-		
 		int finalBonus = bonus;
 		// here
 		// int finalBonus = Balancing.getBonus(bonus, difficulty);
 		echo("finalBonus: " + finalBonus);
-		addMoney(bonus,moneyVer);
+		addMoney(bonus, moneyVer);
 		notSure = false;
 		echo("Process bonus done!");
 	}
@@ -1791,13 +1791,13 @@ public class PeaInvasion extends HtmlGame {
 		// Sound
 		// game.getSound().playSend();
 
-//		// Add temp. money for verification
-//		int money = MONEY_FOR_VERIFICATION; // VALID, NOT VALID
-//		if (selection == GameConstants.UNSURE) { // NOT SURE
-//			money = MONEY_FOR_NOT_SURE;
-//			notSure = true;
-//		}
-//		addMoney(money);
+		// // Add temp. money for verification
+		// int money = MONEY_FOR_VERIFICATION; // VALID, NOT VALID
+		// if (selection == GameConstants.UNSURE) { // NOT SURE
+		// money = MONEY_FOR_NOT_SURE;
+		// notSure = true;
+		// }
+		// addMoney(money);
 
 		// Change verifyButton
 		verifyButton.setEnabled(false);
@@ -1822,7 +1822,9 @@ public class PeaInvasion extends HtmlGame {
 		int rnd = min + (int) (Math.random() * ((max - min) + 1));
 		echo("rnd: " + rnd);
 		// int rnd = 7;
-		if ( (this.verificationStats.getList().size()>0) && ( (this.verificationStats.getList().size() % 8 == 0) || (this.verificationStats.getList().size() % rnd == rnd - 1)) ){
+		if ((this.verificationStats.getList().size() > 0)
+				&& ((this.verificationStats.getList().size() % 8 == 0) || (this.verificationStats
+						.getList().size() % rnd == rnd - 1))) {
 			this.checkUserCredibility = true;
 			nextLink = Message.EVAL_LINK;
 			echo("debug: TRUE . size: "
@@ -1850,53 +1852,57 @@ public class PeaInvasion extends HtmlGame {
 		if (calcErrorRate() <= ERROR_LIMIT) {
 			this.user.setCredible(true);
 			echo("Commit Link Verifications!");
+
+			String data = this.verificationStats.getJson();
+			echo("commit: " + data);
+
+			String url = SERVER_URL + "server?service=commitVerifications";
+			RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
+					URL.encode(url));
+			// StringBuffer postData=new StringBuffer();
+			// postData.append(URL.encode("string")).append("=").append(URL.encode(data));
+			builder.setHeader("Content-type",
+					"application/x-www-form-urlencoded");
+			try {
+				Request request = builder.sendRequest(data,
+						new RequestCallback() {
+							public void onError(Request request,
+									Throwable exception) {
+								echo("ERROR: Commit Verifications! "
+										+ exception.getMessage());
+							}
+
+							public void onResponseReceived(Request request,
+									Response response) {
+								echo(" Commit Verifications success! userStrength: "
+										+ response.toString());
+								JSONValue jsonValue = JSONParser
+										.parseStrict(response.getText());
+								System.out.println("jsonValue: "
+										+ jsonValue.toString());
+								JSONObject jsonObject = jsonValue.isObject();
+								JsoUserstrength str = jsonObject
+										.getJavaScriptObject().cast();
+								user.setStrength(str.getUserstrength());
+							}
+						});
+			} catch (RequestException e) {
+				// Couldn't connect to server
+				echo("ERROR Highscore!");
+			}
+
+			// Submit verificaqtions stats to kongregate
+			if (config.isKongregate() == true)
+				submitVerifyStatsToKongregate(verificationStats.getList()
+						.size() + "", verificationStats.getCountAgreed() + "",
+						verificationStats.getCountPenalty() + "");
+			// Window.alert("java Submit verify stats done!");
+			// Reset List for this level
+
 		} else {
 			this.user.setCredible(false);
 			echo("Too many false verifications! Link Verifications won't be commited!");
-			return;
 		}
-
-		String data = this.verificationStats.getJson();
-		echo("commit: " + data);
-
-		String url = SERVER_URL + "server?service=commitVerifications";
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
-				URL.encode(url));
-		// StringBuffer postData=new StringBuffer();
-		// postData.append(URL.encode("string")).append("=").append(URL.encode(data));
-		builder.setHeader("Content-type", "application/x-www-form-urlencoded");
-		try {
-			Request request = builder.sendRequest(data, new RequestCallback() {
-				public void onError(Request request, Throwable exception) {
-					echo("ERROR: Commit Verifications! "
-							+ exception.getMessage());
-				}
-
-				public void onResponseReceived(Request request,
-						Response response) {
-					echo(" Commit Verifications success! userStrength: "
-							+ response.toString());
-					JSONValue jsonValue = JSONParser.parseStrict(response
-							.getText());
-					System.out.println("jsonValue: " + jsonValue.toString());
-					JSONObject jsonObject = jsonValue.isObject();
-					JsoUserstrength str = jsonObject.getJavaScriptObject()
-							.cast();
-					user.setStrength(str.getUserstrength());
-				}
-			});
-		} catch (RequestException e) {
-			// Couldn't connect to server
-			echo("ERROR Highscore!");
-		}
-
-		// Submit verificaqtions stats to kongregate
-		if (config.isKongregate() == true)
-			submitVerifyStatsToKongregate(verificationStats.getList().size()
-					+ "", verificationStats.getCountAgreed() + "",
-					verificationStats.getCountPenalty() + "");
-		// Window.alert("java Submit verify stats done!");
-		// Reset List for this level
 		this.verificationStats.reset();
 		echo("Reset verificationStats List for this level");
 
@@ -1906,7 +1912,8 @@ public class PeaInvasion extends HtmlGame {
 		double errorRate = ((double) verificationStats.getCountPenalty())
 				/ ((double) verificationStats.getList().size());
 		echo("penalty: " + verificationStats.getCountPenalty() + ", verified: "
-				+ verificationStats.getList().size() + " , error: " + errorRate + " errorLimit: "+ERROR_LIMIT);
+				+ verificationStats.getList().size() + " , error: " + errorRate
+				+ " errorLimit: " + ERROR_LIMIT);
 
 		return errorRate;
 	}
@@ -2234,8 +2241,8 @@ public class PeaInvasion extends HtmlGame {
 
 	private void setPenalty() {
 		echo("Process Link-Evaluation: Penalty");
-//		String msg = "False Verification! << " + GameConstants.BONUS_NEGATIVE
-//				+ " Coins >> Penalty!";
+		// String msg = "False Verification! << " + GameConstants.BONUS_NEGATIVE
+		// + " Coins >> Penalty!";
 		String msg = "False Verification! << You lose all your coins >>!";
 		game.penalty(this.verificationStats.getCountPenalty());
 		msgButton.setText(msg);
@@ -2616,7 +2623,7 @@ public class PeaInvasion extends HtmlGame {
 		// Double.parseDouble(jLink.getDifficulty()));
 
 		if (selection != this.FIRST_QUERY_REQUEST)
-			processEval(jLink.getEval(), jLink.getDifficulty(),selection);
+			processEval(jLink.getEval(), jLink.getDifficulty(), selection);
 
 		setDifficulty(linkset.getDifficulty());
 
