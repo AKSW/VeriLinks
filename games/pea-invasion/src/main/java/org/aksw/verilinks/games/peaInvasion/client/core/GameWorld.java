@@ -50,7 +50,7 @@ public class GameWorld implements ContactListener {
 	public GroupLayer dynamicLayer;
 	public GroupLayer staticLayerFront;
 	public GroupLayer coinLayer;
-	
+
 	// borders for gameWorld
 	private static int width = 52;
 	private static int height = 18;
@@ -83,11 +83,11 @@ public class GameWorld implements ContactListener {
 
 	private final Stack<Entity> entitiesToRemove = new Stack<Entity>();
 	private final Stack<Entity> entitiesToAdd = new Stack<Entity>();
-	
+
 	private List<Coin> coins = new ArrayList<Coin>(0);
 	private final Stack<Coin> coinsToRemove = new Stack<Coin>();
 	private final Stack<Coin> coinsToAdd = new Stack<Coin>();
-	
+
 	private static boolean showDebugDraw = false;
 	private DebugDrawBox2D debugDraw;
 
@@ -104,7 +104,7 @@ public class GameWorld implements ContactListener {
 	private EnemyCashier cashier = null;
 	private int enemyCounter = 0;
 	private GameSound sound;
-	
+
 	public GameWorld(GroupLayer scaledLayer) {
 		// Layers
 		staticLayerBack = graphics().createGroupLayer();
@@ -115,7 +115,7 @@ public class GameWorld implements ContactListener {
 		scaledLayer.add(staticLayerFront);
 		coinLayer = graphics().createGroupLayer();
 		scaledLayer.add(coinLayer);
-		
+
 		// create the physics world
 		Vec2 gravity = new Vec2(0.0f, 10.0f);
 		world = new World(gravity, true);
@@ -132,8 +132,9 @@ public class GameWorld implements ContactListener {
 		// create the walls
 		/*
 		 * Body wallLeft = world.createBody(new BodyDef()); PolygonShape
-		 * wallLeftShape = new PolygonShape(); wallLeftShape.setAsEdge(new Vec2(0,
-		 * 0), new Vec2(0, height)); wallLeft.createFixture(wallLeftShape, 0.0f);
+		 * wallLeftShape = new PolygonShape(); wallLeftShape.setAsEdge(new
+		 * Vec2(0, 0), new Vec2(0, height));
+		 * wallLeft.createFixture(wallLeftShape, 0.0f);
 		 */
 		Body wallRight = world.createBody(new BodyDef());
 		PolygonShape wallRightShape = new PolygonShape();
@@ -177,15 +178,15 @@ public class GameWorld implements ContactListener {
 				newWave = true;
 
 			processContacts();
-			
+
 			// Update Entities
 			updateAllEntities(delta);
 
 			updateCoins();
-			
+
 			// Random sounds
 			playRandomSounds();
-			
+
 			// the step delta is fixed so box2d isn't affected by framerate
 			world.step(0.033f, 10, 10);
 
@@ -202,8 +203,11 @@ public class GameWorld implements ContactListener {
 
 	private void updateAllEntities(float delta) {
 		for (Entity e : entities) {
-			if ((e instanceof Enemy) && (((Enemy) e).getBody().getPosition().x < 0)) { // Enemy
-																																									// reached																																			// ->lose
+			if ((e instanceof Enemy)
+					&& (((Enemy) e).getBody().getPosition().x < 0)) { // Enemy
+																		// reached
+																		// //
+																		// ->lose
 				// e.layer.destroy();
 				this.lose = true;
 				// System.out.println("Enemy x: "+e.x);
@@ -251,7 +255,7 @@ public class GameWorld implements ContactListener {
 
 		// Pea Reset
 		for (Entity e : entities) {
-			if (e instanceof Mine || e instanceof Enemy){
+			if (e instanceof Mine || e instanceof Enemy) {
 				remove(e);
 			}
 		}
@@ -286,7 +290,8 @@ public class GameWorld implements ContactListener {
 
 		// Marker
 		this.marker.redraw();
-		System.out.println("Cmon marker : marker x " + marker.getPoint().getX());
+		System.out
+				.println("Cmon marker : marker x " + marker.getPoint().getX());
 
 		// System.out.println("nach newGame Lvl: "+ this.level);
 
@@ -294,17 +299,18 @@ public class GameWorld implements ContactListener {
 		paused = true;
 
 		/*
-		 * // Change timerDifference -> speed up enemy launch this.timerDifference =
-		 * 500 - (level * 100); System.out.println(timerDifference);
+		 * // Change timerDifference -> speed up enemy launch
+		 * this.timerDifference = 500 - (level * 100);
+		 * System.out.println(timerDifference);
 		 */
 	}
 
 	public void setWin() {
 		echo("Set Win!");
-		//Sound
+		// Sound
 		this.sound.getCurrentLvl().stop();
 		this.sound.playWin();
-		
+
 		// Draw Info
 		fpsCounter.update();
 		infoText.mayRedraw();
@@ -372,12 +378,17 @@ public class GameWorld implements ContactListener {
 
 	public void addMoney(int money) {
 		this.money += money;
-		if(this.money < 0){
+		if (this.money < 0) {
 			this.money = 0;
 		}
-    getInfoText().updateMoney(this.money);
+		getInfoText().updateMoney(this.money);
 	}
 
+	public void resetMoney() {
+		this.money = 0;
+		getInfoText().updateMoney(this.money);
+	}
+	
 	public InfoText getInfoText() {
 		return this.infoText;
 	}
@@ -392,7 +403,7 @@ public class GameWorld implements ContactListener {
 			PhysicsEntity physicsEntity = (PhysicsEntity) entity;
 			bodyEntityLUT.put(physicsEntity.getBody(), physicsEntity);
 		}
-		if(entity instanceof Enemy)
+		if (entity instanceof Enemy)
 			enemyCounter++;
 	}
 
@@ -401,15 +412,15 @@ public class GameWorld implements ContactListener {
 		entitiesToRemove.push(entity);
 	}
 
-	// do  Remove
+	// do Remove
 	private void doRemove(Entity entity) {
 		if (entity instanceof Enemy) { // increase score for enemy kill
 			Enemy e = (Enemy) entity;
 			e.dead();
-			if(enemyCounter > 0)
+			if (enemyCounter > 0)
 				enemyCounter--;
 		}
-		if(entity instanceof EnemyCashier)
+		if (entity instanceof EnemyCashier)
 			cashier = null;
 		if (entity instanceof PhysicsEntity) {
 			PhysicsEntity physicsEntity = (PhysicsEntity) entity;
@@ -420,7 +431,6 @@ public class GameWorld implements ContactListener {
 		entities.remove(entity);
 		entity.getLayer().destroy();
 
-		
 	}
 
 	/**
@@ -431,20 +441,23 @@ public class GameWorld implements ContactListener {
 			Contact contact = contacts.pop();
 
 			// handle collision
-			PhysicsEntity entityA = bodyEntityLUT.get(contact.m_fixtureA.m_body);
-			PhysicsEntity entityB = bodyEntityLUT.get(contact.m_fixtureB.m_body);
+			PhysicsEntity entityA = bodyEntityLUT
+					.get(contact.m_fixtureA.m_body);
+			PhysicsEntity entityB = bodyEntityLUT
+					.get(contact.m_fixtureB.m_body);
 			// System.out.println(entityA.getClass().getName() +" , "+
 			// entityB.getClass().getName());
 			if (entityA != null && entityB != null) {
 				if (entityA instanceof PhysicsEntity.HasContactListener) {
-					((PhysicsEntity.HasContactListener) entityA).contact(entityB);
+					((PhysicsEntity.HasContactListener) entityA)
+							.contact(entityB);
 					if ((entityA instanceof Enemy) && (entityB instanceof Mine)) {
 						Enemy enemy = (Enemy) entityA;
 						Mine mine = (Mine) entityB;
-						
+
 						// Sound
 						this.sound.playHit();
-						
+
 						// Change color
 						if (mine.getHp() == 1)
 							mine.hit();
@@ -459,14 +472,15 @@ public class GameWorld implements ContactListener {
 					}
 				}
 				if (entityB instanceof PhysicsEntity.HasContactListener) {
-					((PhysicsEntity.HasContactListener) entityB).contact(entityA);
+					((PhysicsEntity.HasContactListener) entityB)
+							.contact(entityA);
 					if ((entityB instanceof Enemy) && (entityA instanceof Mine)) {
 						Enemy enemy = (Enemy) entityB;
 						Mine mine = (Mine) entityA;
 
 						// Sound
 						this.sound.playHit();
-						
+
 						// change color
 						if (mine.getHp() == 1)
 							mine.hit();
@@ -550,28 +564,26 @@ public class GameWorld implements ContactListener {
 	public void sendNewWave() {
 		// Sound
 		this.sound.playEnemyWave();
-		
+
 		// Cashier
 		cashier();
-		
+
 		int i = (int) (Math.random() * enemyDropList.size());
 		// System.out.println("Send New Wave!! "+i);
 		// Enemy enemy = new Enemy(this,world,23,i*6,0);
 		Point pos = enemyDropList.get(i);
 		Enemy enemy;
 		int j = (int) (Math.random() * 3);
-		if(j == 0)
-			enemy = new EnemyPea(this, world, (int) pos.getX(), (int) pos.getY(),
-					0);
-		else
-		{
-			if(cashier== null && j==1){
-				enemy = new EnemyCashier(this, world, 42, 12,
-						0);
+		if (j == 0)
+			enemy = new EnemyPea(this, world, (int) pos.getX(),
+					(int) pos.getY(), 0);
+		else {
+			if (cashier == null && j == 1) {
+				enemy = new EnemyCashier(this, world, 42, 12, 0);
 				cashier = (EnemyCashier) enemy;
-			}else
-			enemy = new EnemyShooter(this, world, (int) pos.getX(), (int) pos.getY(),
-					0);
+			} else
+				enemy = new EnemyShooter(this, world, (int) pos.getX(),
+						(int) pos.getY(), 0);
 
 		}
 		this.add(enemy);
@@ -629,46 +641,52 @@ public class GameWorld implements ContactListener {
 		return diff;
 
 	}
-	
-	public void setSound(GameSound sound){
-		this.sound=sound;
+
+	public void setSound(GameSound sound) {
+		this.sound = sound;
 	}
-	public GameSound getSound(){
+
+	public GameSound getSound() {
 		return this.sound;
 	}
-	public void drawCoin(Entity entity){
+
+	public void drawCoin(Entity entity) {
 		Coin coin = new Coin(this, entity);
 		// TODO delayed add??
 		addCoin(coin);
 	}
-	
-	public void drawCoin(Entity entity, boolean isReverse){
-		Coin coin = new Coin(this, entity,isReverse);
+
+	public void drawCoin(Entity entity, boolean isReverse) {
+		Coin coin = new Coin(this, entity, isReverse);
 		// TODO delayed add??
 		addCoin(coin);
 	}
-	
-	private void addCoin(Coin coin){
+
+	private void addCoin(Coin coin) {
 		coinsToAdd.push(coin);
 		coinLayer.add(coin.getLayer());
 	}
-	private void doAddCoin(Coin coin){
+
+	private void doAddCoin(Coin coin) {
 		coins.add(coin);
 	}
-	private void removeCoin(Coin coin){
+
+	private void removeCoin(Coin coin) {
 		coinsToRemove.push(coin);
 	}
-	private void doRemoveCoin(Coin coin){
+
+	private void doRemoveCoin(Coin coin) {
 		coinsToRemove.remove(coin);
 		coin.getLayer().destroy();
 	}
-	private void updateCoins(){
+
+	private void updateCoins() {
 		for (Coin c : coins) {
 			c.update();
-			if(c.shouldDestroy())
+			if (c.shouldDestroy())
 				removeCoin(c);
 		}
-		
+
 		// Add queued Coins
 		while (!coinsToAdd.isEmpty()) {
 			Coin coin = coinsToAdd.pop();
@@ -681,82 +699,80 @@ public class GameWorld implements ContactListener {
 			doRemoveCoin(coin);
 		}
 	}
-	private void playRandomSounds(){
-//		if(sound.getMoan().isPlaying())
-//			return;
-//		long now = System.currentTimeMillis();
-//		if(now % 10 < 2)
-//			for (Entity e : entities) {
-//				if ((e instanceof Enemy)) { 
-//					sound.playMoan();
-//					break;
-//				}
-//			}
+
+	private void playRandomSounds() {
+		// if(sound.getMoan().isPlaying())
+		// return;
+		// long now = System.currentTimeMillis();
+		// if(now % 10 < 2)
+		// for (Entity e : entities) {
+		// if ((e instanceof Enemy)) {
+		// sound.playMoan();
+		// break;
+		// }
+		// }
 	}
 
 	public void setBackground() {
-    // load and show our background image
-    Image bgImage = assetManager().getImage("PeaInvasion/images/bg_dark.png");
-    ImageLayer bgLayer = graphics().createImageLayer(bgImage);
-    graphics().rootLayer().add(bgLayer);
+		// load and show our background image
+		Image bgImage = assetManager().getImage(
+				"PeaInvasion/images/bg_dark.png");
+		ImageLayer bgLayer = graphics().createImageLayer(bgImage);
+		graphics().rootLayer().add(bgLayer);
 
-//    // create our world layer (scaled to "world space")
-//    worldLayer = graphics().createGroupLayer();
-//    worldLayer.setScale(1f / physUnitPerScreenUnit);
-//    graphics().rootLayer().add(worldLayer);
-		
+		// // create our world layer (scaled to "world space")
+		// worldLayer = graphics().createGroupLayer();
+		// worldLayer.setScale(1f / physUnitPerScreenUnit);
+		// graphics().rootLayer().add(worldLayer);
+
 	}
 
 	// TODO change name
 	public void removeMostLeftEnemy() {
 		System.out.println("Remove most left enemy!");
-		if(enemyCounter < 5)
+		if (enemyCounter < 5)
 			return;
 		for (Entity e : entities) {
-			if(e instanceof Enemy){
+			if (e instanceof Enemy) {
 				doRemove(e);
 				System.out.println("Agree remove!");
 				break;
 			}
 		}
 	}
-	
-	
+
 	public void sendEnemy() {
 		// Sound
 		this.sound.playEnemyWave();
-		
-		
+
 		int i = (int) (Math.random() * enemyDropList.size());
 		Point pos = enemyDropList.get(i);
 		Enemy enemy;
 		int j = (int) (Math.random() * 3);
-		if(j == 0)
-			enemy = new EnemyPea(this, world, (int) pos.getX(), (int) pos.getY(),
-					0);
-		else
-		{
-			if(cashier== null && j==1){
-				enemy = new EnemyCashier(this, world, 42, 12,
-						0);
+		if (j == 0)
+			enemy = new EnemyPea(this, world, (int) pos.getX(),
+					(int) pos.getY(), 0);
+		else {
+			if (cashier == null && j == 1) {
+				enemy = new EnemyCashier(this, world, 42, 12, 0);
 				cashier = (EnemyCashier) enemy;
-			}else
-			enemy = new EnemyShooter(this, world, (int) pos.getX(), (int) pos.getY(),
-					0);
+			} else
+				enemy = new EnemyShooter(this, world, (int) pos.getX(),
+						(int) pos.getY(), 0);
 
 		}
 		this.add(enemy);
 	}
-	
-	private void cashier(){
-		if(cashier != null && getMoney()!=0){
-//			echo("Got cashier!");
+
+	private void cashier() {
+		if (cashier != null && getMoney() != 0) {
+			// echo("Got cashier!");
 			// Decrease Money
-      addMoney(-10);
-//      getInfoText().updateMoney(getMoney());
-      drawCoin(cashier,true);
-		} 
-//		else
-//			echo("No cashier!");
+			addMoney(-10);
+			// getInfoText().updateMoney(getMoney());
+			drawCoin(cashier, true);
+		}
+		// else
+		// echo("No cashier!");
 	}
 }

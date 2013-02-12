@@ -1,6 +1,8 @@
 addLinkTask = (function() {
 	
 	var rootURL = "http://verilinks.aksw.org/";
+	// local test
+	// var rootURL ="http://localhost:8080/verilinks-server";
 	
 	window.onload = function(){
 		
@@ -106,6 +108,9 @@ addLinkTask = (function() {
 		},
 		validate : function(){
 			return validate();
+		},
+		cbChanged : function(){
+			return cbChanged();
 		}
 	}
 

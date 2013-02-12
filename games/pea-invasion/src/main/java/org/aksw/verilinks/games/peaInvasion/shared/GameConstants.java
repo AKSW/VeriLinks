@@ -21,7 +21,7 @@ public class GameConstants {
   public static final int REWARD_ENEMY_SHOOTER =25;
   public static final int REWARD_ENEMY_BOSS =25;
   
-  	public static final int BONUS_POSITIVE = 100;
+  	public static final int BONUS_POSITIVE = 40;
 	public static final int BONUS_NEGATIVE = -400;
 	public static final int BONUS_DISAGREE = 0;
 	public static final int BONUS_AGREE = 20;
@@ -38,5 +38,6 @@ public class GameConstants {
 	public static final double EVAL_FIRST = -2;
 	public static final double EVAL_ERROR = -1111;
 	public static final double EVAL_THRESHOLD = 0.3;
+	public static final int TIMER = 2300;
 	
 }

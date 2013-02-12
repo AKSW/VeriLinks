@@ -692,7 +692,7 @@ public class Server extends HttpServlet {
 
 		// Get link
 		Link link = getNewLink(userName, userId, linkset, nextLink,
-				verifiedLinks);
+				verifiedLinks, verification, con);
 
 		// Get difficulty
 		double diff = 0;
@@ -794,10 +794,12 @@ public class Server extends HttpServlet {
 	 *            evaluationLink or normal
 	 * @param verifiedLinks
 	 *            from user verified links
+	 * @param verification 
+	 * @param con2 
 	 * @return
 	 */
 	private Link getNewLink(String userName, String userId, String linkset,
-			String nextLinkType, String verifiedLinks) {
+			String nextLinkType, String verifiedLinks, String lastVerification, Connection con) {
 		echo("Get new Link for client with Linkset = '" + linkset + "'");
 		// Only get statements, which were not shown yet
 		echo("verifiedLinks: " + verifiedLinks);
@@ -814,10 +816,6 @@ public class Server extends HttpServlet {
 			}
 			notIn = getNotInQuery(verifications);
 		}
-		echo("Connect DB");
-		// 1.connect to db
-		DBTool db = new DBTool(resourcePath + dbIniFile);
-		Connection con = db.getConnection();
 	
 		int id = 0;
 		Link statement = null;
@@ -825,7 +823,7 @@ public class Server extends HttpServlet {
 		ResultSet rs = null;
 		// Generate SQL query
 		String SQLqueryLinks = generateLinkQuery(userName, userId, linkset,
-				nextLinkType, verifiedLinks, con);
+				nextLinkType, verifiedLinks, lastVerification, con);
 		echo("SQLqueryLinks: " + SQLqueryLinks);
 
 		// Execute Query
@@ -953,7 +951,7 @@ public class Server extends HttpServlet {
 			else
 				val = parse(rs.getString("Value"), true);
 			subjectProp.add(new Property(prop, val));
-			echo(i + ".property of subject instance: " + prop + " >> " + val);
+//			echo(i + ".property of subject instance: " + prop + " >> " + val);
 			i++;
 		}
 		echo("property size: " + subjectProp.size());
@@ -975,7 +973,7 @@ public class Server extends HttpServlet {
 			else
 				val = parse(rs.getString("Value"), true);
 			objectProp.add(new Property(prop, val));
-			echo(i + ".property of subject instance: " + prop + " >> " + val);
+//			echo(i + ".property of object instance: " + prop + " >> " + val);
 			i++;
 		}
 		echo("property size: " + objectProp.size());
@@ -994,7 +992,7 @@ public class Server extends HttpServlet {
 
 	private String generateLinkQuery(String userName, String userId,
 			String linkset, String nextLinkType, String verifiedLinks,
-			Connection con) {
+			String lastVerification, Connection con) {
 		String SQLqueryLinks = null;
 
 		// Only get statements, which were not shown yet
@@ -1017,6 +1015,7 @@ public class Server extends HttpServlet {
 					+ linkset
 					+ "' "
 					+ notIn
+					+ " and links.Confidence not in (1,-2) "
 					+ " order by easy_questions.Counter limit 1";
 		} else if (nextLink == Message.NORMAL_LINK) {
 			boolean isVerifiedLink = isVerifiedLink();
@@ -1054,9 +1053,16 @@ public class Server extends HttpServlet {
 		}// eval
 		else if (nextLink == Message.EVAL_LINK) {
 			echo("Get Evaluation link!");
+			// Avoid given a verification corresponding to last button press
+			echo("Last verification was = "+lastVerification);
+			int verification = Integer.parseInt(lastVerification);
+			double confidence = 1;
+			if(verification == VALID) // pushed 1 -> now change to link where you have to push 2  
+				confidence = -2;
+			
 			SQLqueryLinks = "select * from links, difficulty where links.ID = difficulty.ID AND links.linkedOntologies='"
 					+ linkset
-					+ "' and links.Confidence in (1,-2) "
+					+ "' and links.Confidence ="+confidence
 					+ notIn
 					+ " order by links.Counter limit 1";
 		}
@@ -1708,9 +1714,9 @@ public class Server extends HttpServlet {
 	 */
 	private String parse(String s, boolean prefix) {
 		// Remove '<' and '>'
-		echo("##Server: Parse " + s + "##");
+//		echo("##Server: Parse " + s + "##");
 		String removedBrackets = s.replaceAll("<", "").replaceAll(">", "");
-		echo("##Server: Removed Brackets " + removedBrackets + "##");
+//		echo("##Server: Removed Brackets " + removedBrackets + "##");
 		if (prefix == false)
 			return removedBrackets;
 		// Set Prefix
@@ -1738,12 +1744,12 @@ public class Server extends HttpServlet {
 																			// ??
 				else
 					parsed += split[j];
-				echo(j + ".parsed split: " + parsed);
+//				echo(j + ".parsed split: " + parsed);
 			}
 		} else {
 			parsed = setPrefix(removedBrackets);
 		}
-		echo("Parsed: " + parsed);
+//		echo("Parsed: " + parsed);
 		// echo("##Server: Parse "+s+" done##");
 		return parsed;
 

@@ -1,7 +1,8 @@
-(function() {
+performLinkTask = (function() {
 	var gotLinkTask = false;
 	var rootURL = "http://verilinks.aksw.org/";
-
+	// local test
+	// var rootURL ="http://localhost:8080/verilinks-server";
 	window.onload = function() {
 		getLinkTasks();
 	};
@@ -67,4 +68,9 @@
 		}
 	}
 
+	return {
+		performLinkTask : function(){
+			performLinkTask();
+		}
+	}
 })();

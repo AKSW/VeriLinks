@@ -113,9 +113,9 @@ import com.google.gwt.maps.client.overlays.MarkerOptions;
  */
 public class PeaInvasion extends HtmlGame {
 
-	// public static final String SERVER_URL =
-	// "http://localhost:8080/verilinks-server/";
-	public static final String SERVER_URL = "http://verilinks.aksw.org/";
+	// local test
+	 public static final String SERVER_URL ="http://localhost:8080/verilinks-server/";
+//	public static final String SERVER_URL = "http://verilinks.aksw.org/";
 	/** Semantic Web nerd, or newbie. */
 	private Configuration config;
 
@@ -1702,8 +1702,13 @@ public class PeaInvasion extends HtmlGame {
 	 * 
 	 * @param money
 	 */
-	public void addMoney(int money) {
-		game.world.addMoney(money);
+	public void addMoney(int money,int moneyVer) {
+		if(money == GameConstants.BONUS_NEGATIVE){
+			game.world.resetMoney();
+		}
+		else{
+			game.world.addMoney(money+moneyVer);
+		}
 		game.world.getInfoText().updateMoney(game.world.getMoney());
 	}
 
@@ -1714,9 +1719,16 @@ public class PeaInvasion extends HtmlGame {
 	 * @param bonus
 	 *            money to add
 	 */
-	public void processEval(double eval, String difficulty) {
+	public void processEval(double eval, String difficulty, int selection) {
 		echo("Process Eval = " + eval + ", Diff = " + difficulty);
 
+		// Add temp. money for verification
+		int moneyVer = MONEY_FOR_VERIFICATION; // VALID, NOT VALID
+		if (selection == GameConstants.UNSURE) { // NOT SURE
+			moneyVer = MONEY_FOR_NOT_SURE;
+			notSure = true;
+		}
+		
 		int bonus = 0;
 
 		String msg = null;
@@ -1728,14 +1740,14 @@ public class PeaInvasion extends HtmlGame {
 			setPenalty();
 		} else if (eval == GameConstants.EVAL_POSITIVE) {// sure positive
 			bonus = GameConstants.BONUS_POSITIVE;
-			setAgreement(GameConstants.BONUS_POSITIVE);
-		} else if (eval == GameConstants.EVAL_FIRST) {// sure positive
+			setAgreement(bonus);
+		} else if (eval == GameConstants.EVAL_FIRST) {// first
 			bonus = GameConstants.BONUS_FIRST;
-			setFirstVerification(GameConstants.BONUS_FIRST);
-		} else if (eval > GameConstants.EVAL_THRESHOLD) {// agree
+			setFirstVerification(bonus);
+		} else if ( (eval > GameConstants.EVAL_THRESHOLD) && (eval < GameConstants.EVAL_POSITIVE)) {// agree
 			bonus = GameConstants.BONUS_AGREE;
-			setAgreement(GameConstants.BONUS_AGREE);
-		} else if (eval <= GameConstants.EVAL_THRESHOLD) {
+			setAgreement(bonus);
+		} else if ( (eval <= GameConstants.EVAL_THRESHOLD) && (eval > GameConstants.EVAL_NEGATIVE)) { //disagree
 			bonus = GameConstants.BONUS_DISAGREE;
 			setDisagreement();
 		}
@@ -1743,11 +1755,13 @@ public class PeaInvasion extends HtmlGame {
 		// documentation of verification
 		verificationStats.addEvaluation(bonus, notSure);
 
+		
+		
 		int finalBonus = bonus;
 		// here
 		// int finalBonus = Balancing.getBonus(bonus, difficulty);
 		echo("finalBonus: " + finalBonus);
-		addMoney(finalBonus);
+		addMoney(bonus,moneyVer);
 		notSure = false;
 		echo("Process bonus done!");
 	}
@@ -1776,13 +1790,13 @@ public class PeaInvasion extends HtmlGame {
 		// Sound
 		// game.getSound().playSend();
 
-		// Add temp. money for verification
-		int money = MONEY_FOR_VERIFICATION; // VALID, NOT VALID
-		if (selection == GameConstants.UNSURE) { // NOT SURE
-			money = MONEY_FOR_NOT_SURE;
-			notSure = true;
-		}
-		addMoney(money);
+//		// Add temp. money for verification
+//		int money = MONEY_FOR_VERIFICATION; // VALID, NOT VALID
+//		if (selection == GameConstants.UNSURE) { // NOT SURE
+//			money = MONEY_FOR_NOT_SURE;
+//			notSure = true;
+//		}
+//		addMoney(money);
 
 		// Change verifyButton
 		verifyButton.setEnabled(false);
@@ -2220,8 +2234,9 @@ public class PeaInvasion extends HtmlGame {
 
 	private void setPenalty() {
 		echo("Process Link-Evaluation: Penalty");
-		String msg = "False Verification! << " + GameConstants.BONUS_NEGATIVE
-				+ " Coins >> Penalty!";
+//		String msg = "False Verification! << " + GameConstants.BONUS_NEGATIVE
+//				+ " Coins >> Penalty!";
+		String msg = "False Verification! << You lose all your coins >>!";
 		game.penalty();
 		msgButton.setText(msg);
 		msgButton.setStyleName("gameMessagePenalty");
@@ -2273,7 +2288,7 @@ public class PeaInvasion extends HtmlGame {
 				verifyComponent.enableButtons();
 			}
 		};
-		t.schedule(1800);
+		t.schedule(GameConstants.TIMER);
 	}
 
 	/** Is verification mechanism locked? */
@@ -2601,7 +2616,7 @@ public class PeaInvasion extends HtmlGame {
 		// Double.parseDouble(jLink.getDifficulty()));
 
 		if (selection != this.FIRST_QUERY_REQUEST)
-			processEval(jLink.getEval(), jLink.getDifficulty());
+			processEval(jLink.getEval(), jLink.getDifficulty(),selection);
 
 		setDifficulty(linkset.getDifficulty());
 
@@ -2658,6 +2673,7 @@ public class PeaInvasion extends HtmlGame {
 
 		echo("predi: " + link.getPredicate());
 		echo("counter: " + link.getCounter());
+		echo("confidence: " + link.getConfidence());
 		// echo("bonus: " + link.getBonus());
 		echo("Client: This link is Eval_Link?: " + thisLink);
 		echo("----------------------------------");
