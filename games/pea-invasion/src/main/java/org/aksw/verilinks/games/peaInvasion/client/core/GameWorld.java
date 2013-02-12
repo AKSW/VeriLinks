@@ -604,6 +604,14 @@ public class GameWorld implements ContactListener {
 		infoText.updateScore(this.score);
 	}
 
+	public void minusScore(int minus){
+		if(this.score >= minus)
+			this.score-= minus;
+		else
+			this.score = 0;
+		infoText.updateScore(this.score);
+	}
+	
 	public int getScore() {
 		return this.score;
 	}
@@ -774,5 +782,16 @@ public class GameWorld implements ContactListener {
 		}
 		// else
 		// echo("No cashier!");
+	}
+	
+	public void speedUp(){
+		Enemy em;
+		for (Entity e : entities) {
+			if (e instanceof Enemy) {
+				em = (Enemy)e; 
+				em.setSpeed(em.getSpeed()*2);
+				break;
+			}
+		}
 	}
 }

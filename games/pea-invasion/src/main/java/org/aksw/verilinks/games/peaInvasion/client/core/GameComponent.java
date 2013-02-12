@@ -449,15 +449,23 @@ public class GameComponent implements Game, Pointer.Listener, Keyboard.Listener 
     System.out.println("SpecialCounter After: "+specialCounter);
   }
 
-  public void penalty(){
+  public void penalty(int countPenalty){
   	// Play Sound
   	this.sound.playDisagree();
-  	// Send Enemy
-  	world.sendEnemy();
-    System.out.println("SpecialCounter Before: "+specialCounter);
+  	// Minus score
+  	world.minusScore(500);
+  	// Send Enemy based on penaties
+  	int enemies = Math.min(countPenalty+1,6);
+  	for(int i=0; i < enemies;i++){
+  		world.sendEnemy();
+  	}
+  	world.speedUp();
+  	// change pea speed
+  	
     specialCounter=0;
-    System.out.println("SpecialCounter After: "+specialCounter);
-    world.sendEnemy();
+    System.out.println("Reset SpecialCounter: "+specialCounter);
+  
+    
   }
   
   public void firstVerification(){

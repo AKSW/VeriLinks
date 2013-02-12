@@ -1752,6 +1752,7 @@ public class PeaInvasion extends HtmlGame {
 			setDisagreement();
 		}
 		echo("bonus: " + bonus);
+		
 		// documentation of verification
 		verificationStats.addEvaluation(bonus, notSure);
 
@@ -1817,11 +1818,11 @@ public class PeaInvasion extends HtmlGame {
 
 	private void checkUserCredibility() {
 		int min = 4;
-		int max = 5;
+		int max = 6;
 		int rnd = min + (int) (Math.random() * ((max - min) + 1));
 		echo("rnd: " + rnd);
 		// int rnd = 7;
-		if (this.verificationStats.getList().size() % rnd == rnd - 1) {
+		if ( (this.verificationStats.getList().size()>0) && ( (this.verificationStats.getList().size() % 8 == 0) || (this.verificationStats.getList().size() % rnd == rnd - 1)) ){
 			this.checkUserCredibility = true;
 			nextLink = Message.EVAL_LINK;
 			echo("debug: TRUE . size: "
@@ -1846,14 +1847,13 @@ public class PeaInvasion extends HtmlGame {
 		int unsure = verificationStats.getCountUnsure();
 		echo("agree: " + agree + " disagree: " + disagree + "penalty: "
 				+ penalty + " unsure:" + unsure);
-		echo("Error limit: " + ERROR_LIMIT);
-		echo("CalcErrorRate: " + calcErrorRate());
 		if (calcErrorRate() <= ERROR_LIMIT) {
 			this.user.setCredible(true);
 			echo("Commit Link Verifications!");
 		} else {
 			this.user.setCredible(false);
 			echo("Too many false verifications! Link Verifications won't be commited!");
+			return;
 		}
 
 		String data = this.verificationStats.getJson();
@@ -1905,8 +1905,8 @@ public class PeaInvasion extends HtmlGame {
 	private double calcErrorRate() {
 		double errorRate = ((double) verificationStats.getCountPenalty())
 				/ ((double) verificationStats.getList().size());
-		echo("pen: " + verificationStats.getCountPenalty() + ", verified: "
-				+ verificationStats.getList().size() + " , error: " + errorRate);
+		echo("penalty: " + verificationStats.getCountPenalty() + ", verified: "
+				+ verificationStats.getList().size() + " , error: " + errorRate + " errorLimit: "+ERROR_LIMIT);
 
 		return errorRate;
 	}
@@ -2237,7 +2237,7 @@ public class PeaInvasion extends HtmlGame {
 //		String msg = "False Verification! << " + GameConstants.BONUS_NEGATIVE
 //				+ " Coins >> Penalty!";
 		String msg = "False Verification! << You lose all your coins >>!";
-		game.penalty();
+		game.penalty(this.verificationStats.getCountPenalty());
 		msgButton.setText(msg);
 		msgButton.setStyleName("gameMessagePenalty");
 	}
