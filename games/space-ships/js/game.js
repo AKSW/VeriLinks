@@ -517,7 +517,11 @@
 			var clockLayer = new Kinetic.Layer();
 			var clock = new Kinetic.Text(_clock);
 			// var timeTxt = _round+".Round: " + (timeTotal < 10 ? "0" + timeTotal+" s left" : timeTotal);
-			var timeTxt = _round + ".Round: " + timeTotal + " s left";
+			var timeTxt;
+			if(round == MAX_ROUNDS)
+				timeTxt = "Last Round: " + timeTotal + " s left";
+			else
+				timeTxt = _round + ".Round: " + timeTotal + " s left";
 			clock.setText(timeTxt);
 			clock.setX(_options.width / 2 - clock.getWidth() / 2);
 			clockLayer.add(clock);
