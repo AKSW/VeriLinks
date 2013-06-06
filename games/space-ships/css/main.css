@@ -84,7 +84,17 @@ a {
 	top: 1px;
 }
 
-/*tabs-----------------------------------------------------------*/
+/* HELP ---------------- */
+#menuHelp{
+	background-color: #8EA676;
+	border: 1px solid black;
+	margin: 20px;
+	padding: 5px;
+	width:700px;
+}
+
+
+/* EQUIPMENT tabs-----------------------------------------------------------*/
 .w3c {
 	
 	/*position: absolute;*/

@@ -583,15 +583,27 @@
 			// start game
 			startGame();
 		}
-		document.getElementById("equipmentBtn").onclick = function() {
+		document.getElementById("helpBtn").onclick = function() {
 			// show menuGear
-			document.getElementById("menuGear").style.display = "";
+			document.getElementById("menuHelp").style.display = "";
 			// hide menu
 			document.getElementById("menu").style.display = "none";
 		}
-		document.getElementById("mgEquippedBackBtn").onclick = function() {
-			// hide menuGear
-			document.getElementById("menuGear").style.display = "none";
+		// document.getElementById("equipmentBtn").onclick = function() {
+			// // show menuGear
+			// document.getElementById("menuGear").style.display = "";
+			// // hide menu
+			// document.getElementById("menu").style.display = "none";
+		// }
+		// document.getElementById("mgEquippedBackBtn").onclick = function() {
+			// // hide menuGear
+			// document.getElementById("menuGear").style.display = "none";
+			// // show menu
+			// document.getElementById("menu").style.display = "";
+		// }
+		document.getElementById("menuBackBtn").onclick = function() {
+			// hide all
+			document.getElementById("menuHelp").style.display = "none";
 			// show menu
 			document.getElementById("menu").style.display = "";
 		}
