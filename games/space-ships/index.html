@@ -3,46 +3,205 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>VeriLinks Game</title>
+		<title>VeriLinks: Spaceship Game</title>
 		<!-- app style -->
 		<link href="css/main.css" rel="stylesheet" />
 		<link href="css/verilinks.css" rel="stylesheet" />
 
 		<!-- libs -->
-<!-- 		<script src="js/lib/jquery-1.8.2.min.js"></script> -->
+		<!-- 		<script src="js/lib/jquery-1.8.2.min.js"></script> -->
 		<!-- <script type="text/javascript" src='js/lib/jsrender.js'></script> -->
 
 		<!-- main logic -->
 		<script data-main="js/main" src="js/require.js"></script>
 	</head>
 	<body>
+		<div id="fb-root"></div>
+		<!-- login -->
+		<div id="login">
+			<h1>VeriLinks: Spaceship Game</h1>
+			<h4>Login to play the game</h4>
+			<!-- <div class="box"><button onclick="LOGIN_FACEBOOK.login(document, 'script', 'facebook-jssdk')">facebook login</button></div>
+			<div class="fb-login-button" data-show-faces="true" data-width="200" data-max-rows="1"></div> -->
+			<!-- <div id="fb-root"></div> -->
+			<div id="user-info">
+				<p>
+					Welcome <b id='user-name'></b>
+				</p>
+				<p id='user-pic'></p>
+				<p>
+					<button id="playGameBtn" onclick="loadGame()" style="display:none">
+						Start Spaceship Game
+					</button>
+				</p>
+			</div>
+			<p>
+				<button id="normalLoginBtn" onclick="showNormalLogin()">
+					Normal Login
+				</button>
+				<button id="fbLoginBtn">
+					Facebook Login
+				</button>
+				<button id="googleLoginBtn">
+					Google Login
+				</button>
+				<!-- <button class="g-signin"
+				data-scope="https://www.googleapis.com/auth/plus.login"
+				data-clientid="23285137063-o1nor0ecqfds8gju8id390dqkis8atac.apps.googleusercontent.com"
+				data-callback="onSignInCallback"
+				data-theme="dark"
+				data-cookiepolicy="single_host_origin"
+				data-requestvisibleactions="http://schemas.google.com/AddActivity"
+				data-width="wide"></button> -->
+			</p>
+			<p>
+				<div id="normalLogin" style="display:none">
+					<p style="font-weight:bold;color:#285459">
+						Please enter your name
+					</p>
+					<table>
+						<tr>
+							<td>Username:</td><td>
+							<input type="text" id="normalUser"/>
+							</td><td>
+							<button onclick="loginNormal()" style="width:100px" >
+								Login
+							</button></td>
+							<td>
+							<button style="width:100px" onclick="disablePlay()">
+								Cancel
+							</button></td>
+						</tr>
+					</table>
+
+				</div>
+			</p>
+
+		</div>
+
 		<!-- gfx container -->
-		<div id="gameContainer"></div>
+		<div id="gameContainer" style="display:none"></div>
 
 		<!-- verify -->
-		<div id="verilinksContainer">
+		<div id="verilinksContainer" style="display:none">
 			<table>
 				<tr>
 					<!-- template rendering-->
 					<td id='verilinks'></td>
 					<!-- buttons -->
 					<td id='buttons'>
-						<p class='vertical-align'>
-							<a id='true' href="#" title='True' onclick='VERILINKS.vTrue()'><img class='lock' src='img/verify/trueButton.png'></a>
-						</p>
-						<p class='vertical-align'>
-							<a id='false' href="#" title='False' onclick='VERILINKS.vFalse()'><img class='lock' src='img/verify/falseButton.png'></a>
-						</p>
-						<p class='vertical-align'>
-							<a id='unsure' href="#" title='Unsure' onclick='VERILINKS.vUnsure()'><img class='lock' src='img/verify/unsureButton.png'></a>
-						</p>
-						<p class='vertical-align'>
-							<button id='start' onclick="emulate()">Start</button>
-						</p>
-					</td>
+					<p class='vertical-align'>
+						<a id='true' href="#" title='True' onclick='VERILINKS.vTrue()'><img class='lock' src='img/verify/trueButton.png'></a>
+					</p>
+					<p class='vertical-align'>
+						<a id='false' href="#" title='False' onclick='VERILINKS.vFalse()'><img class='lock' src='img/verify/falseButton.png'></a>
+					</p>
+					<p class='vertical-align'>
+						<a id='unsure' href="#" title='Unsure' onclick='VERILINKS.vUnsure()'><img class='lock' src='img/verify/unsureButton.png'></a>
+					</p>
+					<p class='vertical-align'>
+						<button id='start' onclick="emulate()">
+							Start new round
+						</button>
+					</p></td>
 				</tr>
 			</table>
 		</div>
 
+		<!-- menu -->
+		<div id="menu" style="display:none">
+			<p class="vertical-align" style="font: 40px MisoRegular;">
+				Menu
+			</p>
+			<p class='vertical-align'>
+				<button id="playBtn">
+					Play
+				</button>
+			</p>
+			<!-- <p class='vertical-align'><button id="multiplayer">
+			Multiplayer
+			</button></p> -->
+			<p class='vertical-align'>
+				<button id="equipmentBtn">
+					Equipment
+				</button>
+			</p>
+			<p class='vertical-align'>
+				<button id="settingsBtn">
+					Settings
+				</button>
+			</p>
+			<p class='vertical-align'>
+				<button id="helpBtn">
+					Help
+				</button>
+			</p>
+		</div>
+
+		<!-- menu gear -->
+		<div id="menuGear" style="display:none">
+			<div class="w3c">
+				<div id="menuGearstats">
+					<a href="#menuGearstats">Stats</a>
+					<!-- <div class="box">
+					<p class='playerName'>Player:</p>
+					<p class='playerLevel'>Level:</p>
+					<p class='playerExp'>Experience:</p>
+					<p class='playerRank'>Rank:</p>
+					</div> -->
+					<div class='box'>
+						<table>
+							<tr>
+								<td>Player:</td><td id='playerName'>[None]</td>
+							</tr>
+							<tr>
+								<td>Level:</td><td id='playerLvl'>[None]</td>
+							</tr>
+							<tr>
+								<td>Experience:</td><td id='playerExp'>[None]</td>
+							</tr>
+							<tr>
+								<td>Rank:</td><td id='playerRank'>[None]</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div id="menuGearWeapon">
+					<a href="#menuGearWeapon">Weapon</a>
+					<div>
+						Upgrade Weapon
+					</div>
+				</div>
+				<div id="menuGearArmor">
+					<a href="#menuGearArmor">Armor</a>
+					<div>
+						Upgrade Armor
+					</div>
+				</div>
+			</div>
+
+			<div id="mgEquipped">
+				<div>
+					<p>
+						Currently equipped gear:
+					</p>
+				</div>
+				<div class="box">
+					<table>
+						<tr>
+							<th>Weapon</th><th>Armor</th>
+						</tr>
+						<tr>
+							<td id='mgEquippedWeapon'>[None]</td><td id='mgEquippedArmor'>[None]</td>
+						</tr>
+					</table>
+				</div>
+				<p style="text-align:right;margin-right:20px">
+					<button id='mgEquippedBackBtn' style>
+						Back
+					</button>
+				</p>
+			</div>
+		</div>
 	</body>
 </html>

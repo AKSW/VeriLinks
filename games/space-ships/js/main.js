@@ -1,14 +1,28 @@
 require([
     "kinetic.min",
+    'lib/jquery-1.9.1.min',
+    "definition",
+	"verilinks",
+	"animations",
+	// "bullet",
     "game",
-    "verilinks"
+    "login"
 ], function(){
     // init game
     var game = new Game('gameContainer');
+    
+    // test mode
+	// game.testGame();
+	
+	window.loadGame = function(){
+		game.loadGame();
+	}
 
     window.emulate = function(){
-        game.startRound();
-        VERILINKS.unlock();
+    	if (!game.isPaused()){
+	        game.startRound();
+	        // VERILINKS.unlock();
+       }
     };
     
     window.drawMsg = function(msg){

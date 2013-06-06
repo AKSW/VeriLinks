@@ -368,13 +368,13 @@ VERILINKS = (function() {
 			if (prevLinkEval == EVAL_FIRST)
 				eval = "first";
 			else if (prevLinkEval == EVAL_NEGATIVE)
-				eval = "penalty";
+				eval = "Penalty for false verification!";
 			else if (prevLinkEval == EVAL_UNSURE)
-				eval = "unsure";
+				eval = "Unsure chosen";
 			else if (prevLinkEval == EVAL_POSITIVE || prevLinkEval > EVAL_THRESHOLD)
-				eval = "agreement";
+				eval = "Agreement with majority";
 			else if (prevLinkEval <= EVAL_THRESHOLD)
-				eval = "disagreement";
+				eval = "Disagreement with majority";
 			// alert(eval);
 			return eval;
 		},
@@ -384,19 +384,19 @@ VERILINKS = (function() {
 			var url = SERVER_URL + "server?service=commitVerifications";
 			var obj = new Commit();
 			var json = JSON.stringify(obj);
-			$.ajax({
-				type : 'POST',
-				url : url,
-				data : json,
-				success : function(data) {
-					// alert("commit: " + data);
-					verifiedLinksCurrent.length = 0;
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					alert("Error: "+errorThrown);
-					verifiedLinksCurrent.length = 0;
-				}
-			});
+			// $.ajax({
+				// type : 'POST',
+				// url : url,
+				// data : json,
+				// success : function(data) {
+					// // alert("commit: " + data);
+					// verifiedLinksCurrent.length = 0;
+				// },
+				// error : function(jqXHR, textStatus, errorThrown) {
+					// alert("Error: "+errorThrown);
+					// verifiedLinksCurrent.length = 0;
+				// }
+			// });
 			return "Commit";
 		},
 		isLocked : function(){

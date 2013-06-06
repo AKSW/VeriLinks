@@ -1,24 +1,177 @@
 body {
-    margin: 0px;
-    background-color: black;
+	margin: 0px;
+	/*background-color: black;*/
+	background-color: #141E26;
 }
 
 a {
-    color: #fff;
+	color: #fff;
 }
-
+/*login*/
+#login{
+	/*background-color: #285459;*/
+	color: #8EA676;
+	margin-left: 20px;
+}
+#user-info{
+	background-color: #1E3640;
+	padding: 20px;
+	display:inline-block;
+	text-align: center;
+}
+#normalLogin{
+	/*width: 350px;*/
+	padding: 20px;
+	color: white;
+	background-color:#8EA676;
+	/*border: 2px solid red;*/
+	display:inline-block;
+}
+/*game*/
 #gameContainer {
-    position: absolute;
-    width: 100%;
-    height: 80%;
-    top: 0;
-    border: 1px dashed black;
+	position: absolute;
+	width: 100%;
+	height: 80%;
+	top: 0;
+	/*border: 1px dashed black;*/
 }
 
 #gameControls {
 	border: 1px dotted red;
-    position: absolute;
-    width: 100%;
-    height: 19%;
-    bottom: 0;
+	position: absolute;
+	width: 100%;
+	height: 19%;
+	bottom: 0;
+}
+
+/*menu-----------------------------------------------------------*/
+#menu {
+	z-index: 3000;
+	position: absolute;
+	color: #3F7364;
+	background-color: #141E26;
+	margin-top: 40px;
+	margin-left: 120px;
+	padding: 40px 150px;
+	border: 1px solid black;
+	/*-moz-box-shadow:    1px 1px 3px 3px darkgrey;
+	 -webkit-box-shadow: 1px 1px 3px 3px darkgrey;
+	 box-shadow:         1px 1px 3px 3px darkgrey;*/
+}
+
+#menu button {
+	color: #141E26;
+	border: 1px solid black;
+	width: 250px;
+	display: inline-block;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	font: 25px MisoRegular;
+	padding: .5em 2em .55em;
+	text-shadow: 0 1px 1px rgba(0,0,0,.3);
+	background-color: #8EA676;
+	/*-moz-box-shadow:    1px 1px 3px 3px #141E26;
+	 -webkit-box-shadow: 1px 1px 3px 3px #141E26;
+	 box-shadow:         1px 1px 3px 3px #141E26;*/
+}
+#menu button:hover {
+	text-decoration: none;
+}
+#menu button:active {
+	position: relative;
+	top: 1px;
+}
+
+/*tabs-----------------------------------------------------------*/
+.w3c {
+	
+	/*position: absolute;*/
+	margin-left: 50px;
+	margin-top:30px;
+	width: 700px;
+	/*padding: 40px 150px;*/
+	
+	z-index: 3000;
+	min-height: 250px;
+	position: relative;
+	/*margin-left:800px;*/
+	
+}
+.w3c > div {
+	display: inline;
+	
+}
+.w3c > div > a {
+	
+	margin-left: -1px;
+	position: relative;
+	left: 1px;
+	text-decoration: none;
+	color: #3F7364;
+	background: white;
+	display: block;
+	float: left;
+	padding: 5px 10px;
+	border: 1px solid black;
+	border-bottom: 1px solid black;
+}
+.w3c > div:not(:target) > a {/*not selected*/
+	border-bottom: 0;
+	/*background: -moz-linear-gradient(top, #8EA676, #3F7364);*/
+	background-color:#1E3640;
+}
+/*selected*/
+.w3c > div:target > a { 
+	background-color:#141E26;
+}
+.w3c > div > div {
+	background-color: #141E26;
+	z-index: -2;
+	left: 0;
+	top: 30px;
+	bottom: 0;
+	right: 0;
+	padding: 20px;
+	border: 1px solid black;
+}
+.w3c > div:not(:target) > div {
+	position: absolute;
+}
+.w3c > div:target > div {
+	position: absolute;
+	z-index: -1;
+}
+/*box*/
+#menuGear .box{
+	background-color: #8EA676;
+	border: 1px solid black;
+	margin: 20px;
+	padding: 5px;
+}
+
+#playerName, #playerRank, #playerLvl, #playerExp{
+	padding: 10px 30px;
+	/*color:#285459;*/
+	color: white;
+}
+
+/*currently equipped*/
+#mgEquipped {
+	z-index:3000;
+	width:500px;
+	position: relative;
+	margin-left: 50px;
+	width: 698px;
+	color: #3F7364;
+	background-color: #141E26;
+	border: 1px solid black;
+}
+#mgEquipped  p{
+	margin-left: 10px;
+}
+#mgEquippedWeapon, #mgEquippedArmor{
+	padding: 10px 30px;
+	color:white;
 }

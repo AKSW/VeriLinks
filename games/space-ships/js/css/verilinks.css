@@ -1,0 +1,48 @@
+#verilinksContainer {
+	bottom: 0;
+	position: absolute;
+	color: white;
+}
+
+#subject, #object, #predicate {
+	/*border: 1px solid black;
+	 -moz-box-shadow: 1px 2px 5px 2px grey;
+	 -webkit-box-shadow: 1px 2px 5px 2px grey;
+	 box-shadow: 1px 2px 5px 2px grey;*/
+	margin: 10px;
+}
+
+#subject{
+	font: 20px MisoRegular;
+	text-shadow: 0px 2px 3px #555;
+	font-style: italic;
+}
+#object{
+	font: 20px MisoRegular;
+	text-shadow: 0px 2px 3px #555;
+	font-style: italic;
+}
+#predicate {
+	text-align: center;
+	text-shadow: 2px 3px 3px #565051;
+	font: 20px MisoRegular;
+}
+#difficulty{
+	margin: 0px;
+	text-shadow: 2px 3px 3px #565051;
+	font: 17px MisoRegular;
+}
+.vertical-align {
+	text-align: center;
+}
+
+#map_subject, #map_object {
+	font: 12px MisoRegular;
+	height: 200px;
+	width: 380px;
+}
+
+.olControlAttribution {
+	margin-bottom: 140px;
+	margin-right: 5px;
+}
