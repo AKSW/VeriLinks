@@ -706,8 +706,10 @@
 	}
 
 	function endGame() {
-		alert("Game Over! Winner: " + _winner.getName());
-
+		if(_winner != null)
+			alert("Game Over! Winner: " + _winner.getName());
+		else
+			alert("The Game ended in a DRAW!");
 		// show highscore
 	}
 
