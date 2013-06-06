@@ -121,7 +121,7 @@
 		var armor2 = new Armor(2);
 		var weapon2 = new Weapon(10, 'pic/gun.png');
 		var gear2 = new Gear(weapon2, armor2);
-		var ship2 = new Spaceship(200, gear2);
+		var ship2 = new Spaceship(100, gear2);
 
 		if (!userAvatar)
 			userAvatar = 'img/avatars/nelson.gif';
