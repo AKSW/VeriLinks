@@ -1,5 +1,5 @@
 require([
-    "kinetic.min",
+    "js/kinetic.min",
     'lib/jquery-1.9.1.min',
     "definition",
 	"verilinks",

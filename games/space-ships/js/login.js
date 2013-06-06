@@ -70,7 +70,8 @@ function loginNormal(){
 // fb
 window.fbAsyncInit = function() {
 	FB.init({
-		appId : '441443792602870',
+		// appId : '441443792602870', // offline
+		appId: "520644954658042", // online
 		status : true,
 		cookie : true,
 		xfbml : true,
