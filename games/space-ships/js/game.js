@@ -25,7 +25,7 @@
 
 	// current round
 	var _round = 1;
-	var MAX_ROUNDS = 3;
+	var MAX_ROUNDS = 5;
 	
 	// Player
 	var _playerOne;
