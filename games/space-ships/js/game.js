@@ -34,6 +34,12 @@
 
 	var _winner;
 
+	// precision of verifications
+	var precision;
+	
+	var evalDmgP1=1;
+	var evalDmgP2=1;
+	
 	// menu
 	var _menuLayer;
 
@@ -125,7 +131,7 @@
 
 		if (!userAvatar)
 			userAvatar = 'img/avatars/nelson.gif';
-		_playerOne = new Player('Nelson', 'novice', 111, userAvatar, 1);
+		_playerOne = new Player(userName, 'novice', 111, userAvatar, 1);
 		_playerOne.spaceship = ship1;
 
 		_playerTwo = new Player('Homer', 'expert', 222, 'img/avatars/homer.gif', 2);
@@ -305,6 +311,25 @@
 	Game.prototype.drawMsg = function(msg) {
 		var stage = _stage;
 
+		// Calculate precision
+		var evalFactor = 0.1;
+		if(msg == "Agreement with majority"){
+			evalDmgP1 +=evalFactor;
+			evalDmgP2 -= evalFactor;
+		}else if(msg == "Disagreement with majority"){
+			evalDmgP1 -= evalFactor;
+			evalDmgP2 +=evalFactor; 
+		}else if(msg == "Penalty for false verification!"){
+			evalDmgP1 -= 10*evalFactor;
+			evalDmgP2 += 10*evalFactor; 
+		}		
+		if(evalDmgP1 < 0){
+			evalDmgP1 = 0;
+		}
+		if(evalDmgP2 < 0){
+			evalDmgP2 = 0;
+		}
+		
 		// select color
 		var col;
 		if (msg.indexOf("Agreement") != -1)
@@ -518,7 +543,7 @@
 			var clock = new Kinetic.Text(_clock);
 			// var timeTxt = _round+".Round: " + (timeTotal < 10 ? "0" + timeTotal+" s left" : timeTotal);
 			var timeTxt;
-			if(round == MAX_ROUNDS)
+			if(_round == MAX_ROUNDS)
 				timeTxt = "Last Round: " + timeTotal + " s left";
 			else
 				timeTxt = _round + ".Round: " + timeTotal + " s left";
@@ -549,11 +574,15 @@
 		// inc rounds
 		_round++;
 
+		// calculate damage
+		var dmgP1 = 10 * evalDmgP1;
+		var dmgP2 = 10 * evalDmgP2;
+		
 		// shoot one
-		shoot(_playerOne, _playerTwo, 10, _images.bulletRed);
+		shoot(_playerOne, _playerTwo, dmgP1, _images.bulletRed);
 		// shoot two with delay
 		setTimeout(function() {
-			shoot(_playerTwo, _playerOne, 10, _images.bulletWhite);
+			shoot(_playerTwo, _playerOne, dmgP2, _images.bulletWhite);
 		}, 500);
 
 	};
@@ -569,6 +598,12 @@
 			return;
 		}
 		VERILINKS.unlock();
+		
+		// reset dmg
+		evalDmgP1 = 1;
+		evalDmgP2 = 1;
+		
+		// round countdown
 		startCountdown();
 	};
 
