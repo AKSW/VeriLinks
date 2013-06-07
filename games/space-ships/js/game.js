@@ -21,7 +21,7 @@
 		"height" : 600
 	};
 	// time of round in seconds
-	var _roundTime = 15;
+	var _roundTime = 20;
 
 	// current round
 	var _round = 1;
