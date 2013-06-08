@@ -9,23 +9,34 @@ a {
 }
 /*login*/
 #login{
-	/*background-color: #285459;*/
+	background-color: #141E26;
 	color: #8EA676;
 	margin-left: 20px;
+	text-align: center;
 }
 #user-info{
 	background-color: #1E3640;
 	padding: 20px;
+	margin-top: 20px;
+	margin-bottom: 20px;
 	display:inline-block;
 	text-align: center;
+	-moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
 }
 #normalLogin{
-	/*width: 350px;*/
+	color: #000;
+	/*width: 350px;*
 	padding: 20px;
 	color: white;
 	background-color:#8EA676;
-	/*border: 2px solid red;*/
-	display:inline-block;
+	/*border: 2px solid red;*
+	display:inline-block;*/
+}
+.verisub{
+	color: #586066;
 }
 /*game*/
 #gameContainer {

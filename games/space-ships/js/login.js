@@ -1,3 +1,7 @@
+// set greetings message on init
+var userName = document.getElementById("user-name");
+userName.innerHTML = "captain. please login to continue";
+
 // Start game button
 function enablePlay() {
 	document.getElementById("playGameBtn").style.display = "";
@@ -6,10 +10,11 @@ function enablePlay() {
 
 function disablePlay() {
 	document.getElementById("playGameBtn").style.display = "none";
-	document.getElementById("normalLogin").style.display = "none";
-	document.getElementById("normalLoginBtn").disabled = false;
-	document.getElementById("googleLoginBtn").disabled = false;
-	document.getElementById("fbLoginBtn").disabled = false;
+	//document.getElementById("normalLogin").style.display = "none";
+	// show all buttons
+	$("#normalLoginBtn").show();
+	$("#googleLoginBtn").show();
+	$("#fbLoginBtn").show();
 
 	document.getElementById("user-name").innerHTML = "";
 	document.getElementById("user-pic").innerHTML = "";
@@ -19,6 +24,7 @@ function disablePlay() {
 	};
 	document.getElementById("normalLoginBtn").innerHTML = "Normal Login";
 
+	return false;
 }
 
 // normal login
@@ -37,14 +43,20 @@ function loginNormal() {
 	}
 	document.getElementById("user-name").innerHTML = user;
 
-	// hide normal
-	document.getElementById("normalLogin").style.display = "none";
+	// hide modal
+	$("#normalLogin").modal('hide');
+
+	// hide other login buttons
+	$("#fbLoginBtn").hide();
+	$("#googleLoginBtn").hide();
 
 	// enable logout
 	document.getElementById("normalLoginBtn").innerHTML = "Logout";
 	document.getElementById("normalLoginBtn").disabled = false;
-	document.getElementById("normalLoginBtn").onclick = function() {
-		disablePlay()
+	document.getElementById("normalLoginBtn").onclick = function(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		disablePlay();
 	};
 
 	enablePlay();
@@ -110,9 +122,9 @@ window.fbAsyncInit = function() {
 							// + response.id + '/picture" style="margin-right:5px"/>'
 							// + response.name;
 
-							// disable other buttons
-							document.getElementById("normalLoginBtn").disabled = true;
-							document.getElementById("googleLoginBtn").disabled = true;
+							// hide other buttons
+							$("#normalLoginBtn").hide();
+							$("#googleLoginBtn").hide();
 
 							enablePlay();
 						});

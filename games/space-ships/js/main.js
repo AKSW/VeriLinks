@@ -1,6 +1,7 @@
 require([
+    "lib/jquery-1.9.1.min",
     "lib/kinetic.min",
-    'lib/jquery-1.9.1.min',
+    "lib/bootstrap.min",
     "definition",
 	"verilinks",
 	"animations",

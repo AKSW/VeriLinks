@@ -4,6 +4,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>VeriLinks: Spaceship Game</title>
+		<!-- boostrap style -->
+		<link href="css/bootstrap.min.css" rel="stylesheet" />
+		<link href="css/bootstrap-responsive.min.css" rel="stylesheet" />
+		<link href="css/font-awesome.min.css" rel="stylesheet" />
+		<link href="css/social-buttons.css" rel="stylesheet" />
 		<!-- app style -->
 		<link href="css/main.css" rel="stylesheet" />
 		<link href="css/verilinks.css" rel="stylesheet" />
@@ -13,29 +18,29 @@
 	<body>
 		<div id="fb-root"></div>
 		<!-- TODO: StartPage -->
-		<div id="login">
-			<h1>VeriLinks: Spaceship Game</h1>
-			<h4>Login to play the game</h4>
+		<div class="hero-unit" id="login">
+			<h1>Spaceship Game</h1>
+			<h4 class="verisub">VeriLinks</h4>
 			<div id="user-info">
 				<p>
-					Welcome <b id='user-name'></b>
+					Welcome, <b id='user-name'></b>!
 				</p>
 				<p id='user-pic'></p>
 				<p>
-					<button id="playGameBtn" onclick="loadGame()" style="display:none">
+					<button class="btn btn-large btn-warning" id="playGameBtn" onclick="loadGame()" style="display:none">
 						Start Spaceship Game
 					</button>
 				</p>
 			</div>
-			<p>
-				<button id="normalLoginBtn" onclick="showNormalLogin()">
-					Normal Login
+			<div>
+				<a href="#normalLogin" role="button" data-toggle="modal" id="normalLoginBtn" class="btn btn-primary"> <!-- onclick="showNormalLogin()" -->
+					Play without connecting
+				</a>
+				<button  class="btn btn-facebook" id="fbLoginBtn">
+					<i class="icon-facebook"></i> | Connect with Facebook
 				</button>
-				<button id="fbLoginBtn">
-					Facebook Login
-				</button>
-				<button id="googleLoginBtn">
-					Google Login
+				<button  class="btn btn-google-plus" id="googleLoginBtn">
+					<i class="icon-google-plus"></i> | Connect with Google Plus
 				</button>
 				<!-- <button class="g-signin"
 				data-scope="https://www.googleapis.com/auth/plus.login"
@@ -45,29 +50,23 @@
 				data-cookiepolicy="single_host_origin"
 				data-requestvisibleactions="http://schemas.google.com/AddActivity"
 				data-width="wide"></button> -->
-			</p>
-			<p>
-				<div id="normalLogin" style="display:none">
-					<p style="font-weight:bold;color:#285459">
-						Please enter your name
-					</p>
-					<table>
-						<tr>
-							<td>Username:</td><td>
-							<input type="text" id="normalUser"/>
-							</td><td>
-							<button onclick="loginNormal()" style="width:100px" >
-								Login
-							</button></td>
-							<td>
-							<button style="width:100px" onclick="disablePlay()">
-								Cancel
-							</button></td>
-						</tr>
-					</table>
+			</div>
 
+			<!-- login modal -->
+			<div id="normalLogin" class="modal hide">
+				<div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				    <h3>Please, enter your username:</h3>
 				</div>
-			</p>
+				<div class="modal-body">
+				    <input type="text" id="normalUser" placeholder="Username"/>
+				</table>
+				</div>
+				<div class="modal-footer">
+				    <a href="#" class="btn" data-dismiss="modal">I changed my mind</a>
+				    <a href="#" onclick="loginNormal()" class="btn btn-primary">Go!</a>
+				</div>
+			</div>
 
 		</div>
 
