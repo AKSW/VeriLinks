@@ -40,9 +40,14 @@ VERILINKS = (function() {
 	var timeout = 1300;
 	var timeoutObject;
 
-	window.onload = function() {
-		insertScript(init);
-	};
+	// window.onload = function() {
+		// insertScript(init);
+	// };
+
+$( document ).ready(function() {
+    console.log( "insertscript!" );
+    insertScript(init);
+});
 
 	function init() {
 		login();
@@ -60,7 +65,7 @@ VERILINKS = (function() {
 		// jQuery
 		// var jqueryScript = document.createElement('script');
 		// jqueryScript.type = 'text/javascript';
-		// jqueryScript.src = '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js';
+		// jqueryScript.src = '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js';
 		// jqueryScript.onload = function() {
 			// openlayers
 			var mapScript = document.createElement('script');
@@ -85,11 +90,11 @@ VERILINKS = (function() {
 					// callback
 					if (callback != undefined && typeof callback == 'function')
 						callback();
-				}
+				};
 				headID.appendChild(jsrenderScript);
-			// };
+			};
 			headID.appendChild(mapScript);
-		}
+		// }
 		// headID.appendChild(jqueryScript);
 	}
 
