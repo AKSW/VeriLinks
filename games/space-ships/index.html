@@ -18,7 +18,18 @@
 	<body>
 		<div id="fb-root"></div>
 		<!-- TODO: StartPage -->
-		<div class="hero-unit" id="login">
+		<div id="loadingScreen" class="hero-unit">
+			<h1>Spaceship Game</h1>
+			<h4 class="verisub">VeriLinks</h4>
+			<div id="progress">
+			<h3>Game is loading. Please wait ..</h3>
+			<p>
+				<progress>working...</progress>
+			</p>
+			</div>
+		</div>
+		
+		<div class="hero-unit" id="login" style="display:none">
 			<h1>Spaceship Game</h1>
 			<h4 class="verisub">VeriLinks</h4>
 			<div id="user-info">
@@ -44,14 +55,6 @@
 				</button>
 				<!-- google connect stuff -->
 				<script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
-				<!-- <button class="g-signin"
-				data-scope="https://www.googleapis.com/auth/plus.login"
-				data-clientid="23285137063-o1nor0ecqfds8gju8id390dqkis8atac.apps.googleusercontent.com"
-				data-callback="onSignInCallback"
-				data-theme="dark"
-				data-cookiepolicy="single_host_origin"
-				data-requestvisibleactions="http://schemas.google.com/AddActivity"
-				data-width="wide"></button> -->
 			</div>
 
 			<!-- login modal -->

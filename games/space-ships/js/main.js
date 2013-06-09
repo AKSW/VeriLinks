@@ -9,8 +9,21 @@ require([
     "game",
     "login"
 ], function(){
+	
+	// display login if error
+	setTimeout(function(){
+			if(document.getElementById("login").style.display=="none"){
+				console.log("error: reload");
+				location.reload();
+			}
+		},9000);
+	
     // init game
     var game = new Game('gameContainer');
+    
+	// display login
+	document.getElementById("loadingScreen").style.display="none";
+	document.getElementById("login").style.display="";
     
     // test mode
 	// game.testGame();

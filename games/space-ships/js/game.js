@@ -26,7 +26,7 @@
 	// current round
 	var _round = 1;
 	var MAX_ROUNDS = 5;
-	
+
 	// Player
 	var _playerOne;
 	// get player
@@ -36,12 +36,23 @@
 
 	// precision of verifications
 	var precision;
-	
-	var evalDmgP1=1;
-	var evalDmgP2=1;
-	
+	var evalDmgP1 = 1;
+	var evalDmgP2 = 1;
+
 	// menu
 	var _menuLayer;
+
+	// calculate loading
+	var numImagesLoaded = 0;
+	
+	function incrementAndCheckLoading() {
+		numImagesLoaded++;
+		if (numImagesLoaded == 6) {
+			// Do some stuff like remove loading screen or redirect to other URL
+			// alert("images: "+numImagesLoaded);
+		}
+		console.log(numImagesLoaded);
+	}
 
 	var loadSprite = function(url, config, layer, stage, callback) {
 		var imageObj = new Image();
@@ -59,6 +70,8 @@
 
 			if ( typeof callback !== "undefined")
 				callback(sprite);
+				
+			incrementAndCheckLoading();
 		};
 		imageObj.src = url;
 	};
@@ -69,6 +82,7 @@
 		img.onload = function() {
 			_images[holder] = img;
 			callback(img);
+			incrementAndCheckLoading();
 		};
 	};
 
@@ -178,37 +192,32 @@
 		var bgLayer = new Kinetic.Layer();
 
 		// // draw planets
-		var num1 = 1 + Math.floor(Math.random()*4),
-		num2 = 4 + Math.floor(Math.random()*4),
-		num3 = 8 + Math.floor(Math.random()*4),
-		size1 = 50 + Math.floor( Math.random() * 100 ),
-		size2 = 50 + Math.floor( Math.random() * 100 ),
-		size3 = 50 + Math.floor( Math.random() * 100 );
-		loadSprite("img/planets/planet_"+num1+".png", {
-		x : 150 + Math.random() * (_options.width - 300),
-		y : Math.random() * 150,
-		rotation : Math.random() * Math.PI * 2,
-		width : size1,
-		height : size1,
-		opacity: 0.15
+		var num1 = 1 + Math.floor(Math.random() * 4), num2 = 4 + Math.floor(Math.random() * 4), num3 = 8 + Math.floor(Math.random() * 4), size1 = 50 + Math.floor(Math.random() * 100), size2 = 50 + Math.floor(Math.random() * 100), size3 = 50 + Math.floor(Math.random() * 100);
+		loadSprite("img/planets/planet_" + num1 + ".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : Math.random() * 150,
+			rotation : Math.random() * Math.PI * 2,
+			width : size1,
+			height : size1,
+			opacity : 0.15
 		}, bgLayer);
-		loadSprite("img/planets/planet_"+num2+".png", {
-		x : 150 + Math.random() * (_options.width - 300),
-		y : 150 + Math.random() * (_options.height / 2 - 150),
-		rotation : Math.random() * Math.PI * 2,
-		width : size2,
-		height : size2,
-		opacity: 0.4
+		loadSprite("img/planets/planet_" + num2 + ".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : 150 + Math.random() * (_options.height / 2 - 150),
+			rotation : Math.random() * Math.PI * 2,
+			width : size2,
+			height : size2,
+			opacity : 0.4
 		}, bgLayer);
-		loadSprite("img/planets/planet_"+num3+".png", {
-		x : 150 + Math.random() * (_options.width - 300),
-		y : (_options.height / 2) + Math.random() * (_options.height / 2 - 150),
-		rotation : Math.random() * Math.PI * 2,
-		width : size3,
-		height : size3,
-		opacity: 0.25
+		loadSprite("img/planets/planet_" + num3 + ".png", {
+			x : 150 + Math.random() * (_options.width - 300),
+			y : (_options.height / 2) + Math.random() * (_options.height / 2 - 150),
+			rotation : Math.random() * Math.PI * 2,
+			width : size3,
+			height : size3,
+			opacity : 0.25
 		}, bgLayer);
-		
+
 		// // add particles fog
 		// var fogColorsAll =[
 		// ["#dc6a19", "#c69d22", "#6c1d1a"], // set one
@@ -313,23 +322,23 @@
 
 		// Calculate precision
 		var evalFactor = 0.1;
-		if(msg == "Agreement with majority"){
-			evalDmgP1 +=evalFactor;
+		if (msg == "Agreement with majority") {
+			evalDmgP1 += evalFactor;
 			evalDmgP2 -= evalFactor;
-		}else if(msg == "Disagreement with majority"){
+		} else if (msg == "Disagreement with majority") {
 			evalDmgP1 -= evalFactor;
-			evalDmgP2 +=evalFactor; 
-		}else if(msg == "Penalty for false verification!"){
-			evalDmgP1 -= 10*evalFactor;
-			evalDmgP2 += 10*evalFactor; 
-		}		
-		if(evalDmgP1 < 0){
+			evalDmgP2 += evalFactor;
+		} else if (msg == "Penalty for false verification!") {
+			evalDmgP1 -= 10 * evalFactor;
+			evalDmgP2 += 10 * evalFactor;
+		}
+		if (evalDmgP1 < 0) {
 			evalDmgP1 = 0;
 		}
-		if(evalDmgP2 < 0){
+		if (evalDmgP2 < 0) {
 			evalDmgP2 = 0;
 		}
-		
+
 		// select color
 		var col;
 		if (msg.indexOf("Agreement") != -1)
@@ -543,7 +552,7 @@
 			var clock = new Kinetic.Text(_clock);
 			// var timeTxt = _round+".Round: " + (timeTotal < 10 ? "0" + timeTotal+" s left" : timeTotal);
 			var timeTxt;
-			if(_round == MAX_ROUNDS)
+			if (_round == MAX_ROUNDS)
 				timeTxt = "Last Round: " + timeTotal + " s left";
 			else
 				timeTxt = _round + ".Round: " + timeTotal + " s left";
@@ -577,7 +586,7 @@
 		// calculate damage
 		var dmgP1 = 10 * evalDmgP1;
 		var dmgP2 = 10 * evalDmgP2;
-		
+
 		// shoot one
 		shoot(_playerOne, _playerTwo, dmgP1, _images.bulletRed);
 		// shoot two with delay
@@ -598,11 +607,11 @@
 			return;
 		}
 		VERILINKS.unlock();
-		
+
 		// reset dmg
 		evalDmgP1 = 1;
 		evalDmgP2 = 1;
-		
+
 		// round countdown
 		startCountdown();
 	};
@@ -629,16 +638,16 @@
 			document.getElementById("menu").style.display = "none";
 		}
 		// document.getElementById("equipmentBtn").onclick = function() {
-			// // show menuGear
-			// document.getElementById("menuGear").style.display = "";
-			// // hide menu
-			// document.getElementById("menu").style.display = "none";
+		// // show menuGear
+		// document.getElementById("menuGear").style.display = "";
+		// // hide menu
+		// document.getElementById("menu").style.display = "none";
 		// }
 		// document.getElementById("mgEquippedBackBtn").onclick = function() {
-			// // hide menuGear
-			// document.getElementById("menuGear").style.display = "none";
-			// // show menu
-			// document.getElementById("menu").style.display = "";
+		// // hide menuGear
+		// document.getElementById("menuGear").style.display = "none";
+		// // show menu
+		// document.getElementById("menu").style.display = "";
 		// }
 		document.getElementById("menuBackBtn").onclick = function() {
 			// hide all
@@ -745,7 +754,7 @@
 	}
 
 	function endGame() {
-		if(_winner != null)
+		if (_winner != null)
 			alert("Game Over! Winner: " + _winner.getName());
 		else
 			alert("The Game ended in a DRAW!");
@@ -765,38 +774,37 @@
 		var anim = ANIM.shootDino();
 		// var anim = ANIM.shootCheetah();
 		var config = {
-		y : _options.height / 2 - 70,
-		animation : 'shoot',
-		animations : anim,
-		frameRate : 4,
-		index : 0
+			y : _options.height / 2 - 70,
+			animation : 'shoot',
+			animations : anim,
+			frameRate : 4,
+			index : 0
 		};
 		var img = anim.img;
 		var dmg = 10;
 		// createTestBtn(shootSprite, _playerTwo, _playerOne, dmg, img, config);
 		createTestBtn(shootSprite, _playerOne, _playerTwo, dmg, img, config);
 	}
-	
 	function createTestBtn(callback, fromPlayer, toPlayer, damage, image, config) {
 		var fPlayer = fromPlayer;
 		var tPlayer = toPlayer;
 		var dmg = damage;
 		var img = image;
 		var conf = config;
-		
+
 		var element = document.createElement("input");
 		element.setAttribute("type", "button");
 		element.setAttribute("value", "shoot");
 		element.setAttribute("name", "button3");
 		element.setAttribute("id", "boo");
 		element.addEventListener('click', function() {
-		if ( typeof callback !== "undefined")
-			callback(fPlayer, tPlayer, dmg, img, conf);
+			if ( typeof callback !== "undefined")
+				callback(fPlayer, tPlayer, dmg, img, conf);
 		}, false);
 		document.getElementById("gameContainer").appendChild(element);
 
 		// if ( typeof callback !== "undefined")
-			// callback(arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]);
+		// callback(arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]);
 
 	}
 
@@ -867,21 +875,21 @@
 			var step = (toPlayer.x - fromPlayer.x) / steps;
 
 			var anim = new Kinetic.Animation(function(frame) {
-					if ((bulletSprite.getX() >= endX && toPlayer.x > fromPlayer.x) || (bulletSprite.getX() <= endX && toPlayer.x < fromPlayer.x)) {
-						// clear animation
-						anim.stop();
-						anim = null;
-						bulletSprite.remove();
-						projectileLayer.remove();
-						bulletSprite = null;
-						// // show explosion
-						createExplosion(toPlayer);
-						// // damage
-						damagePlayer(toPlayer, damage);
-					} else {
-						bulletSprite.move(step, 0);
-					}
-				},projectileLayer);
+				if ((bulletSprite.getX() >= endX && toPlayer.x > fromPlayer.x) || (bulletSprite.getX() <= endX && toPlayer.x < fromPlayer.x)) {
+					// clear animation
+					anim.stop();
+					anim = null;
+					bulletSprite.remove();
+					projectileLayer.remove();
+					bulletSprite = null;
+					// // show explosion
+					createExplosion(toPlayer);
+					// // damage
+					damagePlayer(toPlayer, damage);
+				} else {
+					bulletSprite.move(step, 0);
+				}
+			}, projectileLayer);
 			anim.start();
 		};
 		imageObj.src = img;
@@ -907,9 +915,10 @@
 		console.log("name: " + userName);
 		console.log("pic: " + userAvatar);
 		document.getElementById("login").innerHTML = "";
-		
+
 		// backgroundcolor
 		document.getElementsByTagName("body")[0].style.backgroundColor = "black";
+		document.getElementById("login").style.backgroundColor = "black";
 
 		// update players
 		this.initPlayers();

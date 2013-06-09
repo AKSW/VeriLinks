@@ -7,6 +7,25 @@ body {
 a {
 	color: #fff;
 }
+/*loading*/
+#loadingScreen{
+	background-color: #141E26;
+	color: #8EA676;
+	margin-left: 20px;
+	text-align: center;
+}
+#progress{
+	background-color: #1E3640;
+	padding: 20px;
+	margin: 60px;
+	padding: 80px;
+	display:inline-block;
+	text-align: center;
+	-moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+}
 /*login*/
 #login{
 	background-color: #141E26;

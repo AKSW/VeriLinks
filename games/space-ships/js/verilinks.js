@@ -58,10 +58,10 @@ VERILINKS = (function() {
 	function insertScript(callback) {
 		var headID = document.getElementsByTagName("head")[0];
 		// jQuery
-		var jqueryScript = document.createElement('script');
-		jqueryScript.type = 'text/javascript';
-		jqueryScript.src = '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js';
-		jqueryScript.onload = function() {
+		// var jqueryScript = document.createElement('script');
+		// jqueryScript.type = 'text/javascript';
+		// jqueryScript.src = '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js';
+		// jqueryScript.onload = function() {
 			// openlayers
 			var mapScript = document.createElement('script');
 			mapScript.src = 'http://www.openlayers.org/api/OpenLayers.js';
@@ -87,10 +87,10 @@ VERILINKS = (function() {
 						callback();
 				}
 				headID.appendChild(jsrenderScript);
-			};
+			// };
 			headID.appendChild(mapScript);
 		}
-		headID.appendChild(jqueryScript);
+		// headID.appendChild(jqueryScript);
 	}
 
 	// ajax call to get new link, draw link as callback
