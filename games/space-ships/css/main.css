@@ -84,12 +84,22 @@ a {
 	margin-left: 120px;
 	padding: 40px 150px;
 	border: 1px solid black;
+	
+	-moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
 	/*-moz-box-shadow:    1px 1px 3px 3px darkgrey;
 	 -webkit-box-shadow: 1px 1px 3px 3px darkgrey;
 	 box-shadow:         1px 1px 3px 3px darkgrey;*/
 }
+#menu button{
+color: #141E26;
+width: 250px;	
+font: 25px MisoRegular;
 
-#menu button {
+}
+/*#menu button {
 	color: #141E26;
 	border: 1px solid black;
 	width: 250px;
@@ -102,10 +112,7 @@ a {
 	padding: .5em 2em .55em;
 	text-shadow: 0 1px 1px rgba(0,0,0,.3);
 	background-color: #8EA676;
-	/*-moz-box-shadow:    1px 1px 3px 3px #141E26;
-	 -webkit-box-shadow: 1px 1px 3px 3px #141E26;
-	 box-shadow:         1px 1px 3px 3px #141E26;*/
-}
+}*/
 #menu button:hover {
 	text-decoration: none;
 }
@@ -119,10 +126,17 @@ a {
 	background-color: #8EA676;
 	border: 1px solid black;
 	margin: 20px;
-	padding: 5px;
+	padding: 20px 30px;
 	width:700px;
+	
+	-moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
 }
-
+#menuHelp h2{
+	border-bottom: 1px solid darkgrey;
+}
 
 /* EQUIPMENT tabs-----------------------------------------------------------*/
 .w3c {

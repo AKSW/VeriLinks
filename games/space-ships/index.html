@@ -18,7 +18,7 @@
 		<script data-main="js/main" src="js/require.js"></script>
 	</head>
 	<body>
-		<div id="fb-root"></div>
+		<!-- <div id="fb-root"></div> -->
 		<!-- TODO: StartPage -->
 		<div id="loadingScreen" class="hero-unit">
 			<h1>Spaceship Game</h1>
@@ -74,7 +74,6 @@
 				    <a href="#" onclick="loginNormal()" class="btn btn-primary">Go!</a>
 				</div>
 			</div>
-
 		</div>
 
 		<!-- gfx container -->
@@ -112,9 +111,10 @@
 				Menu
 			</p>
 			<p class='vertical-align'>
-				<button id="playBtn">
+				<!-- <button id="playBtn">
 					Play
-				</button>
+				</button> -->
+				<button id="playBtn" class="btn btn-success btn-large">Play</button>
 			</p>
 			<!-- <p class='vertical-align'><button id="multiplayer">
 			Multiplayer
@@ -130,32 +130,28 @@
 				</button>
 			</p> -->
 			<p class='vertical-align'>
-				<button id="helpBtn">
+				<!-- <button id="helpBtn">
 					Help
-				</button>
+				</button> -->
+				<button id="helpBtn" class="btn btn-info btn-large">Help</button>
 			</p>
 		</div>
 
 		<!-- menu help  -->
 		<div id="menuHelp" style="display:none">
-			<div class="">
-				<div id="menuGearstats">
-					<h2>Help</h2>
-					<div class='box'>
-						<p> Target of the game is to destroy an enemy’s ship before he destroys yours. 
+					<h2 >Help</h2>
+					<p style="margin:20px"> Target of the game is to destroy an enemy’s ship before he destroys yours. 
 							<br><br>The game progresses in <b>4 rounds</b> with <b>each round</b> taking <b>20 seconds</b> to complete. 
-							<br>During the round you have to try to verify as many links as possible. 
+							<br>During every round you have to try to verify as many links as possible. 
 							<br><br>Damage done to the enemy ship is calculated at the end of the round and it's 
-							based on the <b>number of verified links</b> as well as the <b>precision of the verification</b>. 
-							<br><br>The game is still under development. </p>
-					</div>
-				</div>
-				<p style="text-align:right;margin-right:20px">
-					<button id='menuBackBtn' style>
+							based on the <b>number of verified links</b> as well as the <b>precision of the verification</b>.
+					</p>
+					<p>*Note: The game is still under development</p>
+					<p style="text-align:right;margin-right:20px">
+					<button id='menuBackBtn' class="btn btn-primary btn-medium">
 						Back
 					</button>
-				</p>
-			</div>
+					</p>
 		</div>
 		<!-- menu gear -->
 		<div id="menuGear" style="display:none">
