@@ -35,3 +35,25 @@ enemy ship is calculated at the end of the turn and it's based on the number of 
 links as well as the precision of verification.
 
 
+
+### Building the verilinks server (needed by the games)
+```bash
+cd verilinks-server
+mvn clean install
+mvn jetty:run
+```
+
+Configure the games with [http://localhost:8080/](http://localhost:8080/).
+
+Games will try to find the API by appending `/server` to the URL [http://localhost:8080/server/](http://localhost:8080/server/)
+
+
+
+### Launching pea invasion
+```bash
+cd games/pea-invasion
+mvn clean install -Dmaven.test.skip=true
+mvn gwt:run
+```
+
+

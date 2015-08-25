@@ -116,7 +116,10 @@ public class PeaInvasion extends HtmlGame {
 	// local test
 	// public static final String SERVER_URL
 	// ="http://localhost:8080/verilinks-server/";
-	public static final String SERVER_URL = "http://verilinks.aksw.org/";
+	
+    //public static final String SERVER_URL = "http://verilinks.aksw.org/";
+	public static final String SERVER_URL = "http://localhost:8080/";
+	
 	/** Semantic Web nerd, or newbie. */
 	private Configuration config;
 
