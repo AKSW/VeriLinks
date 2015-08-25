@@ -39,6 +39,13 @@ links as well as the precision of verification.
 ### Building the verilinks server (needed by the games)
 ```bash
 cd verilinks-server
+
+cp src/main/resources/db_settings.ini.dist src/main/resources/db_settings.ini
+
+# Adapt the db settings - the db schema will be automatically created
+vim src/main/resources/db_settings.ini
+
+
 mvn clean install
 mvn jetty:run
 ```
