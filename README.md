@@ -37,6 +37,11 @@ links as well as the precision of verification.
 
 
 ### Building the verilinks server (needed by the games)
+
+The verilinks-server can be run from the Java IDE of your choice (e.g. Eclipse, Netbeans, IntelliJ, ...)
+using the main class org.aksw.verilinks.server.MainVerilinksService
+Alterantively, you can run the server from the command line with `jetty:run`.
+
 ```bash
 cd verilinks-server
 

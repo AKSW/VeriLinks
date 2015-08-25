@@ -19,7 +19,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
  *
  *         http://kielczewski.eu/2013/11/using-embedded-jetty-spring-mvc/
  */
-public class MainVerlinkServer {
+public class MainVerlinksServer {
 
     public static void main(String[] args) {
         startServer(8080);
@@ -27,7 +27,7 @@ public class MainVerlinkServer {
     
     public static Server startServer(int port) {
         // Not sure if using this class always works as expected
-        Server result = startServer(MainVerlinkServer.class, port);
+        Server result = startServer(MainVerlinksServer.class, port);
         return result;
     }
 
