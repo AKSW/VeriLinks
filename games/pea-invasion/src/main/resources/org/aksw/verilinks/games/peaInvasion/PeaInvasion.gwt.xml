@@ -25,7 +25,8 @@
   <inherits name="com.allen_sauer.gwt.voices.gwt-voices" />
   <inherits name="com.google.gwt.webgl.WebGL" />
   <!-- Google Maps -->
-  <inherits name='com.google.gwt.maps.Apis_Google_Maps'/>
+  <!-- <inherits name='com.google.gwt.maps.Apis_Google_Maps'/> -->
+  <inherits name='com.google.gwt.maps.Maps'/>
   
   <!-- Specify the app entry point class.                         -->
   <entry-point class='org.aksw.verilinks.games.peaInvasion.client.PeaInvasion' />

@@ -6,4 +6,7 @@
 *.ear
 
 verilinks-core/
+
 .project
+.settings
+target

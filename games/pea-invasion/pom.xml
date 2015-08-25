@@ -87,19 +87,47 @@
 		</dependency>
 
 
+
+
+<dependency>
+	<groupId>com.github.branflake2267</groupId>
+	<artifactId>gwt-maps-api</artifactId>
+	<version>3.10.0-alpha-6</version>
+<exclusions><exclusion><groupId>com.google.gwt</groupId><artifactId>gwt-dev</artifactId></exclusion></exclusions>
+</dependency>
+
+<!--
+<dependency>
+	<groupId>com.google.gwt.google-apis</groupId>
+	<artifactId>gwt-ajaxloader</artifactId>
+	<version>1.1.0</version>
+</dependency>
+
+<dependency>
+	<groupId>com.google.gwt.google-apis</groupId>
+	<artifactId>gwt-maps</artifactId>
+	<version>1.0.4</version>
+</dependency>
+-->
 		<!-- local mvn repo -->
+
+
+<!--
 		<dependency>
-			<groupId>com.google.gwt.maps</groupId>
+			<groupId>com.github.branflake2267</groupId>
 			<artifactId>gwt-maps-v3-api</artifactId>
-			<version>1.0</version>
+			<version>3.10.0-alpha-6</version>
 			<type>jar</type>
 		</dependency>
+-->
+<!--
 		<dependency>
-			<groupId>com.google.gwt.ajaxloader</groupId>
+			<groupId></groupId>
 			<artifactId>ajaxloader</artifactId>
-			<version>1.0</version>
+			<version>1.1.0</version>
 			<type>jar</type>
 		</dependency>
+-->
 	</dependencies>
 
 
