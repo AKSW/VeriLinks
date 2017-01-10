@@ -26,8 +26,8 @@ Upon entering your user name, the mode in which you will be prompted for tasks w
 
 # Team
 
-Gordian Dziwis
-Claus Stadler (http://aksw.org/ClausStadler)
-Jens Lehmann (http://jens-lehmann.org/)
+* Gordian Dziwis
+* [Claus Stadler](http://aksw.org/ClausStadler)
+* [Jens Lehmann](http://jens-lehmann.org/)
 
 
