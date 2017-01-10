@@ -19,8 +19,14 @@ Upon entering your user name, the mode in which you will be prompted for tasks w
 ![VeriTask ability](images/veritask-ability.png)
 
 
-## Ok, enough text, let me play!
+## Got it, let's play!
 
 [Click here to play!](http://138.68.87.150/)
+
+# Team
+
+Gordian Dziwis
+Claus Stadler (http://aksw.org/ClausStadler)
+Jens Lehmann (http://jens-lehmann.org/)
 
 
