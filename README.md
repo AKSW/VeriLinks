@@ -1,4 +1,5 @@
 # Verilinks: Crowd Sourcing Link Evaluation
+(For the impatient: The link to the game is [near the bottom of the page](#letsplay))
 
 ![VeriTask vanilla](images/veritask-vanilla.png)
 
@@ -19,7 +20,7 @@ Upon entering your user name, the mode in which you will be prompted for tasks w
 ![VeriTask ability](images/veritask-ability.png)
 
 
-## Got it, let's play!
+## <a name="letsplay"></a>Got it, let's play!
 
 [Click here to play!](http://138.68.87.150/)
 
