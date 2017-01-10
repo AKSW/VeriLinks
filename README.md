@@ -24,6 +24,8 @@ Upon entering your user name, the mode in which you will be prompted for tasks w
 
 [Click here to play!](http://138.68.87.150/)
 
+Issues, Feedback, Comments? Please use the [issue tracker](https://github.com/AKSW/VeriLinks/issues).
+
 # Team
 
 * Gordian Dziwis
